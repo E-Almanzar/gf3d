@@ -1,0 +1,62 @@
+#ifndef __ENTITY_H__
+#define __ENTITY_H__
+
+#include "gfc_text.h"
+//#include "vector.h"
+//#include "matrix.h"
+//#include "primitives.h"
+#include "gf3d_mesh.h"
+#include "gf3d_texture.h"
+
+
+typedef struct Entity_S{
+    Uint8           _inuse;
+    GFC_TextLine    name;
+    Mesh            *mesh;
+    Texture         *texture;
+    GFC_Color       color;
+    GFC_Matrix4     matrix;
+    GFC_Vector3D    position;
+    GFC_Vector3D    rotation;
+    GFC_Vector3D    scale;
+    // GFC_Primitive   collision; //Not a mesh primitive
+    GFC_Box         bounds;
+    void            (*draw)(struct Entity_S *self);
+    void            (*think)(struct Entity_S *self);
+    void            (*update)(struct Entity_S *self);
+} Entity;
+
+/*
+    Were rendering to a matrix
+*/
+
+/*
+    @brief get a new pointer to a blank entity
+    @return NULL on out of memory or other error a pointer to a blank entity otherwise
+*/
+Entity *entity_new();
+
+/*
+    @brief free a previously new'd entity
+    @param ent the entity to be free'd
+    @note memory address should no longer be used
+*/
+void entity_free(Entity *ent);
+/*
+    @
+*/
+void entity_system_init(Uint32 max_ents);
+
+
+/*
+    Function pointers
+*/
+void entity_system_draw_all();
+
+void entity_system_think_all();
+
+void entity_system_update_all();
+
+
+
+#endif
