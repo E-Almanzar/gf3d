@@ -12,7 +12,7 @@ static EntitySystem entity_system = {0};
     @brief get a new pointer to a blank entity
     @return NULL on out of memory or other error a pointer to a blank entity otherwise
 */
-Entity *entity_new(){
+/*Entity *entity_new(){
     int i;
     for(i = 0; i < entity_system.entity_max; i++){
         if(!entity_system.entity_list[i]._inuse){
@@ -25,7 +25,7 @@ Entity *entity_new(){
         } 
     
     }
-}
+}*/
 
 /*
     @brief free a previously new'd entity
@@ -66,16 +66,17 @@ void entity_system_init(Uint32 max_ents){
     Function pointers
 */
 //a void pointer for entity draw?
+/*
 void entity_system_draw_all(){
 
     int i;
     for(i = 0; i < entity_system.entity_max; i++){
         if(!entity_system.entity_list[i]._inuse){
             //If its in use draw it
-            entity_draw(&entity_system.entity_list[i]);
+            //entity_draw(&entity_system.entity_list[i]);
         } 
     }
-}
+}*/
 
 void entity_system_think_all();
 
