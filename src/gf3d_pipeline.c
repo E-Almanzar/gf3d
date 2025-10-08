@@ -78,6 +78,7 @@ void gf3d_pipeline_call_render(
     vkCmdBindDescriptorSets(pipe->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
     if (indexBuffer != VK_NULL_HANDLE)vkCmdDrawIndexed(pipe->commandBuffer, vertexCount, 1, 0, 0, 0);
     else vkCmdDraw(pipe->commandBuffer, vertexCount,1,0,0);
+    // slog("~~~%i", vertexCount);
 }
 
 void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawCall)
@@ -131,6 +132,7 @@ void gf3d_pipeline_render_drawcall(Pipeline *pipe,PipelineDrawCall *drawCall)
         drawCall->vertexBuffer,
         drawCall->vertexCount,
         drawCall->indexBuffer);
+        //slog("Here?");
 }
 
 void gf3d_pipeline_render_all_drawcalls(Pipeline *pipe)
@@ -198,6 +200,7 @@ void gf3d_pipeline_queue_render(
     drawCall->indexBuffer = indexBuffer;
     drawCall->texture = texture;
     memcpy(drawCall->uboData,uboData,pipe->uboDataSize);
+    //slog("In here");
 }
 
 void gf3_pipeline_update_ubos(Pipeline *pipe)

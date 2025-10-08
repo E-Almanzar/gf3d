@@ -44,7 +44,7 @@ int main(int argc,char *argv[])
     Texture *texture;
     float theta = 0;
     GFC_Vector3D cam = {0,50,0};
-    GFC_Matrix4 id,dinoM;
+    GFC_Matrix4 id, dinoM;
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
@@ -66,8 +66,10 @@ int main(int argc,char *argv[])
     mesh = gf3d_mesh_load("models/dino/dino.obj");
     texture = gf3d_texture_load("models/dino/dino.png");
     gfc_matrix4_identity(id);
+    if(mesh){slog("Mesh in game.c");}
     
     gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
+    
     while(!_done)
     {
         gfc_input_update();
@@ -78,7 +80,7 @@ int main(int argc,char *argv[])
         gfc_matrix4_rotate_z(dinoM,id,theta);
         //camera updaes
         gf3d_camera_update_view();
-        gf3d_vgraphics_render_start();
+        gf3d_vgraphics_render_start(); // No updates between render start and render end
                 //3D draws
                 gf3d_mesh_draw(mesh,dinoM,GFC_COLOR_WHITE,texture);
                 //2D draws
