@@ -24,6 +24,8 @@ typedef struct
     GFC_Matrix4     proj;
     GFC_Vector4D    color;
     GFC_Vector4D    camera;
+    GFC_Vector4D    lightPos;
+    GFC_Vector4D    lightColor;
 }MeshUBO;
 
 typedef struct
@@ -82,7 +84,7 @@ Mesh *gf3d_mesh_load(const char *filename);
 /**
  * @brief draw a mesh given the parameters
  */
-void gf3d_mesh_draw(Mesh *mesh,GFC_Matrix4 modelMat,GFC_Color mod,Texture *texture);
+void gf3d_mesh_draw(Mesh *mesh,GFC_Matrix4 modelMat,GFC_Color mod, Texture *texture, GFC_Vector3D lightPos, GFC_Color lightColor);
 
 /**
  * @brief allocate a zero initialized mesh primitive

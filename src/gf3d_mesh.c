@@ -65,7 +65,7 @@ Mesh *gf3d_mesh_get_by_filename(const char *filename);
 
 static MeshManager mesh_manager = {0};
 
-void gf3d_mesh_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture){
+void gf3d_mesh_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture, GFC_Vector3D lightPos, GFC_Color lightColor){
 
     MeshUBO ubo = {0};
 
@@ -75,8 +75,8 @@ void gf3d_mesh_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *te
     gf3d_vgraphics_get_projection_matrix(&ubo.proj);
 
     ubo.color = gfc_color_to_vector4f(mod);
-    //ubo.lightColor = gfc_color_to_vector4f(lightColor);
-    //ubo.lightPos = gfc_vector3dw(lightPos,1.0);
+    ubo.lightColor = gfc_color_to_vector4f(lightColor);
+    ubo.lightPos = gfc_vector3dw(lightPos,1.0);
     ubo.camera = gfc_vector3dw(gf3d_camera_get_position(),1.0);
     gf3d_mesh_queue_render(mesh, mesh_manager.pipe,&ubo, texture);
 }
@@ -265,19 +265,19 @@ Mesh *gf3d_mesh_load(const char *filename){
     }
 
     // Per prim...?
-    slog("Per prim");
+    //slog("Per prim");
     prim->objData = objdata;
     
     gf3d_mesh_primitive_create_vertex_buffers(prim);
     gf3d_mesh_setup_face_buffers(prim);
-    slog("In meshload facecount: %i, vertexcount: %i", prim->faceCount, prim->vertexCount);
+    //slog("In meshload facecount: %i, vertexcount: %i", prim->faceCount, prim->vertexCount);
     Vertex *vdata = prim->objData->faceVertices;
     for (int i = 0; i <3 && i< prim->vertexCount; i++){
-        slog("V[%d]=(%.2f,%.2f,%.2f)", i, vdata[i].vertex.x, vdata[i].vertex.y, vdata[i].vertex.z);
+        //slog("V[%d]=(%.2f,%.2f,%.2f)", i, vdata[i].vertex.x, vdata[i].vertex.y, vdata[i].vertex.z);
     }
     Face *fdata = prim->objData->outFace;
     for (int i = 0; i <3 && i< prim->faceCount; i++){
-        slog("V[%d]=(%.2f,%.2f,%.2f)", i, fdata[i].verts); //fdata[i].vertex.y, fdata[i].vertex.z);
+        //slog("V[%d]=(%.2f,%.2f,%.2f)", i, fdata[i].verts); //fdata[i].vertex.y, fdata[i].vertex.z);
     }
     
     //slog("After per prim, 1");

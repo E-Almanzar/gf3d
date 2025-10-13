@@ -2,12 +2,11 @@
 #define __ENTITY_H__
 
 #include "gfc_text.h"
-//#include "vector.h"
-//#include "matrix.h"
-//#include "primitives.h"
+#include "gfc_vector.h"
+#include "gfc_matrix.h"
+#include "gfc_primitives.h"
 #include "gf3d_mesh.h"
 #include "gf3d_texture.h"
-
 
 typedef struct Entity_S{
     Uint8           _inuse;
@@ -19,11 +18,15 @@ typedef struct Entity_S{
     GFC_Vector3D    position;
     GFC_Vector3D    rotation;
     GFC_Vector3D    scale;
+    GFC_Vector3D    velocity;
+    float           speed;
+
     // GFC_Primitive   collision; //Not a mesh primitive
     GFC_Box         bounds;
     void            (*draw)(struct Entity_S *self);
     void            (*think)(struct Entity_S *self);
     void            (*update)(struct Entity_S *self);
+    Uint8           doGenericUpdate;
 } Entity;
 
 /*

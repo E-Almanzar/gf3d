@@ -21,6 +21,8 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_camera.h"
 #include "gf3d_mesh.h"
+#include "entity.h"
+#include "monster.h"
 
 extern int __DEBUG;
 
@@ -40,11 +42,11 @@ void exitGame()
 int main(int argc,char *argv[])
 {
     //local variables
-    Mesh *mesh;
-    Texture *texture;
+    //Mesh *mesh;
+    //Texture *texture;
     float theta = 0;
     GFC_Vector3D cam = {0,50,0};
-    GFC_Matrix4 id, dinoM;
+    //GFC_Matrix4 id, dinoM;
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
@@ -59,30 +61,44 @@ int main(int argc,char *argv[])
     gf2d_actor_init(1000);
     
     //game init
+    entity_system_init(1024);
     srand(SDL_GetTicks());
     slog_sync();
     gf2d_mouse_load("actors/mouse.actor");
     // main game loop    
-    mesh = gf3d_mesh_load("models/dino/dino.obj");
-    texture = gf3d_texture_load("models/dino/dino.png");
-    gfc_matrix4_identity(id);
-    if(mesh){slog("Mesh in game.c");}
-    
+    //mesh = gf3d_mesh_load("models/dino/dino.obj");
+    //texture = gf3d_texture_load("models/dino/dino.png");
+    //gfc_matrix4_identity(id);
+    //if(mesh){slog("Mesh in game.c");}
+    GFC_Vector3D lightdir =  gfc_vector3d(5,0,5); 
+    // First is horizontal, then depth? then vertical
+    GFC_Vector3D startpos =  gfc_vector3d(0,0,0); 
+
     gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
     
+    for(int i = 0; i < 1024; i++){
+        monster_spawn(gfc_vector3d(gfc_crandom()*150,gfc_crandom()*100,gfc_crandom()*20), gfc_color(gfc_random(), gfc_random(), gfc_random(), 1));
+    }
+    
+    
+    monster_spawn(startpos, GFC_COLOR_WHITE);
     while(!_done)
     {
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
+        // Think all and update all
+        entity_system_think_all();
+        entity_system_update_all();
         //world updates
-        theta += 0.1;
-        gfc_matrix4_rotate_z(dinoM,id,theta);
+        theta += 0.01;
+        //gfc_matrix4_rotate_z(dinoM,id,theta);
         //camera updaes
         gf3d_camera_update_view();
         gf3d_vgraphics_render_start(); // No updates between render start and render end
                 //3D draws
-                gf3d_mesh_draw(mesh,dinoM,GFC_COLOR_WHITE,texture);
+                //gf3d_mesh_draw(mesh,dinoM,GFC_COLOR_WHITE,texture,lightdir, GFC_COLOR_WHITE);
+                entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
                 //2D draws
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
                 gf2d_mouse_draw();
