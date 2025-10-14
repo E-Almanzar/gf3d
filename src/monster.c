@@ -15,10 +15,12 @@ void monster_think(Entity *self){
     if(!self) return;
      
     //self->position.x += self->speed;
-    self->position.x += self->velocity.x;
+    //self->position.x += self->velocity.x;
     //slog("Monster thinking?");
 
     self->rotation.z += self->speed;
+    //self->rotation.x += self->speed;
+    //self->rotation.y += self->speed;
     //self->rotation.z += .1;
     if(fabs(self->position.x) > 150){
         //self->velocity.x *= -1;

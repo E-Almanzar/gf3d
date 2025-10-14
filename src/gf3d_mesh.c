@@ -43,6 +43,7 @@ typedef struct {
     Uint32          chain_length;     /**<length of swap chain*/
     VkDevice        device;           /**<logical vulkan device*/
     Pipeline        *pipe;             /**<the pipeline associated with sprite rendering*/
+    Pipeline        *sky_pipe; 
     VkBuffer        faceBuffer;       /**<memory handle for the face buffer (always two faces)*/
     VkDeviceMemory  faceBufferMemory; /**<memory habdle for the face memory*/
     //Do we need vertex buffers?
@@ -79,6 +80,29 @@ void gf3d_mesh_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *te
     ubo.lightPos = gfc_vector3dw(lightPos,1.0);
     ubo.camera = gfc_vector3dw(gf3d_camera_get_position(),1.0);
     gf3d_mesh_queue_render(mesh, mesh_manager.pipe,&ubo, texture);
+}
+
+void gf3d_sky_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture){
+
+    SkyUBO ubo = {0};
+
+    if (!mesh)return;
+    gfc_matrix4_copy(ubo.model,modelMat);
+    gf3d_vgraphics_get_view(&ubo.view);
+    ubo.view[0][3] = 0;
+    ubo.view[1][3] = 0;
+    ubo.view[2][3] = 0;
+    ubo.view[3][0] = 0;
+    ubo.view[3][1] = 0;
+    ubo.view[3][2] = 0;
+
+    gf3d_vgraphics_get_projection_matrix(&ubo.proj);
+
+    //for the matrix make sure its zeroed
+
+
+    ubo.color = gfc_color_to_vector4f(mod);
+    gf3d_mesh_queue_render(mesh, mesh_manager.sky_pipe,&ubo, texture);
 }
 void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe, void  *uboData, Texture *texture)
 {
@@ -146,6 +170,19 @@ void gf3d_mesh_init(Uint32 mesh_max)
     mesh_manager.device = gf3d_vgraphics_get_default_logical_device();
 
     gf3d_mesh_get_attribute_descriptions(&count);
+
+    //Sky pipeline- it should be before 
+    mesh_manager.sky_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/sky_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_manager_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        sizeof(SkyUBO),
+        VK_INDEX_TYPE_UINT16
+    );
     mesh_manager.pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/model_pipeline.cfg",
@@ -157,6 +194,9 @@ void gf3d_mesh_init(Uint32 mesh_max)
         sizeof(MeshUBO),
         VK_INDEX_TYPE_UINT16
     );
+    
+
+
     mesh_manager.defaultTexture = gf3d_texture_load("images/default.png");
     if(__DEBUG)slog("mesh manager initiliazed");
     //atexit(gf3d_mesh_manager_close);
@@ -271,7 +311,7 @@ Mesh *gf3d_mesh_load(const char *filename){
     gf3d_mesh_primitive_create_vertex_buffers(prim);
     gf3d_mesh_setup_face_buffers(prim);
     //slog("In meshload facecount: %i, vertexcount: %i", prim->faceCount, prim->vertexCount);
-    Vertex *vdata = prim->objData->faceVertices;
+    /*Vertex *vdata = prim->objData->faceVertices;
     for (int i = 0; i <3 && i< prim->vertexCount; i++){
         //slog("V[%d]=(%.2f,%.2f,%.2f)", i, vdata[i].vertex.x, vdata[i].vertex.y, vdata[i].vertex.z);
     }
@@ -279,7 +319,7 @@ Mesh *gf3d_mesh_load(const char *filename){
     for (int i = 0; i <3 && i< prim->faceCount; i++){
         //slog("V[%d]=(%.2f,%.2f,%.2f)", i, fdata[i].verts); //fdata[i].vertex.y, fdata[i].vertex.z);
     }
-    
+    */
     //slog("After per prim, 1");
     gfc_list_append(mesh->primitives, prim);
     return mesh;
@@ -290,7 +330,9 @@ Mesh *gf3d_mesh_load(const char *filename){
 Mesh *gf3d_mesh_new(){
     int i;
     for(i = 0; i < mesh_manager.mesh_count ; i++){
-        if(mesh_manager.mesh_list[i]._refCount) continue;
+            slog("continue");
+
+        if(mesh_manager.mesh_list[i]._refCount) {continue;}
         memset (&mesh_manager.mesh_list[i], 0, sizeof(Mesh)); 
         mesh_manager.mesh_list[i]._refCount = 1;
         mesh_manager.mesh_list[i].primitives = gfc_list_new(); 
@@ -493,9 +535,9 @@ void gf3d_mesh_init(Uint32 mesh_max){
     gf3d_mesh_manager_init(mesh_max);
     //gfc_allocate_array(mesh_)
     //mesh_manager.chain_length = gfc_edge_length();
-    /*manager chain gfc_edge_length
+    manager chain gfc_edge_length
 manager mesh list allocate
-????/
+????
 }
 
 void gf3d_mesh_setup_face_buffers(MeshPrimitive *prim, Face *faces, Uint32 fcount){
@@ -527,13 +569,13 @@ void gf3d_mesh_setup_face_buffers(MeshPrimitive *prim, Face *faces, Uint32 fcoun
 
 void gf3d_mesh_primitive_create_vertex_buffers(MeshPrimitive *prim)
 {
-    /* facecount, vertcount, face list and face count?, buffersize
+     facecount, vertcount, face list and face count?, buffersize
 
         Face buffer vs vertex buffers???? I copy pasted face to here
 
 
         OK so now i have a very messy create vertex buffer that uses faceVerticies, but even now im not so sure what to do 
-    /
+    
     void *data = NULL;
     Vertex *vertices;
     Uint32 vcount;
@@ -543,9 +585,9 @@ void gf3d_mesh_primitive_create_vertex_buffers(MeshPrimitive *prim)
     vertices = prim->objData->faceVertices; //!!!!!!!!!!!! outface is for faces
     vcount = prim->objData->vertex_count; //basically vertecies and vcount
     //slog("fcount=%u", prim->objData->vertex_count);
-    /*for (int i = 0; i <3 && i< fcount; i++){
+    for (int i = 0; i <3 && i< fcount; i++){
         slog("V[%d]=(%f,%f,%f)", i, faces[i].vertex.x, faces[i].vertex.y, faces[i].vertex.z);
-    }/
+    }
 
     bufferSize = sizeof(Vertex) * vcount; //vertex -> face -> vertex
     
@@ -698,14 +740,14 @@ void gf3d_mesh_draw(Mesh * mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *t
     //if(!texture) texture = mesh_manager // load the default texture in the manager not the draw manager.default
 
     //if(!texture) texure = mesh_manager.de //default again
-    /*gf3d_pipeline_queue_render(
+    gf3d_pipeline_queue_render(
         pipe
         prim->vertexBuffer, 
         prim
         ..
         uboData
         texture
-    )/
+    )
 }
 
 
@@ -718,7 +760,7 @@ Pipeline *gf3d_mesh_get_pipeline(){
 void gf3d_mesh_delete(Mesh *mesh)
 {
     if (!mesh)return;
-    /*
+    
 
     TODO free up objdata
 
