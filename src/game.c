@@ -44,19 +44,19 @@ int main(int argc,char *argv[])
     //local variables
     //Mesh *mesh;
     //Texture *texture;
-    float theta = 0;
-    GFC_Vector3D cam = {0,50,0};
-   
+    float theta = 0;//, delta = .01;
+    GFC_Vector3D cam = {0,10,10};
+    GFC_Vector3D lookingAt = gfc_vector3d(0,0,0);
     
     //Sky
     Mesh *sky_mesh;
     GFC_Matrix4 id;
     Texture *sky_texture;
-    
+    GFC_Matrix4 dinoM;
+
 
     gfc_matrix4_identity(id);
 
-    //GFC_Matrix4 id, dinoM;
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
@@ -81,21 +81,27 @@ int main(int argc,char *argv[])
     //texture = gf3d_texture_load("models/dino/dino.png");
     //gfc_matrix4_identity(id);
     //if(mesh){slog("Mesh in game.c");}
-    GFC_Vector3D lightdir =  gfc_vector3d(5,0,5); 
+    GFC_Vector3D lightdir = gfc_vector3d(5,0,5); 
     // First is horizontal, then depth? then vertical
-    GFC_Vector3D startpos =  gfc_vector3d(0,0,0); 
+    //GFC_Vector3D startpos =  gfc_vector3d(0,0,0); 
     sky_mesh = gf3d_mesh_load("models/sky/sky.obj");
     sky_texture = gf3d_texture_load("models/sky/sky.png");
 
     gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
-    
-    for(int i = 0; i < 1; i++){
+    //theta = 1;
+    /*for(int i = 0; i < 1023; i++){
         monster_spawn(gfc_vector3d(gfc_crandom()*150,gfc_crandom()*100,gfc_crandom()*20), gfc_color(gfc_random(), gfc_random(), gfc_random(), 1));
     }
     
     
-    monster_spawn(startpos, GFC_COLOR_WHITE);
+    //monster_spawn(startpos, GFC_COLOR_WHITE);
     
+    //lookingAt.z -= GFC_HALF_PI;
+    //lookingAt.x -= GFC_PI;
+    */
+
+    //World?
+    World * world = world_load("defs/terrain.def");
     while(!_done)
     {
         gfc_input_update();
@@ -104,17 +110,40 @@ int main(int argc,char *argv[])
         // Think all and update all
         entity_system_think_all();
         entity_system_update_all();
+        
         //world updates
-        theta += 0.01;
-        //gfc_matrix4_rotate_z(dinoM,id,theta);
+        /*theta += delta;
+        if(theta > 1 || theta < -1){
+            delta *= -1;
+        }
+        //lookingAt.x = theta; 
+        //lookingAt.z = theta;
+        //lookingAt.y = theta;
+        */
+
+        /*if(fabs(lookingAt.z) > GFC_PI){
+            //lookingAt.z = -GFC_HALF_PI;
+
+        }*/
+        //x moves up and down, and z left and right- lock it so that you dont see the skybox hole
+        //lookingAt.x += theta;
+        //lookingAt.z += theta;
+        //gf3d_camera_set_rotation(lookingAt);
+        //slog("%f: %f, %f, %f",theta, lookingAt.x, lookingAt.y, lookingAt.z);
+        //slog("%f, %f",theta, delta);
+        //gf3d_camera_look_at(lookingAt,&cam);
+        //cam.y+=theta;
+        theta += .01;
+
+        gfc_matrix4_rotate_z(dinoM,id,theta);
         //camera updaes
         gf3d_camera_update_view();
         gf3d_vgraphics_render_start(); // No updates between render start and render end
                 //3D draws
                 //gf3d_mesh_draw(mesh,dinoM,GFC_COLOR_WHITE,texture,lightdir, GFC_COLOR_WHITE);
+                world_draw(world, dinoM);
                 entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
                 gf3d_sky_draw(sky_mesh, id, GFC_COLOR_WHITE, sky_texture);
-
                 //2D draws
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
                 gf2d_mouse_draw();

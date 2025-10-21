@@ -1,0 +1,11 @@
+{
+    "world":
+    {
+        "terrainMesh":"models/mesh/Plane2.obj",
+        "terrainTexture":"models/mesh/Plane.xcf",
+        "lightColor": [255,255,255,255],
+        "lightPos": [10,10,10,10]
+
+    }
+
+}

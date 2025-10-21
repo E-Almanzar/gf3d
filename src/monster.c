@@ -59,7 +59,7 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color){
     //slog("WHAT %i", self->speed);
     self->rotation.z = 3.141592;
     
-    slog("Creating %s", self->mesh->filename);
+    //slog("Creating %s", self->mesh->filename);
 //Somewhere you need to pass the name!!!!!!111
     /*slog("checking everything mesh: %i, texture: %i, postion: %i",
         self->mesh != 0,

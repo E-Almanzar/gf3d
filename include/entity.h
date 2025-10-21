@@ -5,6 +5,7 @@
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
 #include "gfc_primitives.h"
+#include "world.h"
 #include "gf3d_mesh.h"
 #include "gf3d_texture.h"
 

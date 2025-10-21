@@ -1,11 +1,13 @@
 #include "simple_logger.h"
 #include "entity.h"
+#include "world.h"
 //List of mesh pointers to create a bunch of objs
 typedef struct{
     Entity *entity_list;
     Uint32 entity_max;
 
 }EntitySystem;
+
 
 static EntitySystem entity_system = {0};
 /*
@@ -148,3 +150,11 @@ void entity_system_update_all(){
     }
 }
 
+Uint8 entity_get_floor_position(Entity *entity, World *world){
+    
+    return 0;
+
+    GFC_Vector3D down;
+    GFC_Vector3D contact;
+    //return world_edge_test(entity,entity->position, down, contact);
+}

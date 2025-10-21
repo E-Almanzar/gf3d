@@ -329,9 +329,8 @@ Mesh *gf3d_mesh_load(const char *filename){
 
 Mesh *gf3d_mesh_new(){
     int i;
+    //for the mesh there is no mesh count?
     for(i = 0; i < mesh_manager.mesh_count ; i++){
-            slog("continue");
-
         if(mesh_manager.mesh_list[i]._refCount) {continue;}
         memset (&mesh_manager.mesh_list[i], 0, sizeof(Mesh)); 
         mesh_manager.mesh_list[i]._refCount = 1;
