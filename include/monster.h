@@ -5,6 +5,7 @@
 
 
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color);
+void monster_set_cam(Entity* self, Entity *cam);
 //?
 
 #endif

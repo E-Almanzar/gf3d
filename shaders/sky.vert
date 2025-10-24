@@ -29,7 +29,7 @@ void main()
     //positions
     matrix = mat3(mvp);
     gl_Position =  vec4(matrix * inPosition, 1.0); //I had the vec4 * matrix?
-   
+    //gl_Position =  matrix * vec4(inPosition, 1.0);
     //pass throughs
     colorMod = ubo.color;
     fragTexCoord = inTexCoord;

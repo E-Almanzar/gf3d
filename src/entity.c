@@ -14,6 +14,34 @@ static EntitySystem entity_system = {0};
     @brief get a new pointer to a blank entity
     @return NULL on out of memory or other error a pointer to a blank entity otherwise
 */
+/*
+    //real freaking cheap ass shadows
+    //a new thing in entity
+    //Tell it the flag Uint8 in the entity to draw the shadow
+    void entity_draw_shadow(Entity *ent){
+        if(!ent || !ent->drawshadow) return;
+        GFC_Matrix4 modelMat;
+        GFC_Vector3D drawPos;
+        gfc_vector3d_copy(drawPos, ent->position);
+        drawpos.z += .1;
+        gfc_matrix4_from_vectors(
+            modelMat,
+            ent->position,
+            ent->rotation,
+            gfc_vector3d(ent->scale.x, ent->scale.y, .01);
+        gf3d_mesh_draw(
+            ent->mesh,
+            modelMat,
+            gfc_color(0,0,0,120),
+            //ent->texture,
+            gfc_vector3d(0,0,0) 
+
+        );
+
+
+    }
+*/
+
 Entity *entity_new(){
     int i;
     for(i = 0; i < entity_system.entity_max; i++){
@@ -41,6 +69,11 @@ Entity *entity_new(){
 */
 void entity_free(Entity *ent){
     if(!ent){return;}
+    if(ent->free)ent->free(ent);
+    gf3d_mesh_free(ent->mesh);
+    gf3d_texture_free(ent->texture);
+    memset(ent,0,sizeof(Entity));
+
     //mesh and texture free?
     //This design pattern exist many places so we need to find it
 
@@ -93,6 +126,7 @@ void entity_draw(Entity *ent, GFC_Vector3D lightPos, GFC_Color lightColor){
         lightPos, //????
         lightColor
     );
+    //entity_draw_shadow(ent);
     //entity system init before srand sdl
 }
 

@@ -19,7 +19,7 @@ void main()
     //- +
     vec3 lightDir = normalize(worldPosition.xyz-lightPos.xyz);
     vec4 texColor = texture(texSampler, fragTexCoord);
-
+    //did he un negative the lightdir
     texColor.xyz = texColor.xyz * max(0.4,(dot(-lightDir,inNormal)+.2));
 
     outColor = texColor * colorMod;

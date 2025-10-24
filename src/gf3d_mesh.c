@@ -95,6 +95,7 @@ void gf3d_sky_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *tex
     ubo.view[3][0] = 0;
     ubo.view[3][1] = 0;
     ubo.view[3][2] = 0;
+    //ubo.view[3][3] = 0; //didnt have, but not the error I had
 
     gf3d_vgraphics_get_projection_matrix(&ubo.proj);
 
