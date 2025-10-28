@@ -7,9 +7,9 @@
 #include "world.h"
 
 static World * world; 
-
+//Did we scale the world?
 World * world_new(){
-    World * world;
+    //World * world;
     world = gfc_allocate_array(sizeof(World), 1);
     //do init
     return world;
@@ -56,7 +56,16 @@ void world_free(World * world){
 
 void world_draw(World * world, GFC_Matrix4 mat){
     //GFC_Matrix4 modelMat;
+    /*slog("NEW MAT:");
+    for(int i = 0; i < 4; i++){
+         for(int j = 0; j < 4; j++)
+         {
+            slog("mat: %f", mat[i][j]);
+         }
+    }*/
+
     gf3d_mesh_draw(world->mesh, mat, GFC_COLOR_WHITE, world->texture, world->lightPos, world->lightColor);
+    
 }
 
 //call this in your ent get floor position
@@ -94,12 +103,13 @@ Uint8 world_edge_test(World *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Ve
             t.c = prim->objData->faceVertices[prim->objData->outFace[j].verts[2]].vertex;
             //t.a prim obj faceVertices[ prim obj outFace [j].verts[0,1,2].vertex;
             //int x = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
-
-            /*if(gfc_triangle_edge_test(e,t,contact)) {
-                slog("returning True");
+           
+            //GFC_Edge3D e = gfc_edge3d_from_vectors(gfc_vector3d(0,0,0),gfc_vector3d(0,0,0));
+            if(gfc_trigfc_angle_edge_test(e,t,contact)) {
+                //slog("returning True");
                 return 1;
-            }*/
-           slog("triangle edge test failed i:%i j:", i, j);
+            }
+           //slog("triangle edge test failed i:%i j:", i, j);
         }
         
 
@@ -107,7 +117,8 @@ Uint8 world_edge_test(World *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Ve
     return 0;
 }
 
-World * world_get_the(){
+World* world_get_the(){
+    if(!world){slog("no world in world get");}
     return world;
 }
 /*

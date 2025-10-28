@@ -18,4 +18,5 @@ World * world_new();
 World * world_load(const char *name);
 World * world_get_the();
 void world_draw(World * world,GFC_Matrix4 mat);
+Uint8 world_edge_test(World *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Vector3D *contact);
 #endif

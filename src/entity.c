@@ -184,11 +184,43 @@ void entity_system_update_all(){
     }
 }
 
-Uint8 entity_get_floor_position(Entity *entity, World *world){
-    
-    return 0;
+Uint8 entity_get_floor_position(Entity *entity, World *world, GFC_Vector3D *contact){
+    GFC_Vector3D contactHold;
+    GFC_Vector3D downCheck, down, footpos;
+    int x;
+    float footoffset = 4.91;
+    downCheck = entity->position;
+    downCheck.z -= 500;
 
-    GFC_Vector3D down;
-    GFC_Vector3D contact;
-    //return world_edge_test(entity,entity->position, down, contact);
+    //TODO why does this happen, what do we need- ask in the discord
+    //is this a vector not moving 
+    //down.x =0; down.y =0; down.z = 0;
+    //instead of abovehead we need down
+    gfc_vector3d_add(down, entity->position, gfc_vector3d(0,0,3));
+    x = world_edge_test(world_get_the(), downCheck, down, &contactHold);
+    contact->x = contactHold.x;
+    contact->y = contactHold.y;
+    contact->z = contactHold.z+footoffset;
+    //contact = &contactHold;
+    //slog("%f, %f, %f",contact->x, contact->y, contact->z);
+    //gfc_vector3d_copy(contactHold, gfc_vector3d(contact->x, contact->y, contact->z+footoffset));
+    //slog("%f, %f, %f",contact->x, contact->y, contact->z);
+    
+
+    //gfc_vector3d_copy(footpos, gfc_vector3d(contact->x, contact->y, contact->z));
+    /*
+    if(x){
+        gfc_vector3d_copy(footpos, gfc_vector3d(contact->x, contact->y, contact->z+footoffset));
+        //No more snapping- maybe only return here?
+        //gfc_vector3d_copy(entity->position,footpos);
+        //slog("Self Position: %f,%f,%f", entity->position.x, entity->position.y, entity->position.z);
+        //slog("Contact: %i, %f, %f, %f", x, contact.x, contact.y, contact.z);
+        //return contact;
+    }
+        //return world_edge_test(entity,entity->position, down, contact);
+    //return x;
+    return x;*/
+    if(x)
+        return 1;
+    return 0;
 }

@@ -44,7 +44,7 @@ int main(int argc,char *argv[])
 {
     //local variables
     GFC_Matrix4 dinoM;
-    GFC_Matrix4 id, skyMat;
+    GFC_Matrix4 id, skyMat, terrainMat;
     GFC_Vector3D lightdir;
     GFC_Vector3D startpos;
 
@@ -85,7 +85,7 @@ int main(int argc,char *argv[])
     //Skybox
     gfc_matrix4_identity(skyMat);
     lightdir = gfc_vector3d(5,0,5); 
-    startpos =  gfc_vector3d(0,0,0); 
+    startpos =  gfc_vector3d(0,0,-20); 
     sky_mesh = gf3d_mesh_load("models/sky/sky.obj");
     sky_texture = gf3d_texture_load("models/sky/sky3.png");
     gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.78, .78, .78)); //It was clipping the far plane
@@ -114,7 +114,7 @@ int main(int argc,char *argv[])
 
     //World
     World * world = world_load("defs/terrain.def");
-    
+    gfc_matrix4_multiply_scalar(terrainMat, id, 5);
     //Camera Spawn
     //gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
     /*for(int i = 0; i < 100; i++){
@@ -166,7 +166,10 @@ int main(int argc,char *argv[])
                 //3D draws
                 //gf3d_mesh_draw(mesh,dinoM,GFC_COLOR_WHITE,texture,lightdir, GFC_COLOR_WHITE);
                 
-                world_draw(world, id);// World is not being drawn rn
+                
+                //You need to make sure the edge test is edge testing?
+                //Ask in the discord what the down thing should be?
+                world_draw(world, terrainMat);// World is not being drawn rn
                 gf3d_sky_draw(sky_mesh, skyMat, GFC_COLOR_WHITE, sky_texture);
                 entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
 

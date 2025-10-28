@@ -144,8 +144,9 @@ Entity *camera_entity_spawn(GFC_Vector3D position, Entity *target){
     self->think = camera_entity_think;
     //self->free = camera_entity_free;
     data->target = target;
-    data->followDist = 15;
-    data->followHeight = 8;
+    //15 and 8 originally
+    data->followDist = 20;
+    data->followHeight = 13;
     data->angle = GFC_PI;
     //set the data tartget as target
     //subtract to get the unit vector in front of our face?
