@@ -87,9 +87,10 @@ int main(int argc,char *argv[])
     lightdir = gfc_vector3d(5,0,5); 
     startpos =  gfc_vector3d(0,0,-20); 
     sky_mesh = gf3d_mesh_load("models/sky/sky.obj");
-    sky_texture = gf3d_texture_load("models/sky/sky3.png");
+    sky_texture = gf3d_texture_load("models/sky/sky4.png");
     gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.78, .78, .78)); //It was clipping the far plane
-
+    //gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.87, .87, .87));
+    
     //mesh = gf3d_mesh_load("models/dino/dino.obj");
     //texture = gf3d_texture_load("models/dino/dino.png");
     //gfc_matrix4_identity(id);
@@ -174,12 +175,15 @@ int main(int argc,char *argv[])
                 entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
 
                 //2D draws
-                gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
+                gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
                 gf2d_mouse_draw();
         gf3d_vgraphics_render_end();
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();
     }    
+
+    //UI Update?
+    
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup
     slog("gf3d program end");

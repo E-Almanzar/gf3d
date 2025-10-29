@@ -52,7 +52,7 @@ float validate_move_between(float velocity, float entpos, float targetpos, Entit
    return distance; 
 }
 
-
+//How the hell do we do coyote time?
 void monster_gravity(Entity *self){
     GFC_Vector3D *contact;
     int hitFloor;
@@ -60,102 +60,32 @@ void monster_gravity(Entity *self){
     contact = malloc(sizeof(GFC_Vector3D));
     hitFloor = entity_get_floor_position(self, world_get_the(), contact);
 
-
-
-    if(!hitFloor){slog("Didnt hit the floor??");return;}
-    
-    
+    /*
+        Floating? no ground 500-ish units below? no gravity, no jump.
+        Basically we want to make sure the player doesn't fall into an infinite pit 
+    */
+    if(!hitFloor){
+        slog("Didnt hit the floor??");
+        return;
+    }
     self->velocity.z += GRAVITY;
-    /*if(self->position.z - contact->z <= .025){
-        moveValid = 0;
-        self->velocity.z = 0;
-        self->position.z = contact->z;
-    }*/
-    //else{
-        moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z,self);
-    //}
-
-    //slog("MOVEVALID?: %f", moveValid);
-    if(fabs(moveValid) >= .001){
+    moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z,self);
+    //Uint8 t = self->position.z == contact->z;
+    //slog("%f, pos %f, con %f", t, self->position.z, contact->z);
+    if(fabs(moveValid) >= .0001){
+        /*
+            If you can move vertically, move vertically
+            zero out our horizontal v for a second?
+            When youre on the ground and you didnt jump dont fall just yet
+            Techinally this is not a deliverable so we should just ignore it- move on 
+        */
         self->position.z += moveValid;
     }
-    else {//if (fabs(self->velocity.z-self->position.z) <= .001){
-        //This is wrong, it stops at the peak
+    else if(self->position.z - contact->z < .01){
+        //On the floor
         jumpAllowed = 1;
-        //jumping = 0;
-        //slog("STEADY????????????????????????????????");
-        //Weve hit the ground already and have no more velocities
-    }
-    //slog("~~~~~~~~~~~~~~!%f!~~~~~~~~~~~~~~", self->position.z);
-
-/*
-    //float vmove = self->velocity.z;
-    if(self->velocity.z > -3){
-        self->velocity.z = self->velocity.z +  GRAVITY;
-    }
-    
-    contact = malloc(sizeof(GFC_Vector3D));
-    hitFloor = entity_get_floor_position(self, world_get_the(), contact);
-    //self->velocity.z = vmove;
-    if(!hitFloor) return;
-
-    slog("Velocity: %f, Position: %f Contact: %f",self->velocity.z, self->position.z, contact->z);
-    
-    if(self->position.z > contact->z){
-        //slog("IS %f > %f????", self->position.z, contact->z);
-        //downward
-        self->position.z += self->velocity.z;
-    }
-    else{// if(self->position.z - contact->z < .5 || self->position.z < contact->z){
-        //On the ground- let us jump
-        //We will subdivide each step and check if its valid
-        
-        validate_move_between(self->velocity.z, self->position.z, contact->z);
-        
-        if(self->velocity.z >0){
-            self->position.z += self->velocity.z;
-
-        }else
-        {
-            self->position.z = contact->z;
-            jumpAllowed = 1;
-       }
-        
-        //snap to floor?
-        //slog("HELLO?");
-        //slog("IS %f < %f????", self->position.z, contact->z);
-        //Is this the only place where floor contact will be made?
-
     }
 
-    if(self->velocity.z > 0){
-        //self->position.z += self->velocity.z;
-    }
-    /
-    //slog("gravity");
-    if(hitFloor){
-        //slog("hit the floor");
-        //slog("%i, %f, %f, %f",hitFloor, contact->x, contact->y, contact->z);
-        //slog("POSITION: %i, %f, %f, %f",hitFloor, self->position.x, self->position.y, self->position.z);
-        slog("Velocity: %f, Position: %f",self->velocity.z, self->position.z);
-        if(self->position.z > contact->z){
-            //slog("IS %f > %f????", self->position.z, contact->z);
-            self->position.z += self->velocity.z;
-        }
-//        gfc_vector3d_copy(self->position, gfc_vector3d(contact->x, contact->y, contact->z));
-    }
-    if(self->velocity.z)
-    {
-        slog("Jump was pressed- add an impulse upward");
-        //You move up or down based on vertical velocity
-        if(self->position.z > contact->z){
-            if(self->velocity.z > GRAVITY)
-                self->velocity.z -= .01;
-        }
-        self->position.z += self->velocity.z;
-        //We now have the floor below you
-    }/
-*/
 }
 void monster_move(Entity *self){
     GFC_Vector3D forward, camForward, right, move = {0};
@@ -199,7 +129,8 @@ void monster_move(Entity *self){
     //TODO- Jump w/ gravity
     monster_gravity(self);
 
-    slog(" jumpallowed: %i, pVelocity:%f ",jumpAllowed, pVelocity);
+    //This is the actual jump
+    //slog(" jumpallowed: %i, pVelocity:%f ",jumpAllowed, pVelocity);
     if(jumpAllowed && pVelocity>0){
         //slog("Both?");
         self->position.z += pVelocity;

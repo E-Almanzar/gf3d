@@ -1,10 +1,10 @@
 {
     "world":
     {
-        "terrainMesh":"models/terrain/terrain2.obj",
+        "terrainMesh":"models/terrain/terrain3.obj",
         "terrainTexture":"models/terrain/Cube.xcf",
         "lightColor": [255,255,255,255],
-        "lightPos": [10,10,10,10]
+        "lightPos": [0,0,1000,10]
 
     }
 

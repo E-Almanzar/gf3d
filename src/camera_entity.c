@@ -98,7 +98,7 @@ void camera_entity_think(Entity *self){
         vangle -= vpanStep;
     }
     if(vangle < -2.25){vangle = -2.25;}
-    if(vangle > 5.75){vangle = 5.75;}
+    if(vangle > 8.75){vangle = 8.75;}
     data->vangle = vangle;
 
    
