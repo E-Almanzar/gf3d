@@ -5,7 +5,7 @@
 #include "monster.h"
 #include "gf3d_mesh.h"
 #include "m_plat.h"
-
+#include "tp.h"
 //List of mesh pointers to create a bunch of objs
 typedef struct{
     Entity *entity_list;
@@ -413,6 +413,27 @@ Entity *entity_check_collide(Entity *self, Uint16 flag){
                 //For a mving plat, if you collide with it then do something?
                 if(gfc_stricmp(entity_system.entity_list[i].name, "mp") == 0){
                     //slog("returning %s",entity_system.entity_list[i].name );
+                    return &entity_system.entity_list[i];
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+Entity *entity_find_tp_partner(Entity *pair, Entity *self,Uint16 tpPair){
+    int i;
+    for(i = 0; i < entity_system.entity_max; i++){
+        if(!entity_system.entity_list[i]._inuse || !entity_system.entity_list[i].data){continue;}
+        //stricmp for tp's only
+        //slog("name %s", entity_system.entity_list[i].name);
+        if(gfc_stricmp(entity_system.entity_list[i].name, "tp") == 0){
+
+            if(&entity_system.entity_list[i] != self){
+                if(((struct TeleportData*)entity_system.entity_list[i].data)->tpPair == tpPair){
+                //if()    
+                    //slog("find tp partner");
+                    pair = &entity_system.entity_list[i];
                     return &entity_system.entity_list[i];
                 }
             }

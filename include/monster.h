@@ -12,6 +12,7 @@ Entity* player_get_the();
 
 
 GFC_Vector3D player_get_forward();
-void set_think_to_bounce(Entity *self);
+void set_think_to_bounce(Entity *self, Uint8 flag);
+long long get_timer_from_player();
 
 #endif

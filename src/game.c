@@ -26,6 +26,8 @@
 #include "bouncepad.h"
 #include "camera_entity.h"
 #include "m_plat.h"
+#include "tp.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
@@ -129,11 +131,18 @@ int main(int argc,char *argv[])
 
     //Other ents
     //Bouncepads
-
+    //Movepad
     startpos =  gfc_vector3d(20,20,0); 
     mp_spawn(startpos, GFC_COLOR_WHITE);
+    //Bouncepad
     startpos =  gfc_vector3d(-25,0,-32); 
     bp_spawn(startpos, GFC_COLOR_WHITE);
+    //Tp's
+    startpos =  gfc_vector3d(80,0,-32);
+    tp_spawn(startpos, GFC_COLOR_WHITE, 1);
+    startpos =  gfc_vector3d(-70,0,-32);
+    tp_spawn(startpos, GFC_COLOR_WHITE, 1);
+
 
     //main loop: everything in here is run repeatedly
     while(!_done)

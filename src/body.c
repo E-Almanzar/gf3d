@@ -49,7 +49,7 @@ Uint8 body_test_body(Body *a, Body *b){
             bp = gfc_list_nth(b->volumes,i);
             bpTest = gfc_primitive_offset(*bp, b->stepPosition);
             //TODO test if the two primitives collided
-            /*
+            /
                 How the hell do you test if two primitives intersected?
                 Do you need to check every edge in a point in triangle?
             /
