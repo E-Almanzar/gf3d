@@ -23,7 +23,7 @@ typedef struct Entity_S{
     float           speed;
 
     // GFC_Primitive   collision; //Not a mesh primitive
-    GFC_Box         bounds;
+    GFC_Box         *bounds;
     void            (*draw)(struct Entity_S *self);
     void            (*think)(struct Entity_S *self);
     void            (*update)(struct Entity_S *self);
@@ -67,5 +67,6 @@ void entity_system_think_all();
 void entity_system_update_all();
 //Uint8
 Uint8 entity_get_floor_position(Entity *entity, World *world, GFC_Vector3D *contact);
-
+Entity *entity_check_collide(Entity *self, Uint16 flag);
+Uint8 ents_mesh_collide_check(Entity *one, Entity *two);
 #endif

@@ -1,6 +1,11 @@
 #include "simple_logger.h"
 #include "entity.h"
+#include "gf3d_obj_load.h"
 #include "world.h"
+#include "monster.h"
+#include "gf3d_mesh.h"
+#include "m_plat.h"
+
 //List of mesh pointers to create a bunch of objs
 typedef struct{
     Entity *entity_list;
@@ -55,6 +60,9 @@ Entity *entity_new(){
             entity_system.entity_list[i].speed = 0;
             entity_system.entity_list[i].doGenericUpdate = 1;
             // How do we set a default scale?
+            
+            //Bounding Box- Uh oh
+            entity_system.entity_list[i].bounds = NULL;
             return &entity_system.entity_list[i];
         } 
     
@@ -184,13 +192,28 @@ void entity_system_update_all(){
     }
 }
 
+Uint8 world_mp_edge_helper(GFC_Vector3D *downCheck, GFC_Vector3D *down, GFC_Vector3D *contact){
+    int i, x;
+    //GFC_Vector3D contact;
+    for(i = 0; i < entity_system.entity_max; i++){
+        if(!entity_system.entity_list[i]._inuse){continue;}
+        if(gfc_stricmp("bp", entity_system.entity_list[i].name) == 0){
+            //slog("in the check?");
+            x = mp_edge_test(&entity_system.entity_list[i], *downCheck, *down, contact);
+            if(x)
+             return x;
+        }
+    }
+    return 0;
+}
+
 Uint8 entity_get_floor_position(Entity *entity, World *world, GFC_Vector3D *contact){
-    GFC_Vector3D contactHold;
-    GFC_Vector3D downCheck, down, footpos;
-    int x;
+    GFC_Vector3D contactHold;//, contactHold2;
+    GFC_Vector3D downCheck, down;//, footpos;
+    int x, mp=0;
     float footoffset = 4.91;
     downCheck = entity->position;
-    downCheck.z -= 500;
+    downCheck.z -= 50000; //Increase if distance to floor needs to
 
     //TODO why does this happen, what do we need- ask in the discord
     //is this a vector not moving 
@@ -198,9 +221,25 @@ Uint8 entity_get_floor_position(Entity *entity, World *world, GFC_Vector3D *cont
     //instead of abovehead we need down
     gfc_vector3d_add(down, entity->position, gfc_vector3d(0,0,3));
     x = world_edge_test(world_get_the(), downCheck, down, &contactHold);
+    //mp = world_mp_edge_helper(&downCheck, &down, &contactHold2);
+    /*if(x && mp){
+        if(contactHold.z < contactHold2.z){
+        contact->x = contactHold2.x;
+        contact->y = contactHold2.y;
+        contact->z = contactHold2.z+footoffset;
+        slog("contacthold2 baby");
+        }
+    }else{
     contact->x = contactHold.x;
     contact->y = contactHold.y;
     contact->z = contactHold.z+footoffset;
+    }*/
+    //default to ground
+    if(!mp){
+        contact->x = contactHold.x;
+        contact->y = contactHold.y;
+        contact->z = contactHold.z+footoffset;
+    }
     //contact = &contactHold;
     //slog("%f, %f, %f",contact->x, contact->y, contact->z);
     //gfc_vector3d_copy(contactHold, gfc_vector3d(contact->x, contact->y, contact->z+footoffset));
@@ -220,7 +259,164 @@ Uint8 entity_get_floor_position(Entity *entity, World *world, GFC_Vector3D *cont
         //return world_edge_test(entity,entity->position, down, contact);
     //return x;
     return x;*/
-    if(x)
+    if(x || mp)
         return 1;
     return 0;
+}
+
+Uint8 mesh_primitive_collide_check(MeshPrimitive *prim1, MeshPrimitive *prim2, Entity *one, Entity *two){    
+    if(!prim1 || !prim2){slog("f you, no prim in mprim collide check"); return 0;}
+    //Create a vertex in triangle check?
+    GFC_Triangle3D t;
+    //Do we have to make an edge between each of the two points of the triangle?
+    GFC_Edge3D e1, e2, e3;
+    //prim one point 1, prim 2 point 1
+    GFC_Vector3D p1p1, p1p2, p1p3;
+    //GFC_Vector3D p2p1, p2p2, p2p3;
+    int i, j, c, d;
+    GFC_Vector3D *contact1, *contact2, *contact3;
+    contact1 = malloc(sizeof(GFC_Vector3D));
+    contact2 = malloc(sizeof(GFC_Vector3D));
+    contact3 = malloc(sizeof(GFC_Vector3D));
+
+    c = prim1->objData->face_count;
+    //For every face in prim 1
+    for(i = 0; i < c; i++){
+        //Set the p1p...
+        //getting the three points of the first primitive's vertex
+        p1p1 = prim1->objData->faceVertices[prim1->objData->outFace[i].verts[0]].vertex;
+        p1p2 = prim1->objData->faceVertices[prim1->objData->outFace[i].verts[1]].vertex;
+        p1p3 = prim1->objData->faceVertices[prim1->objData->outFace[i].verts[2]].vertex;
+        //Then create three edges
+        e1 = gfc_edge3d_from_vectors(p1p1, p1p2);
+        e2 = gfc_edge3d_from_vectors(p1p2, p1p3);
+        e3 = gfc_edge3d_from_vectors(p1p1, p1p3); 
+        //Then set d
+        d = prim2->objData->face_count;
+        for(j = 0; j < d; j++){
+
+            t.a = prim2->objData->faceVertices[prim2->objData->outFace[j].verts[0]].vertex;
+            t.b = prim2->objData->faceVertices[prim2->objData->outFace[j].verts[1]].vertex;
+            t.c = prim2->objData->faceVertices[prim2->objData->outFace[j].verts[2]].vertex;
+            //t.a prim obj faceVertices[ prim obj outFace [j].verts[0,1,2].vertex;
+            //int x = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+           
+            //Kind of brute force way to test all of the vectors
+            //If any of the triangles hit the one side of the other return true
+            //if(gfc_point3d_in_primitive()...?
+            //    if (gfc_point_in_triangle(intersectPoint,t))
+//!!
+
+
+
+            if(gfc_trigfc_angle_edge_test(e1,t,contact1)) {
+                //printf("e1: %f, %f, %f\n", contact1->x, contact1->y, contact1->z);
+                return 1;
+            }
+            if(gfc_trigfc_angle_edge_test(e2,t,contact2)) {
+                //printf("e2: %f, %f, %f\n", contact2->x, contact2->y, contact2->z);
+
+                return 1;}
+            if(gfc_trigfc_angle_edge_test(e3,t,contact3)) {
+                //printf("e3: %f, %f, %f\n", contact3->x, contact3->y, contact3->z);
+                return 1;}
+        }        
+    }
+    //Is it creating like, infinite lines betweens them so it always hits it?
+    //How do i get just the meshes?
+    return 0;
+}
+Uint8 ents_mesh_collide_check(Entity *one, Entity *two){
+    if(!one || !two){slog("no ents in mesh collide check"); return 0;}
+    GFC_List *oneL, *twoL;
+    int i, j, c, d, test;
+    oneL = one->mesh->primitives;
+    c = gfc_list_count(oneL);
+    twoL = two->mesh->primitives;
+    for(i = 0; i <  c; i++){
+        d = gfc_list_count(twoL);
+        for(j = 0; j < d; j++){
+            //If they overlap (HOW check?)
+            //return 1;
+            //For every primitive
+                //mesh_primitive_collide_check(oneP, twoP);
+            //Or just send in every the lists? nahh
+            //all on the zero zero?
+            test = mesh_primitive_collide_check(gfc_list_nth(oneL, i), gfc_list_nth(twoL, j), one, two);
+            if(test){
+                //slog("yes in ents mesh collide %i, i:%i, j:%i", test, i, j);
+                //slog("%s, %s", one->name, two->name);
+                return test;}
+        }
+    }
+    return 0;
+}
+/*
+Uint8 entity_to_entity_test(){
+    
+    for(i = 0; i < c; i++){
+        prim = gfc_list_nth(world->mesh->primitives, i);
+        //if primitive bad continue
+        if(!prim){
+            continue;
+        }
+        d = prim->objData->face_count;
+        for(j = 0; j < d; j++){
+            /
+                t is a triangle and its looking for a b and c,
+                a b and c are vector3ds
+            
+            /
+            t.a = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+            t.b = prim->objData->faceVertices[prim->objData->outFace[j].verts[1]].vertex;
+            t.c = prim->objData->faceVertices[prim->objData->outFace[j].verts[2]].vertex;
+            //t.a prim obj faceVertices[ prim obj outFace [j].verts[0,1,2].vertex;
+            //int x = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+           
+            //GFC_Edge3D e = gfc_edge3d_from_vectors(gfc_vector3d(0,0,0),gfc_vector3d(0,0,0));
+            if(gfc_trigfc_angle_edge_test(e,t,contact)) {
+                //slog("returning True");
+                return 1;
+            }
+           //slog("triangle edge test failed i:%i j:", i, j);
+        }
+}
+*/
+//Bugged as hell, idk why its returning when it shouldnt be
+//Use the new function to get the player and see if its the same
+
+//Flags
+//0 is player, 1 is bouncepad
+Entity *entity_check_collide(Entity *self, Uint16 flag){
+    int i;
+    //if(flag == 1){slog("looking for a bouncepad");}
+
+    if(!self){slog("no self in entity check collide"); return NULL;}
+    if(!self->bounds){slog("You dont have a freaking box"); return NULL;}
+    for(i = 0; i < entity_system.entity_max; i++){
+        if(!entity_system.entity_list[i]._inuse || !entity_system.entity_list[i].bounds){continue;}
+        //We check with our box and the ents box
+        //So now we have our box and the targets box
+        if(gfc_box_overlap(*self->bounds,*entity_system.entity_list[i].bounds)){
+            //slog("WE OVERLAP!!! %s", entity_system.entity_list[i].name);
+            //if(strcmp("Alien Guy",entity_system.entity_list[i].name)){
+            //K so this is also wrong? IDK
+            
+            if(flag == 0){
+                if(player_get_the() == &entity_system.entity_list[i]){
+                    //slog("alien?");
+                    return &entity_system.entity_list[i];
+                }
+            }
+            
+            if(flag == 1){
+                //For a mving plat, if you collide with it then do something?
+                if(gfc_stricmp(entity_system.entity_list[i].name, "mp") == 0){
+                    //slog("returning %s",entity_system.entity_list[i].name );
+                    return &entity_system.entity_list[i];
+                }
+            }
+        }
+    }
+    return NULL;
 }

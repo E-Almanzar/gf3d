@@ -23,8 +23,9 @@
 #include "gf3d_mesh.h"
 #include "entity.h"
 #include "monster.h"
+#include "bouncepad.h"
 #include "camera_entity.h"
-
+#include "m_plat.h"
 extern int __DEBUG;
 
 static int _done = 0;
@@ -126,6 +127,14 @@ int main(int argc,char *argv[])
     monster_set_cam(player, camera);
     gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
 
+    //Other ents
+    //Bouncepads
+
+    startpos =  gfc_vector3d(20,20,0); 
+    mp_spawn(startpos, GFC_COLOR_WHITE);
+    startpos =  gfc_vector3d(-25,0,-32); 
+    bp_spawn(startpos, GFC_COLOR_WHITE);
+
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
@@ -183,7 +192,7 @@ int main(int argc,char *argv[])
     }    
 
     //UI Update?
-    
+
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup
     slog("gf3d program end");

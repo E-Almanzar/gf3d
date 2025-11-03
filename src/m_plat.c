@@ -1,0 +1,151 @@
+#include "simple_logger.h"
+#include "entity.h"
+#include "monster.h"
+#include "simple_json.h"
+#include "gfc_config.h"
+#include "gfc_primitives.h"
+#include "gf3d_obj_load.h"
+#include "world.h"
+
+float initalX, initalY;
+float moveBy = .1;
+void mp_update(Entity *self){
+    
+    self->position.x += self->velocity.x;
+    if(self->position.x > (initalX+10) || self->position.x < (initalX-10)){
+        moveBy *= -1;
+        
+    }
+
+}
+
+void mp_think(Entity *self){
+    /*Entity *target;
+    GFC_Vector3D forward;
+    if(!self){return;}
+
+    target = entity_check_collide(self);
+    if(target == NULL){return;} 
+
+    if(target){
+
+    }
+    */
+    self->velocity.x = moveBy;
+    self->bounds->x = self->position.x-15;
+    self->bounds->y = self->position.y-15;
+    self->bounds->z = self->position.z+10;
+
+}
+
+
+Entity *mp_spawn(GFC_Vector3D position, GFC_Color color){
+    Entity *self;
+    self = entity_new();
+    if(!self) return NULL;
+
+    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad.obj");
+    self->texture = gf3d_texture_load("models/bouncepad/movepad.png");
+    strcpy(self->mesh->filename, "models/bouncepad/bouncepad.obj");
+    self->scale = gfc_vector3d(10,10,10);
+    self->color = color;
+    self->position = position;
+    self->position.y -= 12;
+    self->think = mp_think;
+    self->update = mp_update;
+
+    self->bounds = gfc_allocate_array(sizeof(GFC_Box),1);
+    //We need to set the bounds positions to the corner-
+    //This is kinda stupid idk how to make it all the way around the box
+    //Should I just make the mesh?
+    //self->bounds->x = position.x-12;
+    //self->bounds->y = position.y-27;
+    //self->bounds->z = position.z+10;
+    self->bounds->w = 33;
+    self->bounds->h = 33;
+    self->bounds->d = 6;
+
+    initalX = self->position.x;
+    initalY = self->position.y;
+
+    strcpy(self->name, "mp");
+    return self;
+}
+
+Uint8 gfc_triangle_edge_test(
+    GFC_Edge3D e,
+    GFC_Triangle3D t,
+    GFC_Vector3D *contact)
+{
+    float time;
+    GFC_Plane3D p;
+    GFC_Vector3D intersectPoint = {0,0,0};
+
+    p = gfc_trigfc_angle_get_plane(t);
+    time = gfc_edge_in_plane(e,p,&intersectPoint);
+    if ((time <= 0)||(time > 1))
+    {
+        return 0;
+    }
+    if (gfc_point_in_triangle(intersectPoint,t))
+    {
+        if (contact)
+        {
+            gfc_vector3d_copy((*contact),intersectPoint);
+        }
+        //printf("RETURN 1 PLS");
+        return 1;
+    }
+    return 0;
+}
+
+Uint8 mp_edge_test(Entity *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Vector3D *contact){
+    //UGHHH above checks gross
+    GFC_Edge3D e;
+    int i, j, c, d;
+    MeshPrimitive * prim;
+    GFC_Triangle3D t; 
+
+    if(!world){
+        slog("no world in egde test"); 
+        return 0;
+    }        
+
+    
+    e = gfc_edge3d_from_vectors(start, end);
+    c = gfc_list_count(world->mesh->primitives);
+
+    //slog("start: %f, %f, %f, end: %f, %f, %f", start.x, start.y, start.z, end.x, end.y, end.z);
+
+    for(i = 0; i < c; i++){
+        prim = gfc_list_nth(world->mesh->primitives, i);
+        //if primitive bad continue
+        if(!prim){
+            continue;
+        }
+        d = prim->objData->face_count;
+        for(j = 0; j <= d; j++){
+            /* 
+                t is a triangle and its looking for a b and c,
+                a b and c are vector3ds
+            
+            */
+            t.a = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+            t.b = prim->objData->faceVertices[prim->objData->outFace[j].verts[1]].vertex;
+            t.c = prim->objData->faceVertices[prim->objData->outFace[j].verts[2]].vertex;
+            //t.a prim obj faceVertices[ prim obj outFace [j].verts[0,1,2].vertex;
+            //int x = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+            //slog("ugh trigangle %f, %f, %f", t.a, t.b, t.c);
+            //GFC_Edge3D e = gfc_edge3d_from_vectors(gfc_vector3d(0,0,0),gfc_vector3d(0,0,0));
+            if(gfc_triangle_edge_test(e,t,contact)) {
+                slog("~~~~~~~~~~~~~~~~returning True");
+                return 1;
+            }
+            //if(gfc_point_in_box(world->bounds))
+            //slog("triangle edge test failed i:%i j:%i dc %i, %i", i, j,d,c);
+        }
+        
+
+    }
+    return 0;
+}

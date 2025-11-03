@@ -7,34 +7,39 @@
 #include "world.h"
 #define GRAVITY -.4
 #define JUMP 10
-typedef struct{
-    Entity              *cam;
-    CameraEntityData    *camData;
-    GFC_Vector3D        forward;
-    Uint8               jumpAllowed;
-}MonsterEntityData; //Padding?
+typedef struct
+{
+    Entity *cam;
+    CameraEntityData *camData;
+    GFC_Vector3D forward;
+    Uint8 jumpAllowed;
+} MonsterEntityData; // Padding?
+void monster_move(Entity *self, Uint8 calledByPushback);
 
 MonsterEntityData *MonsterData;
 
-//1 for allowed to jump, 0 for not
+// 1 for allowed to jump, 0 for not
 Uint8 jumpAllowed = 0;
 Uint8 jumping = 0;
-
-
+static Entity *player;
+GFC_Vector3D lapsePos;
 /*
     Return -1 for "you can do another step safely"
     otherwise return the distance that they can move in the next step
 
     TODO move into entity.c
 */
-float validate_move_between(float velocity, float entpos, float targetpos, Entity *self){
-    if(!velocity || !entpos || !targetpos){
+float validate_move_between(float velocity, float entpos, float targetpos, Entity *self)
+{
+    if (!velocity || !entpos || !targetpos)
+    {
         slog("Nothing in validate move");
         return 0;
     }
-    float distance = entpos-targetpos;
-    if(fabs(distance) > fabs(velocity)){
-        //slog("difference, velocity %f, >  %f, %i", fabs(distance), fabs(velocity), fabs(distance) > fabs(velocity));
+    float distance = entpos - targetpos;
+    if (fabs(distance) > fabs(velocity))
+    {
+        // slog("difference, velocity %f, >  %f, %i", fabs(distance), fabs(velocity), fabs(distance) > fabs(velocity));
         return velocity;
     }
 
@@ -43,146 +48,230 @@ float validate_move_between(float velocity, float entpos, float targetpos, Entit
         calculate the allowed distance
 
         do we set the v velocity to zero here?
-        
-    */
-   self->velocity.z = 0;
-   //slog("Distance: %f", distance);
-   if(velocity < 0)
-       return -1*distance;
-   return distance; 
-}
 
-//How the hell do we do coyote time?
-void monster_gravity(Entity *self){
+    */
+    self->velocity.z = 0;
+    // slog("Distance: %f", distance);
+    if (velocity < 0)
+        return -1 * distance;
+    return distance;
+}
+//Is this our wall cling
+void monster_push_back(Entity* self){
+    slog("PUSHING BACK");
+    self->velocity.x *= -1;
+    self->velocity.y *= -1;
+    if (gfc_input_command_down("jump"))
+    {
+        slog("WALL JUMP");
+                //gfc_vector3d_negate(self->velocity,MonsterData->forward);
+                self->velocity.z = JUMP;
+                
+                monster_move(self, 1);
+                return;
+    }
+    monster_move(self, 1);
+}
+// How the hell do we do coyote time?
+void monster_gravity(Entity *self)
+{
     GFC_Vector3D *contact;
-    int hitFloor;
+    int hitFloor;//, i;
     float moveValid;
+    Entity *target;
+
     contact = malloc(sizeof(GFC_Vector3D));
     hitFloor = entity_get_floor_position(self, world_get_the(), contact);
+    
+    //Did we hit the moving platform too?
+    target = entity_check_collide(self, 1);
+    if(target){
+        //We found a moving platform
+        if(self->position.z >= target->bounds->z){
+            //slog("%f %s target: %f %s", self->position.z, self->name, target->position.z, target->name);
+            //slog("were higher? or does this not work idiot, you gotta collide to collide");
+            hitFloor = true;
+            contact->x = self->position.x;
+            contact->y = self->position.y;
+            contact->z = target->bounds->z;
+
+            self->position.x += target->velocity.x;
+        }
+
+    }
+
+
+    //slog("Did contact %f, %f, %f", contact->x, contact->y, contact->z);
 
     /*
         Floating? no ground 500-ish units below? no gravity, no jump.
-        Basically we want to make sure the player doesn't fall into an infinite pit 
+        Basically we want to make sure the player doesn't fall into an infinite pit
     */
-    if(!hitFloor){
-        slog("Didnt hit the floor??");
+    if (!hitFloor)
+    {
+        //Can we stop movement before you hit it?
+
+        //Push back function?
+        monster_push_back(self);
+        //slog("Didnt hit the floor??");
         return;
     }
-    self->velocity.z += GRAVITY;
-    moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z,self);
-    //Uint8 t = self->position.z == contact->z;
-    //slog("%f, pos %f, con %f", t, self->position.z, contact->z);
-    if(fabs(moveValid) >= .0001){
+    if(self->velocity.z > -10){
+    self->velocity.z += GRAVITY;}
+    moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z, self);
+    // Uint8 t = self->position.z == contact->z;
+    // slog("%f, pos %f, con %f", t, self->position.z, contact->z);
+    if (fabs(moveValid) >= .0001)
+    {
         /*
             If you can move vertically, move vertically
             zero out our horizontal v for a second?
             When youre on the ground and you didnt jump dont fall just yet
-            Techinally this is not a deliverable so we should just ignore it- move on 
+            Techinally this is not a deliverable so we should just ignore it- move on
         */
+        jumpAllowed = 0;
+
         self->position.z += moveValid;
     }
-    else if(self->position.z - contact->z < .01){
-        //On the floor
+    else if (self->position.z - contact->z < .01)
+    {
+        // On the floor
         jumpAllowed = 1;
     }
-
 }
-void monster_move(Entity *self){
-    GFC_Vector3D forward, camForward, right, move = {0};
-    //Fix for bounce?
+void monster_move(Entity *self, Uint8 calledByPushback)
+{
+    GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack;
+    // Fix for bounce?
     float pVelocity = self->velocity.z;
 
     camForward = MonsterData->camData->forward;
-    
-    forward.x = camForward.x; forward.y = camForward.y; forward.z = 0;
 
-    gfc_vector3d_cross_product(&right, forward, gfc_vector3d(0,0,1));
-    if(self->velocity.x){
-        if(self->velocity.x < 0){
-            gfc_vector3d_add(self->position, self->position,right);
+    forward.x = camForward.x;
+    forward.y = camForward.y;
+    forward.z = 0;
+
+
+    gfc_vector3d_cross_product(&right, forward, gfc_vector3d(0, 0, 1));
+    //slog("RIGHT?? %f, %f, %f", right.x, right.y, right.x);
+    gfc_vector3d_scale(mHoriz, right, self->velocity.x);
+    gfc_vector3d_scale(mForBack, forward, self->velocity.y);
+
+  //  slog("RIGHT AFTER?? %f, %f, %f", mHoriz.x, mHoriz.y, mHoriz.x);
+    //mHoriz = right;
+    // forward = gfc_vector3d_multiply(forward, self->velocity);
+
+    if (self->velocity.x)
+    {
+        gfc_vector3d_sub(self->position, self->position, mHoriz);
+        if (self->velocity.x < 0)
             gfc_vector3d_add(move, move, forward);
-
-        }
-        else{
-            gfc_vector3d_sub(self->position, self->position,right);
+        else
             gfc_vector3d_sub(move, move, forward);
-
+        /*if (self->velocity.x < 0)
+        {
+            gfc_vector3d_add(self->position, self->position, right);
+            gfc_vector3d_add(move, move, forward);
         }
+        else
+        {
+            gfc_vector3d_sub(self->position, self->position, right);
+            gfc_vector3d_sub(move, move, forward);
+        }*/
     }
-    if(self->velocity.y){
-        if(self->velocity.y < 0){
-           gfc_vector3d_add(self->position, self->position,forward);
+    if (self->velocity.y)
+    {
+        gfc_vector3d_sub(self->position, self->position, mForBack);
+        if (self->velocity.y < 0)
             gfc_vector3d_sub(move, move, right);
-
-
-        }
-        else{
-            gfc_vector3d_sub(self->position, self->position,forward);
+        else
             gfc_vector3d_add(move, move, right);
+        /*if (self->velocity.y < 0)
+        {
+            gfc_vector3d_add(self->position, self->position, forward);
+            gfc_vector3d_sub(move, move, right);
         }
+        else
+        {
+            gfc_vector3d_sub(self->position, self->position, forward);
+            gfc_vector3d_add(move, move, right);
+        }*/
     }
+    if(!calledByPushback){
+        if ((self->velocity.x) || (self->velocity.y))
+        {
+            self->rotation.z = atan2(move.y, move.x);
+        }
+        MonsterData->forward = forward;
+        // TODO- Jump w/ gravity
+        monster_gravity(self);
 
-    if((self->velocity.x) || (self->velocity.y)){
-        self->rotation.z = atan2(move.y, move.x);
-    }
-
-    //TODO- Jump w/ gravity
-    monster_gravity(self);
-
-    //This is the actual jump
-    //slog(" jumpallowed: %i, pVelocity:%f ",jumpAllowed, pVelocity);
-    if(jumpAllowed && pVelocity>0){
-        //slog("Both?");
-        self->position.z += pVelocity;
-    }
-    else{
-        //slog("JumpAllowed: %i, Jumpin %i,vel: %f", jumpAllowed, jumping, self->velocity.z);
+        // This is the actual jump
+        // slog(" jumpallowed: %i, pVelocity:%f ",jumpAllowed, pVelocity);
+        if (jumpAllowed && pVelocity > 0)
+        {
+            // slog("Both?");
+            self->position.z += pVelocity;
+        }
+        else
+        {
+            // slog("JumpAllowed: %i, Jumpin %i,vel: %f", jumpAllowed, jumping, self->velocity.z);
+        }
     }
 }
 /*
     IMPORTANT- Update
     We want to do no decisions here, only obtain information and change states
 */
-void monster_update(Entity *self){
-    if(!self) return;
-    monster_move(self);
-    
-
-
+void monster_update(Entity *self)
+{
+    if (!self)
+        return;
+    monster_move(self, 0);
+    self->bounds->x = self->position.x;
+    self->bounds->y = self->position.y;
+    self->bounds->z = self->position.z;
 }
-void monster_control(Entity *self){
-   float move = 0;
-    float moveStep = .1;
-    if((!self)||(!self->data))return;
-
+void monster_control(Entity *self)
+{
+    float move = 0;
+    float moveStep = 1;
+    if ((!self) || (!self->data))
+        return;
 
     /*Input*/
-    if(gfc_input_command_down("walkforward")){
+    if (gfc_input_command_down("walkforward"))
+    {
         move += moveStep;
     }
-        if(gfc_input_command_down("walkback")){
+    if (gfc_input_command_down("walkback"))
+    {
         move -= moveStep;
     }
     self->velocity.y = move;
     move = 0;
-    if(gfc_input_command_down("walkleft")){
+    if (gfc_input_command_down("walkleft"))
+    {
         move -= moveStep;
     }
-        if(gfc_input_command_down("walkright")){
+    if (gfc_input_command_down("walkright"))
+    {
         move += moveStep;
     }
     self->velocity.x = move;
-    //Jump
-    if(jumpAllowed){
+    // Jump
+    if (jumpAllowed)
+    {
         move = self->velocity.z;
-        if(gfc_input_command_down("jump")){
-            
-            //jumping = 1;
+        if (gfc_input_command_down("jump"))
+        {
+
+            // jumping = 1;
             jumpAllowed = 0;
-            //slog("jumpin? %i", jumping);
-            
-            //if(self->position.z < JUMP){
-                self->velocity.z += JUMP;
+            // slog("jumpin? %i", jumping);
+
+            // if(self->position.z < JUMP){
+            self->velocity.z += JUMP;
             //}
         }
     }
@@ -191,23 +280,38 @@ void monster_control(Entity *self){
 /*
     IMPORTANT- Think, make the decisions here, do not change states
 */
-void monster_think(Entity *self){
-    if(!self){return;}
-    
-    //contact = malloc(sizeof(GFC_Vector3D));
+void monster_think(Entity *self)
+{
+    if (!self)
+    {
+        return;
+    }
+    //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
+    // contact = malloc(sizeof(GFC_Vector3D));
     monster_control(self);
-    
-    //We now have a very dirty contact (ik its not ideal but who cares)
-    //Now we need to not set the Z in entity, and instead do it here, and make it stop
 
-    //slog("got it: %i", x);
+    // We now have a very dirty contact (ik its not ideal but who cares)
+    // Now we need to not set the Z in entity, and instead do it here, and make it stop
 
+    // slog("got it: %i", x);
+
+    if (self->position.x - lapsePos.x > 1 || self->position.x - lapsePos.x < -1)
+    {
+        // slog("Lapsepos: %f, %f, %f", self->position.x, self->position.y, self->position.z);
+        lapsePos = self->position;
+    }
 }
-//This has to run AFTER monster data init
-//This should fix the very messyness
-void monster_set_cam(Entity* self, Entity *cam){
-    if((!self)||(!cam)){ slog("no self or cam in set cam"); return; }
-    if((!self->data))return;
+// This has to run AFTER monster data init
+// This should fix the very messyness
+void monster_set_cam(Entity *self, Entity *cam)
+{
+    if ((!self) || (!cam))
+    {
+        slog("no self or cam in set cam");
+        return;
+    }
+    if ((!self->data))
+        return;
     CameraEntityData *cdata;
     MonsterData->cam = cam;
     cdata = malloc(sizeof(CameraEntityData));
@@ -215,34 +319,41 @@ void monster_set_cam(Entity* self, Entity *cam){
     MonsterData->camData = cdata;
 }
 
-void snap_to_ground(Entity *self){
-    if(!self)return;
+//Dead code
+void snap_to_ground(Entity *self)
+{
+    /*if (!self)
+        return;
     GFC_Vector3D *contact;
     int didCont;
     contact = malloc(sizeof(GFC_Vector3D));
-    
+
     didCont = entity_get_floor_position(self, world_get_the(), contact);
-    slog("%i, %f, %f, %f",didCont, contact->x, contact->y, contact->z);
-    //gfc_vector3d_copy(self->position, gfc_vector3d(contact->x, contact->y, contact->z+4.91));
-    free(contact);
+    //slog("Did contact %i, %f, %f, %f", didCont, contact->x, contact->y, contact->z);
+    // gfc_vector3d_copy(self->position, gfc_vector3d(contact->x, contact->y, contact->z+4.91));
+    free(contact);*/
 }
 
-void monster_data_init(Entity *self){
+void monster_data_init(Entity *self)
+{
     MonsterEntityData *data;
     data = malloc(sizeof(MonsterEntityData));
     MonsterData = data;
 }
-Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color){
+
+Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
+{
     Entity *self;
     self = entity_new();
-    if(!self) return NULL;
+    if (!self)
+        return NULL;
     /*
     self->mesh = gf3d_mesh_load("models/dino/dino.obj");
     self->texture = gf3d_texture_load("models/dino/dino.png");
     strcpy(self->mesh->filename, "models/dino/dino.obj");
     */
-    //DATA = GFC_ALLOCATE from camera
-    //self->data , self->free 
+    // DATA = GFC_ALLOCATE from camera
+    // self->data , self->free
     self->mesh = gf3d_mesh_load("models/alien/alien.obj");
     self->texture = gf3d_texture_load("models/alien/alien.png");
     strcpy(self->mesh->filename, "models/alien/alien.obj");
@@ -251,41 +362,147 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color){
     self->position = position;
     self->think = monster_think;
     self->data = gfc_allocate_array(sizeof(MonsterEntityData), 1);
-    //self->free is something
+    // self->free is something
 
     self->update = monster_update;
-    //self->velocity = position;
-    // = gfc_vector3d(.25,0,0);
-    
-    //self->velocity.z = .25;
+    // self->velocity = position;
+    //  = gfc_vector3d(.25,0,0);
 
-    //self->velocity.x = .25;
-    //slog("WHAT %f", self->velocity.x);
-    self->speed = gfc_random()/10;
-    //slog("WHAT %i", self->speed);
+    // self->velocity.z = .25;
+
+    // self->velocity.x = .25;
+    // slog("WHAT %f", self->velocity.x);
+    self->speed = 10;
+    // slog("WHAT %i", self->speed);
     self->rotation.z = 3.141592;
-    
-    //slog("Creating %s", self->mesh->filename);
-//Somewhere you need to pass the name!!!!!!111
+
+    // slog("Creating %s", self->mesh->filename);
+    // Somewhere you need to pass the name!!!!!!111
     /*slog("checking everything mesh: %i, texture: %i, postion: %i",
         self->mesh != 0,
         self->texture != 0,
         self->mesh != 0
     );*/
-    
-    
-    //I guess we should spawn it on the world?
+
+    // I guess we should spawn it on the world?
     monster_data_init(self);
-    //Its just gonna be hardcoded?
-    //snap_to_ground(self);
-    
+
+    // Box
+    self->bounds = gfc_allocate_array(sizeof(GFC_Box), 1);
+    self->bounds->x = position.x;
+    self->bounds->y = position.y;
+    self->bounds->z = position.z;
+    self->bounds->w = 1;
+    self->bounds->h = 1;
+    self->bounds->d = 1;
+
+    strcpy(self->name, "Alien Guy");
+    player = self;
+    // float x,y,z;   //position of corner
+    // float w,h,d;   // width, height, and depth offsets
+    // Its just gonna be hardcoded?
+    // snap_to_ground(self);
+    lapsePos = self->position;
     return self;
 }
 
-void monster_free(){
-    //Copy from camera
-
+void monster_free()
+{
+    // Copy from camera
 }
 
+// Maybe a function to expose the player?
+// The design pattern will be selfish- you can check to see if you hit the player
+// And if you did return 1, and then they can go get the player themselves
+Entity *player_get_the()
+{
+    if (!player)
+    {
+        slog("no player in player get");
+    }
+    return player;
+}
+
+GFC_Vector3D player_get_forward(Entity *player)
+{
+    if (!player)
+    {
+        slog("no data in player data get");
+    }
+    return MonsterData->forward;
+}
+void bounce_think(Entity *self){
+/*    
+    self->velocity.x += .10;
+    self->velocity.y += .10;
+    self->velocity.z += .10;
+*/
+    //Ok so it takes the negative value
+    self->velocity.z = fabs(self->velocity.z * 1.1 + .1); 
+    //gfc_vector3d_add(self->velocity, self->velocity, MonsterData->forward);
+    if(self->velocity.z > 10){
+        self->think = monster_think;
+        self->update = monster_update;
+    }
+    //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
+}
+
+void bounce_update(Entity *self){
+
+    if (!self)
+        return;
+
+    GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack, up;
+
+    camForward = MonsterData->camData->forward;
+
+    forward.x = camForward.x;
+    forward.y = camForward.y;
+    forward.z = 0;
+
+    up = gfc_vector3d(0, 0, 1);
+    gfc_vector3d_cross_product(&right, forward, up);
+    gfc_vector3d_scale(mHoriz, right, self->velocity.x);
+    gfc_vector3d_scale(mForBack, forward, self->velocity.y);
+    gfc_vector3d_scale(up, up, self->velocity.z);
+
+    if (self->velocity.x)
+    {
+        gfc_vector3d_sub(self->position, self->position, mHoriz);
+        if (self->velocity.x < 0)
+            gfc_vector3d_add(move, move, forward);
+        else
+            gfc_vector3d_sub(move, move, forward);
+    }
+    if (self->velocity.y)
+    {
+        gfc_vector3d_sub(self->position, self->position, mForBack);
+        if (self->velocity.y < 0)
+            gfc_vector3d_sub(move, move, right);
+        else
+            gfc_vector3d_add(move, move, right);
+    }
+    if (self->velocity.z)
+    {
+        gfc_vector3d_add(self->position, self->position, up);
+
+    }
+
+    if ((self->velocity.x) || (self->velocity.y))
+    {
+        self->rotation.z = atan2(move.y, move.x);
+    }
+    MonsterData->forward = forward;
+
+    self->bounds->x = self->position.x;
+    self->bounds->y = self->position.y;
+    self->bounds->z = self->position.z;
+}
+
+void set_think_to_bounce(Entity *self){
+    self->velocity.z = 1;
+    self->think = bounce_think;
+    self->update = bounce_update;
+}
 
 /*eol@eof*/
