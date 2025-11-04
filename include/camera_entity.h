@@ -1,3 +1,6 @@
+#ifndef __CAMERA_ENTITY_H__
+#define __CAMERA_ENTITY_H__
+
 #include "gfc_text.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
@@ -21,3 +24,5 @@ typedef struct CEntData_S{
 void camera_entity_think(Entity *self);
 Entity *camera_entity_spawn(GFC_Vector3D position, Entity *target);
 void camera_entity_free(CameraEntityData *self);
+
+#endif

@@ -24,7 +24,7 @@
 #include "entity.h"
 #include "monster.h"
 #include "bouncepad.h"
-#include "camera_entity.h"
+//#include "camera_entity.h"
 #include "m_plat.h"
 #include "tp.h"
 
@@ -34,6 +34,8 @@ static int _done = 0;
 static Uint32 frame_delay = 33;
 static float fps = 0;
 
+long long timer;
+
 void parse_arguments(int argc,char *argv[]);
 void game_frame_delay();
 
@@ -42,6 +44,10 @@ void exitGame()
     _done = 1;
 }
 
+long long get_timer(){
+    
+    return timer;
+}
 
 int main(int argc,char *argv[])
 {
@@ -147,6 +153,7 @@ int main(int argc,char *argv[])
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
+        timer++;
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
@@ -239,4 +246,5 @@ void game_frame_delay()
     fps = 1000.0/MAX(SDL_GetTicks() - then,0.001);
 //     slog("fps: %f",fps);
 }
+
 /*eol@eof*/

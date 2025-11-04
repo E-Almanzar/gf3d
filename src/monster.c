@@ -5,18 +5,14 @@
 #include "gfc_input.h"
 #include "camera_entity.h"
 #include "world.h"
+#include "monster_thinks.h"
+
 #define GRAVITY -.4
 #define JUMP 10
 
 long long lazy_timer = 0;
 
-typedef struct
-{
-    Entity *cam;
-    CameraEntityData *camData;
-    GFC_Vector3D forward;
-    Uint8 jumpAllowed;
-} MonsterEntityData; // Padding?
+
 void monster_move(Entity *self, Uint8 calledByPushback);
 void teleport_think(Entity *self);
 void teleport_update(Entity *self);
@@ -245,6 +241,13 @@ void monster_control(Entity *self)
         return;
 
     /*Input*/
+    
+    //Lets say we roll first
+    if(gfc_input_command_down("roll")){
+        set_think_for_movement(self, 0);
+        return;
+    }    
+
     if (gfc_input_command_down("walkforward"))
     {
         move += moveStep;
@@ -437,74 +440,8 @@ GFC_Vector3D player_get_forward(Entity *player)
     }
     return MonsterData->forward;
 }
-void bounce_think(Entity *self){
-/*    
-    self->velocity.x += .10;
-    self->velocity.y += .10;
-    self->velocity.z += .10;
-*/
-    //Ok so it takes the negative value
-    self->velocity.z = fabs(self->velocity.z * 1.1 + .1); 
-    //gfc_vector3d_add(self->velocity, self->velocity, MonsterData->forward);
-    if(self->velocity.z > 10){
-        self->think = monster_think;
-        self->update = monster_update;
-    }
-    //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
-}
 
-void bounce_update(Entity *self){
-
-    if (!self)
-        return;
-
-    GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack, up;
-
-    camForward = MonsterData->camData->forward;
-
-    forward.x = camForward.x;
-    forward.y = camForward.y;
-    forward.z = 0;
-
-    up = gfc_vector3d(0, 0, 1);
-    gfc_vector3d_cross_product(&right, forward, up);
-    gfc_vector3d_scale(mHoriz, right, self->velocity.x);
-    gfc_vector3d_scale(mForBack, forward, self->velocity.y);
-    gfc_vector3d_scale(up, up, self->velocity.z);
-
-    if (self->velocity.x)
-    {
-        gfc_vector3d_sub(self->position, self->position, mHoriz);
-        if (self->velocity.x < 0)
-            gfc_vector3d_add(move, move, forward);
-        else
-            gfc_vector3d_sub(move, move, forward);
-    }
-    if (self->velocity.y)
-    {
-        gfc_vector3d_sub(self->position, self->position, mForBack);
-        if (self->velocity.y < 0)
-            gfc_vector3d_sub(move, move, right);
-        else
-            gfc_vector3d_add(move, move, right);
-    }
-    if (self->velocity.z)
-    {
-        gfc_vector3d_add(self->position, self->position, up);
-
-    }
-
-    if ((self->velocity.x) || (self->velocity.y))
-    {
-        self->rotation.z = atan2(move.y, move.x);
-    }
-    MonsterData->forward = forward;
-
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
-}
-
+//These are for ONLY the jumppads and other world things that change the player state
 void set_think_to_bounce(Entity *self, Uint8 flag){
     //Flag: 0 is bounce
     //1 is teleport
@@ -525,55 +462,29 @@ void set_think_to_bounce(Entity *self, Uint8 flag){
         self->velocity.y = 0;
         self->position.z += 15;
 
+
     }
 }
-
-void teleport_update(Entity *self){
-
-    if (!self)
-        return;
-
-    GFC_Vector3D forward, camForward, up;//,right, move = {0}, mHoriz, mForBack, up;
-
-    camForward = MonsterData->camData->forward;
-
-    forward.x = camForward.x;
-    forward.y = camForward.y;
-    forward.z = 0;
-    up = gfc_vector3d(0, 0, 1);
-    gfc_vector3d_scale(up, up, self->velocity.z);
-    if (self->velocity.z)
-    {
-        gfc_vector3d_add(self->position, self->position, up);
-    }
-    MonsterData->forward = forward;
-
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
-}
-
-void teleport_think(Entity *self){
+void set_think_for_movement(Entity *self, Uint8 flag){
     
-
-
-    //Ok so it takes the negative value
-    //slog("V1:%f", self->velocity.z);
-    if(self->velocity.z < 0){self->velocity.z *=-1;}
-    //slog("V:%f", self->velocity.z);
-    self->velocity.z += .075;
-    self->rotation.z +=.1;
-    //gfc_vector3d_add(self->velocity, self->velocity, MonsterData->forward);
-    if(self->velocity.z > 5){
-        self->think = monster_think;
-        self->update = monster_update;
+    if(!flag){
+        slog("we rolled");
+        self->think = roll_think;
+        self->update = roll_update;
     }
-    //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
+
 }
+
+
 
 long long get_timer_from_player(){
     
     return lazy_timer;
+}
+
+MonsterEntityData * get_data_from_player(){
+    return MonsterData;
+
 }
 
 /*eol@eof*/
