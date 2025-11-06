@@ -28,6 +28,8 @@
 #include "m_plat.h"
 #include "tp.h"
 
+#include "saucer.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
@@ -137,18 +139,22 @@ int main(int argc,char *argv[])
 
     //Other ents
     //Bouncepads
+
     //Movepad
     startpos =  gfc_vector3d(20,20,0); 
-    mp_spawn(startpos, GFC_COLOR_WHITE);
+    //mp_spawn(startpos, GFC_COLOR_WHITE);
     //Bouncepad
-    startpos =  gfc_vector3d(-25,0,-32); 
+    startpos =  gfc_vector3d(-25,0,-30.5); 
     bp_spawn(startpos, GFC_COLOR_WHITE);
     //Tp's
-    startpos =  gfc_vector3d(80,0,-32);
+    startpos =  gfc_vector3d(80,0,-30.5);
     tp_spawn(startpos, GFC_COLOR_WHITE, 1);
-    startpos =  gfc_vector3d(-70,0,-32);
+    startpos =  gfc_vector3d(-70,0,-30.5);
     tp_spawn(startpos, GFC_COLOR_WHITE, 1);
 
+    //Enemies
+    startpos =  gfc_vector3d(0,0,10); 
+    saucer_spawn(startpos, GFC_COLOR_WHITE);
 
     //main loop: everything in here is run repeatedly
     while(!_done)

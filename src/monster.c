@@ -11,9 +11,8 @@
 #define JUMP 10
 
 long long lazy_timer = 0;
+long long last_time_rolled = -500;
 
-
-void monster_move(Entity *self, Uint8 calledByPushback);
 void teleport_think(Entity *self);
 void teleport_update(Entity *self);
 
@@ -88,6 +87,7 @@ void monster_gravity(Entity *self)
     target = entity_check_collide(self, 1);
     if(target){
         //We found a moving platform
+        //Oh i think here is the issue with the moving platform
         if(self->position.z >= target->bounds->z){
             //slog("%f %s target: %f %s", self->position.z, self->name, target->position.z, target->name);
             //slog("were higher? or does this not work idiot, you gotta collide to collide");
@@ -198,10 +198,12 @@ void monster_move(Entity *self, Uint8 calledByPushback)
             gfc_vector3d_add(move, move, right);
         }*/
     }
-    if(!calledByPushback){
-        if ((self->velocity.x) || (self->velocity.y))
-        {
-            self->rotation.z = atan2(move.y, move.x);
+    if(calledByPushback != 1){
+        if(calledByPushback != 2){
+            if ((self->velocity.x) || (self->velocity.y))
+            {
+                self->rotation.z = atan2(move.y, move.x);
+            }
         }
         MonsterData->forward = forward;
         // TODO- Jump w/ gravity
@@ -243,10 +245,24 @@ void monster_control(Entity *self)
     /*Input*/
     
     //Lets say we roll first
-    if(gfc_input_command_down("roll")){
-        set_think_for_movement(self, 0);
-        return;
-    }    
+    //We need to check the roll timer
+    //We can kinda just compare against long long lazy timer
+    //if(lazy_timer - last_time_rolled > 500){
+        if(gfc_input_command_down("roll")){
+            set_think_for_movement(self, 0);
+            last_time_rolled = lazy_timer;
+            return;
+        }   
+    //}
+    //sidestep? rainbow?
+        if(gfc_input_command_down("rainbow")){
+            set_think_for_movement(self, 1);
+            return;
+        }
+        if(gfc_input_command_down("glide") && self->think != glide_think){//
+            set_think_for_movement(self, 2);
+            return;
+        }
 
     if (gfc_input_command_down("walkforward"))
     {
@@ -405,6 +421,7 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
     self->bounds->h = 1;
     self->bounds->d = 1;
 
+    //slog("HOLY %f", self->rotation.y);
     strcpy(self->name, "Alien Guy");
     player = self;
     // float x,y,z;   //position of corner
@@ -466,11 +483,24 @@ void set_think_to_bounce(Entity *self, Uint8 flag){
     }
 }
 void set_think_for_movement(Entity *self, Uint8 flag){
-    
+    //Roll
     if(!flag){
-        slog("we rolled");
+        //slog("we rolled");
         self->think = roll_think;
         self->update = roll_update;
+    }
+    //Rainbow Jump
+    if(flag == 1){
+        self->think = rainbow_think;
+        self->update = rainbow_update;
+        self->velocity.x = 0;
+        self->velocity.z = 0;
+    }
+
+    if(flag == 2){
+        self->think = glide_think;
+        self->update = glide_update;
+        self->rotation.z = GFC_PI;
     }
 
 }

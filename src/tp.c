@@ -53,8 +53,8 @@ void tp_update(Entity *self){
 void tp_think(Entity *self){
     
     //self->velocity.x = moveBy;
-    self->bounds->x = self->position.x-15;
-    self->bounds->y = self->position.y-15;
+    self->bounds->x = self->position.x-8;
+    self->bounds->y = self->position.y-8;
     self->bounds->z = self->position.z;
 
 }
@@ -68,26 +68,23 @@ Entity *tp_spawn(GFC_Vector3D position, GFC_Color color, Uint16 tpPair){
     self = entity_new();
     if(!self) return NULL;
 
-    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad.obj");
+    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad2.obj");
     self->texture = gf3d_texture_load("models/bouncepad/tp.png");
-    strcpy(self->mesh->filename, "models/bouncepad/bouncepad.obj");
-    self->scale = gfc_vector3d(10,10,10);
+    strcpy(self->mesh->filename, "models/bouncepad/bouncepad2.obj");
+    self->scale = gfc_vector3d(1,1,1);
     self->color = color;
     self->position = position;
-    self->position.y -= 12;
     self->think = tp_think;
     self->update = tp_update;
 
     self->bounds = gfc_allocate_array(sizeof(GFC_Box),1);
-    //We need to set the bounds positions to the corner-
-    //This is kinda stupid idk how to make it all the way around the box
-    //Should I just make the mesh?
+
     //self->bounds->x = position.x-12;
     //self->bounds->y = position.y-27;
     //self->bounds->z = position.z+10;
-    self->bounds->w = 33;
-    self->bounds->h = 33;
-    self->bounds->d = 15;
+    self->bounds->w = 16;
+    self->bounds->h = 16;
+    self->bounds->d = 16;
 
     //Set its tpPair
     self->data = gfc_allocate_array(sizeof(TeleportData), 1);

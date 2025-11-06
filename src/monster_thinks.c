@@ -10,10 +10,13 @@
 #include "game.h"
 
 long long roll_timer = -100;
+long long rainbow_timer = -100;
+
 
 Uint8 timer_check(long long * previous_time, float how_long_until_again){
-    slog("checking %lld - %lld = %lld >= %f", get_timer(), *previous_time, get_timer() - *previous_time, how_long_until_again);
+    //slog("checking %lld - %lld = %lld >= %f", get_timer(), *previous_time, get_timer() - *previous_time, how_long_until_again);
     if(get_timer() - *previous_time >=  how_long_until_again){
+        //Are they racing???
         *previous_time = get_timer();
         return 1;    
     }
@@ -136,19 +139,24 @@ void teleport_think(Entity *self){
 
 //Roll think?
 void roll_think(Entity *self){
-
+    //If the time has been more than 100 frames, then you return to the og thinks
+    //slog("roll, %lld", roll_timer);
     GFC_Vector3D forward;
     forward = get_data_from_player()->camData->forward;
 
-
-    //If the time has been more than 100 frames, then you return to the og thinks
-    slog("roll, %lld", roll_timer);
     if(timer_check(&roll_timer, 50)){
-        slog("timer end");
+        //slog("timer end");
         self->think = monster_think;
         self->update = monster_update;
+        self->rotation.y = 0;
+        //slog("END %f", self->rotation.y);
+        return;
     }
     //gfc_vector3d_add(self->velocity, self->velocity, forward);
+    self->rotation.y++;
+    //slog("HOLY %f", self->rotation.y);
+
+
     self->velocity.z = 0; 
 
 }
@@ -176,4 +184,122 @@ void roll_update(Entity *self){
             else
                 gfc_vector3d_add(move, move, right);
         }
+}
+
+float rainbowdir = 1;
+
+//Rainbow = sidestep left or right 
+void rainbow_think(Entity *self){
+    self->velocity.z += rainbowdir;
+    self->velocity.x += 1;
+    if(self->velocity.z >= 10 && rainbowdir >0){
+        rainbowdir*=-1;
+    }
+    monster_move(self, 0);
+    if(timer_check(&rainbow_timer, 50)){
+        //slog("timer end %f", rainbowdir);
+        self->think = monster_think;
+        self->update = monster_update;
+        //self->rotation.y = 0;
+        rainbowdir = 1;
+        //slog("END %f", self->rotation.y);
+        return;
+    }
+ /*   GFC_Vector3D forward;
+    forward = get_data_from_player()->camData->forward;
+
+
+    //If the time has been more than 100 frames, then you return to the og thinks
+    //slog("roll, %lld", roll_timer);
+    if(timer_check(&rainbow_timer, 50)){
+        slog("timer end %f", rainbowdir);
+        self->think = monster_think;
+        self->update = monster_update;
+        //self->rotation.y = 0;
+        //rainbowdir *= -1;
+        //slog("END %f", self->rotation.y);
+        return;
+    }
+
+    //if(self->velocity.y){
+        //Then do the y routine
+        //if youre at the peak, flip and go down
+        //self->velocity.y += .4;
+        self->velocity.x += rainbowdir;
+        self->velocity.z += rainbowdir;
+        if(self->velocity.z > 2 && rainbowdir > 0){
+            rainbowdir *= -1;
+        }
+        slog("%f", self->velocity.z);
+
+    //}
+
+    //self->velocity.z = 0; 
+*/
+}
+
+void rainbow_update(Entity *self){
+    /*GFC_Vector3D forward, right, forward_backward, horizontal, move = {0};
+    forward = get_data_from_player()->camData->forward;
+    slog("2: %f", self->velocity.z);
+
+    gfc_vector3d_cross_product(&right, forward, gfc_vector3d(0, 0, 1));
+    gfc_vector3d_scale(forward_backward, forward, self->velocity.y);
+    gfc_vector3d_scale(horizontal, right, self->velocity.x);
+
+    if (self->velocity.x){
+        gfc_vector3d_sub(self->position, self->position, horizontal);
+        if (self->velocity.x < 0)
+            gfc_vector3d_add(move, move, forward);
+        else
+            gfc_vector3d_sub(move, move, forward);
+    }
+    if (self->velocity.y)
+    {
+        gfc_vector3d_sub(self->position, self->position, forward_backward);
+        if (self->velocity.y < 0)
+            gfc_vector3d_sub(move, move, right);
+        else
+            gfc_vector3d_add(move, move, right);
+    }
+    //slog("3: %f", self->velocity.z);
+    self->position.z += self->velocity.z;
+    //monster_gravity(self);
+    //slog("%f", self->velocity.z);
+*/
+}
+
+//Glide think?
+void glide_update(Entity *self){
+        if (!self)
+        return;
+    monster_move(self, 2);
+    //Set your rotation funky
+        self->rotation.z +=.01;
+        self->rotation.y +=.01;
+
+    self->bounds->x = self->position.x;
+    self->bounds->y = self->position.y;
+    self->bounds->z = self->position.z;
+}
+
+void glide_think(Entity *self){
+    GFC_Vector3D *contact;
+
+    contact = malloc(sizeof(GFC_Vector3D));
+    entity_get_floor_position(self, world_get_the(), contact);
+
+    if(self->position.z - contact->z < .025){
+        self->think = monster_think;
+        self->update = monster_update;
+    }
+    /*if(gfc_input_command_down("c")){
+        self->think = monster_think;
+        self->update = monster_update;
+    }*/
+    monster_control(self);
+    self->velocity.x *= 1.3;
+    self->velocity.y *= 1.3;
+    self->velocity.z *= .5;
+
 }
