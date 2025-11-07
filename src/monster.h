@@ -6,9 +6,10 @@
 typedef struct
 {
     Entity *cam;
-    CameraEntityData *camData;
-    GFC_Vector3D forward;
-    Uint8 jumpAllowed;
+    CameraEntityData    *camData;
+    GFC_Vector3D        forward;
+    Uint8               jumpAllowed;
+    Uint8               sprinting;
 } MonsterEntityData; // Padding?
 
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color);

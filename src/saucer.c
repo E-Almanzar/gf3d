@@ -7,7 +7,15 @@ float angle = 0;
 
 void saucer_update(Entity *self){
 
-
+ Entity *target, *pair;
+    pair = malloc(sizeof(Entity));
+    if(!self){return;}
+    target = entity_check_collide(self, 0);
+    if(target == NULL){return;} 
+    if(target){
+        slog("YOU DIED OR SOMETHING");
+        set_think_to_dead(target);
+    }
 }
 
 

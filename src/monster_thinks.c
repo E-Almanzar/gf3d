@@ -12,6 +12,12 @@
 long long roll_timer = -100;
 long long rainbow_timer = -100;
 
+void monster_update_bounds(Entity *self){
+    self->bounds->x = self->position.x;
+    self->bounds->y = self->position.y;
+    self->bounds->z = self->position.z;
+}
+
 
 Uint8 timer_check(long long * previous_time, float how_long_until_again){
     //slog("checking %lld - %lld = %lld >= %f", get_timer(), *previous_time, get_timer() - *previous_time, how_long_until_again);
@@ -141,14 +147,15 @@ void teleport_think(Entity *self){
 void roll_think(Entity *self){
     //If the time has been more than 100 frames, then you return to the og thinks
     //slog("roll, %lld", roll_timer);
-    GFC_Vector3D forward;
-    forward = get_data_from_player()->camData->forward;
+   // GFC_Vector3D forward;
+   // forward = get_data_from_player()->camData->forward;
 
     if(timer_check(&roll_timer, 50)){
         //slog("timer end");
         self->think = monster_think;
         self->update = monster_update;
         self->rotation.y = 0;
+        self->rotation.x = 0;
         //slog("END %f", self->rotation.y);
         return;
     }
@@ -275,12 +282,10 @@ void glide_update(Entity *self){
         return;
     monster_move(self, 2);
     //Set your rotation funky
-        self->rotation.z +=.01;
-        self->rotation.y +=.01;
+        //self->rotation.z +=.01;
+        self->rotation.x +=.01;
 
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
+    monster_update_bounds(self);
 }
 
 void glide_think(Entity *self){
@@ -289,9 +294,13 @@ void glide_think(Entity *self){
     contact = malloc(sizeof(GFC_Vector3D));
     entity_get_floor_position(self, world_get_the(), contact);
 
+    //|| gfc_input_command_down("glide") Can't turn it off just yet
     if(self->position.z - contact->z < .025){
         self->think = monster_think;
         self->update = monster_update;
+        self->rotation.y = 0;
+        self->rotation.x = 0;
+        return;
     }
     /*if(gfc_input_command_down("c")){
         self->think = monster_think;
@@ -303,3 +312,25 @@ void glide_think(Entity *self){
     self->velocity.z *= .5;
 
 }
+
+void dead_update(Entity *self){
+    self->rotation.z += .00001;
+
+}
+
+
+void dead_think(Entity *self){
+//If you hit respawn, respawn
+
+    self->position = gfc_vector3d(0,0,100);
+    get_data_from_player()->cam->position = gfc_vector3d(0,0,100); 
+    slog("dead as hell");
+    if (gfc_input_command_down("jump"))
+    {
+        self->think = monster_think;
+        self->update = monster_update;
+        self->position = gfc_vector3d(0,0,100);
+    }
+    monster_update_bounds(self);
+}
+

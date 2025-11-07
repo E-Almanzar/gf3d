@@ -153,7 +153,7 @@ int main(int argc,char *argv[])
     tp_spawn(startpos, GFC_COLOR_WHITE, 1);
 
     //Enemies
-    startpos =  gfc_vector3d(0,0,10); 
+    startpos =  gfc_vector3d(100,100,10); 
     saucer_spawn(startpos, GFC_COLOR_WHITE);
 
     //main loop: everything in here is run repeatedly

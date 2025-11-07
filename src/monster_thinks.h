@@ -17,3 +17,6 @@ void rainbow_update(Entity *self);
 
 void glide_think(Entity *self);
 void glide_update(Entity *self);
+
+void dead_think(Entity *self);
+void dead_update(Entity *self);

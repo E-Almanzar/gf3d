@@ -140,6 +140,9 @@ void monster_gravity(Entity *self)
         jumpAllowed = 1;
     }
 }
+float sprintHelpy = 0; 
+int forwardposneg = 1, sidesideposneg = 1;
+int previousDirectionX =1, previousDirectionY =1;
 void monster_move(Entity *self, Uint8 calledByPushback)
 {
     GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack;
@@ -155,8 +158,40 @@ void monster_move(Entity *self, Uint8 calledByPushback)
 
     gfc_vector3d_cross_product(&right, forward, gfc_vector3d(0, 0, 1));
     //slog("RIGHT?? %f, %f, %f", right.x, right.y, right.x);
-    gfc_vector3d_scale(mHoriz, right, self->velocity.x);
-    gfc_vector3d_scale(mForBack, forward, self->velocity.y);
+
+    //If were sprinting we should scale it more
+    //Oscillating between 3 and 2.99
+    if (sprintHelpy > 0 && !MonsterData->sprinting) {
+        sprintHelpy -= 0.01;
+        if (sprintHelpy < 0) sprintHelpy = 0;   
+    }
+    else if (MonsterData->sprinting && sprintHelpy < 3) {
+        sprintHelpy += 0.01;
+        if (sprintHelpy > 3) sprintHelpy = 3;   
+    }
+
+    //slog("%f", sprintHelpy);
+    //How do we get the 
+    //variable = (condition) ? expressionTrue : expressionFalse;
+    if (self->velocity.x != 0) {
+        sidesideposneg = (self->velocity.x >= 0) ? 1 : -1;
+    }
+
+    if (self->velocity.y != 0) {
+        forwardposneg = (self->velocity.y >= 0) ? 1 : -1;
+    }
+
+    // Apply sliding if not moving actively
+    if (sprintHelpy > 0 && self->velocity.x == 0) {
+        self->velocity.x = sprintHelpy * sidesideposneg;
+    }
+
+    if (sprintHelpy > 0 && self->velocity.y == 0) {
+        self->velocity.y = sprintHelpy * forwardposneg;
+    }
+
+    gfc_vector3d_scale(mHoriz, right, self->velocity.x+sprintHelpy * sidesideposneg);
+    gfc_vector3d_scale(mForBack, forward, self->velocity.y+sprintHelpy * forwardposneg);
 
   //  slog("RIGHT AFTER?? %f, %f, %f", mHoriz.x, mHoriz.y, mHoriz.x);
     //mHoriz = right;
@@ -199,12 +234,12 @@ void monster_move(Entity *self, Uint8 calledByPushback)
         }*/
     }
     if(calledByPushback != 1){
-        if(calledByPushback != 2){
+        //if(calledByPushback != 2){
             if ((self->velocity.x) || (self->velocity.y))
             {
                 self->rotation.z = atan2(move.y, move.x);
             }
-        }
+        //}
         MonsterData->forward = forward;
         // TODO- Jump w/ gravity
         monster_gravity(self);
@@ -221,6 +256,10 @@ void monster_move(Entity *self, Uint8 calledByPushback)
             // slog("JumpAllowed: %i, Jumpin %i,vel: %f", jumpAllowed, jumping, self->velocity.z);
         }
     }
+
+    //Set the previous
+    //previousDirectionX = (self->velocity.x <= 0 || previousDirectionX == -1) ? 1 : -1;
+    //previousDirectionY = (self->velocity.x >= 0) ? 1 : -1;
 }
 /*
     IMPORTANT- Update
@@ -237,6 +276,8 @@ void monster_update(Entity *self)
 }
 void monster_control(Entity *self)
 {
+    //Turn off sprinting at the start
+    MonsterData->sprinting = 0;
     float move = 0;
     float moveStep = 1;
     if ((!self) || (!self->data))
@@ -299,6 +340,14 @@ void monster_control(Entity *self)
             //}
         }
     }
+
+    //SPRINT- if the button is pressed add a little bit
+    //if its not, subtract until the velocity isnt 
+    if(gfc_input_command_down("sprint")){//Sprinting
+        //slog("sprintingting");
+        MonsterData->sprinting = 1;// Where do we unset it?
+    }
+
 }
 
 /*
@@ -500,11 +549,16 @@ void set_think_for_movement(Entity *self, Uint8 flag){
     if(flag == 2){
         self->think = glide_think;
         self->update = glide_update;
-        self->rotation.z = GFC_PI;
+        self->rotation.y = GFC_PI/2;
     }
 
 }
 
+void set_think_to_dead(Entity *self){
+    self->think = dead_think;
+    self->update = dead_update;
+
+}
 
 
 long long get_timer_from_player(){
