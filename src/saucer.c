@@ -2,19 +2,21 @@
 #define __SAUCER_H__
 #include "simple_logger.h"
 #include "entity.h"
+#include "monster_thinks.h"
 
 float angle = 0;
 
 void saucer_update(Entity *self){
 
- Entity *target, *pair;
-    pair = malloc(sizeof(Entity));
+ Entity *target;//, *pair;
+    //pair = malloc(sizeof(Entity));
     if(!self){return;}
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
     if(target){
-        slog("YOU DIED OR SOMETHING");
-        set_think_to_dead(target);
+        //slog("YOU DIED OR SOMETHING");
+        target->velocity.z = .5;
+        //set_think_to_dead(target);
     }
 }
 
@@ -48,12 +50,14 @@ Entity *saucer_spawn(GFC_Vector3D position, GFC_Color Color){
     self->bounds = gfc_allocate_array(sizeof(GFC_Box), 1);
     self->bounds->x = position.x-20;
     self->bounds->y = position.y-20;
-    self->bounds->z = position.z;
+    //We set the bounds low and maybe when we get you, and if we collide with the other
+    //box you die? Thats kinda genius
+    self->bounds->z = position.z-40;
 
     //Set the bounds to the bottom and send it out 40 
     self->bounds->w = 40;
-    self->bounds->h = 20;
-    self->bounds->d = 40;
+    self->bounds->h = 40; //this is a fucking lie
+    self->bounds->d = 1000;
 
     strcpy(self->name, "Saucer");
 

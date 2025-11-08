@@ -98,7 +98,7 @@ int main(int argc,char *argv[])
     lightdir = gfc_vector3d(5,0,5); 
     startpos =  gfc_vector3d(0,0,-20); 
     sky_mesh = gf3d_mesh_load("models/sky/sky.obj");
-    sky_texture = gf3d_texture_load("models/sky/sky4.png");
+    sky_texture = gf3d_texture_load("models/sky/sky5.png");
     gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.78, .78, .78)); //It was clipping the far plane
     //gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.87, .87, .87));
     

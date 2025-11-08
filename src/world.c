@@ -15,7 +15,7 @@ World * world_new(){
     return world;
 }
 World * world_load(const char *name){
-    //slog("world load?");
+    slog("world load?");
     World * world;
     SJson *json;
     SJson *config;
