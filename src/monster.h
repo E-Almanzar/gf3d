@@ -28,6 +28,7 @@ void monster_move(Entity *self, Uint8 calledByPushback);
 void monster_control(Entity *self);
 void set_think_to_bounce(Entity *self, Uint8 flag);
 void set_think_for_movement(Entity *self, Uint8 flag);
+void set_think_to_dead(Entity *self);
 
 long long get_timer_from_player();
 

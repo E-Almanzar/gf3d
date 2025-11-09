@@ -29,6 +29,7 @@
 #include "tp.h"
 
 #include "saucer.h"
+#include "bug.h"
 
 extern int __DEBUG;
 
@@ -155,7 +156,8 @@ int main(int argc,char *argv[])
     //Enemies
     startpos =  gfc_vector3d(100,100,10); 
     saucer_spawn(startpos, GFC_COLOR_WHITE);
-
+    startpos =  gfc_vector3d(-100,-100,10); 
+    bug_spawn(startpos, GFC_COLOR_WHITE);
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
