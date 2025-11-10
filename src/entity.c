@@ -214,7 +214,7 @@ Uint8 entity_get_floor_position(Entity *entity, World *world, GFC_Vector3D *cont
     float footoffset = 4.91;
     downCheck = entity->position;
     downCheck.z -= 50000; //Increase if distance to floor needs to
-
+    
     //TODO why does this happen, what do we need- ask in the discord
     //is this a vector not moving 
     //down.x =0; down.y =0; down.z = 0;

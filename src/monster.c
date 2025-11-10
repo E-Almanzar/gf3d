@@ -368,6 +368,9 @@ void monster_think(Entity *self)
     //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
     // contact = malloc(sizeof(GFC_Vector3D));
     monster_control(self);
+    self->velocity.x *= self->speed;
+    self->velocity.y *= self->speed;
+
 
     // We now have a very dirty contact (ik its not ideal but who cares)
     // Now we need to not set the Z in entity, and instead do it here, and make it stop
@@ -452,7 +455,7 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
 
     // self->velocity.x = .25;
     // slog("WHAT %f", self->velocity.x);
-    self->speed = 10;
+    self->speed = 1;
     // slog("WHAT %i", self->speed);
     self->rotation.z = 3.141592;
 

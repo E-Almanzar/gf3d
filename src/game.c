@@ -32,6 +32,9 @@
 #include "bug.h"
 #include "plant.h"
 
+
+#include "powerup.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
@@ -163,8 +166,12 @@ int main(int argc,char *argv[])
     startpos =  gfc_vector3d(-100,-100,10);
     plant_spawn(startpos, GFC_COLOR_WHITE);
         
-    
+    startpos =  gfc_vector3d(0,20,-28);
+    powerup_spawn(startpos, GFC_COLOR_WHITE);
 
+    startpos =  gfc_vector3d(20,20,-28);
+    powerup_spawn(startpos, GFC_COLOR_WHITE);
+    
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
