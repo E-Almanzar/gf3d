@@ -370,7 +370,10 @@ void monster_think(Entity *self)
     monster_control(self);
     self->velocity.x *= self->speed;
     self->velocity.y *= self->speed;
-
+    //We can kinda hardcode in our small enchant
+    if(self->scale.z == .1f && self->velocity.z < 0){
+        self->velocity.z *= .75f;
+    }
 
     // We now have a very dirty contact (ik its not ideal but who cares)
     // Now we need to not set the Z in entity, and instead do it here, and make it stop

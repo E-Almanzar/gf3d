@@ -310,6 +310,10 @@ void glide_think(Entity *self){
     self->velocity.x *= 1.3;
     self->velocity.y *= 1.3;
     self->velocity.z *= .5;
+    //We can kinda hardcode in our small enchant
+    if(self->scale.z == .1f && self->velocity.z < 0){
+        self->velocity.z *= .75f;
+    }
 
 }
 

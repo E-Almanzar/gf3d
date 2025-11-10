@@ -166,11 +166,17 @@ int main(int argc,char *argv[])
     startpos =  gfc_vector3d(-100,-100,10);
     plant_spawn(startpos, GFC_COLOR_WHITE);
         
-    startpos =  gfc_vector3d(0,20,-28);
-    powerup_spawn(startpos, GFC_COLOR_WHITE);
+    //Longs
+    startpos =  gfc_vector3d(0,-20,-28);
+    powerup_spawn(startpos, GFC_COLOR_WHITE, 0);
+    startpos =  gfc_vector3d(20,-20,-28);
+    powerup_spawn(startpos, GFC_COLOR_WHITE, 0);
 
+    
+    startpos =  gfc_vector3d(0,20,-28);
+    powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
     startpos =  gfc_vector3d(20,20,-28);
-    powerup_spawn(startpos, GFC_COLOR_WHITE);
+    powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
     
     //main loop: everything in here is run repeatedly
     while(!_done)

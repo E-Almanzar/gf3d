@@ -2,6 +2,32 @@
 
 float initalZ; 
 float movestep = .01;
+
+void p_long(Entity *self, Entity *target){
+    if(target->scale.y == 10){
+        //slog("maeke small now?");
+        target->bounds->d = 1;
+        target->speed = 1;
+        target->scale = gfc_vector3d(1,1,1);
+    }
+    else if (target->scale.y == 1){
+        //slog("make beeg");
+        target->bounds->d = 10;
+        target->speed = 1.5;
+        target->scale = gfc_vector3d(1,10,1);
+    }
+}
+
+//A lot of this code is in monster- search hardcoded
+void p_mini(Entity *self, Entity *target){
+    if(target->scale.x == .1f){
+        target->scale = gfc_vector3d(1,1,1);
+    }
+    else{
+        target->scale = gfc_vector3d(.1,.1,.1);
+    }
+}
+
 void powerup_update(Entity *self){
 
     Entity *target;//, *pair;
@@ -11,23 +37,16 @@ void powerup_update(Entity *self){
     if(target == NULL){return;} 
     if(target){
         target->velocity.z += .1;
-        slog("We powered up");
+        //slog("We powered up");
         
-        
-        
+        if(gfc_stricmp("p_long", self->name) == 0){
+            p_long(self, target);
+        }
+        else if(gfc_stricmp("p_mini", self->name) == 0){
+           p_mini(self, target);
+        }
         //Maybe we need to re-enable ourselves after a certain time?
-        if(target->scale.y == 10){
-            slog("maeke small now?");
-            target->bounds->d = 1;
-            target->speed = 1;
-            target->scale = gfc_vector3d(1,1,1);
-        }
-        else{
-            slog("make beeg");
-            target->bounds->d = 10;
-            target->speed = 1.5;
-            target->scale = gfc_vector3d(1,10,1);
-        }
+
         entity_free(self);
     }
 
@@ -43,7 +62,7 @@ void powerup_think(Entity *self){
 
 }
 
-Entity *powerup_spawn(GFC_Vector3D position, GFC_Color Color){
+Entity *powerup_spawn(GFC_Vector3D position, GFC_Color Color, Uint8 flag){
     Entity *self;
     self = entity_new();
     if (!self)
@@ -54,7 +73,6 @@ Entity *powerup_spawn(GFC_Vector3D position, GFC_Color Color){
     strcpy(self->mesh->filename, "models/enemies/saucer.png");
 
     self->scale = gfc_vector3d(.5,.5,.5);
-    self->color = Color;
     self->position = position;
 
     self->think = powerup_think;
@@ -75,7 +93,14 @@ Entity *powerup_spawn(GFC_Vector3D position, GFC_Color Color){
     self->bounds->h = 10; //this is a fucking lie
     self->bounds->d = 20; //This is the real height :eyeroll:
 
-    strcpy(self->name, "p_");
+    if(flag == 0){
+        self->color = GFC_COLOR_WHITE;
+        strcpy(self->name, "p_long");
+    }
+    if(flag == 1){
+        self->color = GFC_COLOR_RED;
+        strcpy(self->name, "p_mini");
+    }
     initalZ = position.z;
     return self;
 }

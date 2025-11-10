@@ -5,6 +5,6 @@
 #include "monster.h"
 #include "monster_thinks.h"
 
-Entity* powerup_spawn();
+Entity *powerup_spawn(GFC_Vector3D position, GFC_Color Color, Uint8 flag);
 
 #endif
