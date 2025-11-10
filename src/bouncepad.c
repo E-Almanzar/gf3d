@@ -40,7 +40,7 @@ Entity *bp_spawn(GFC_Vector3D position, GFC_Color color){
     self->update = bp_update;
 
     self->bounds = gfc_allocate_array(sizeof(GFC_Box),1);
-    slog("Position? %f, %f, %f", position.x, position.y, position.z);
+    //slog("Position? %f, %f, %f", position.x, position.y, position.z);
     self->bounds->x = position.x-8;
     self->bounds->y = position.y-8;
     self->bounds->z = position.z;

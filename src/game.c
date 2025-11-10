@@ -30,6 +30,7 @@
 
 #include "saucer.h"
 #include "bug.h"
+#include "plant.h"
 
 extern int __DEBUG;
 
@@ -143,7 +144,7 @@ int main(int argc,char *argv[])
 
     //Movepad
     startpos =  gfc_vector3d(20,20,0); 
-    //mp_spawn(startpos, GFC_COLOR_WHITE);
+    mp_spawn(startpos, GFC_COLOR_WHITE);
     //Bouncepad
     startpos =  gfc_vector3d(-25,0,-30.5); 
     bp_spawn(startpos, GFC_COLOR_WHITE);
@@ -157,7 +158,13 @@ int main(int argc,char *argv[])
     startpos =  gfc_vector3d(100,100,10); 
     saucer_spawn(startpos, GFC_COLOR_WHITE);
     startpos =  gfc_vector3d(-100,-100,10); 
-    bug_spawn(startpos, GFC_COLOR_WHITE);
+    //bug_spawn(startpos, GFC_COLOR_WHITE);
+    //Turn off the bugs for testing
+    startpos =  gfc_vector3d(-100,-100,10);
+    plant_spawn(startpos, GFC_COLOR_WHITE);
+        
+    
+
     //main loop: everything in here is run repeatedly
     while(!_done)
     {

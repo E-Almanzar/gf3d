@@ -119,6 +119,11 @@ void monster_gravity(Entity *self)
     }
     if(self->velocity.z > -10){
     self->velocity.z += GRAVITY;}
+    //This is where the mplat breaks?
+    //If we are on a mplat, we need to calculate it? or just drop the feature imo.
+    //or just leave it idgaf 
+
+
     moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z, self);
     // Uint8 t = self->position.z == contact->z;
     // slog("%f, pos %f, con %f", t, self->position.z, contact->z);
@@ -270,9 +275,9 @@ void monster_update(Entity *self)
     if (!self)
         return;
     monster_move(self, 0);
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
+    self->bounds->x = self->position.x-4;
+    self->bounds->y = self->position.y-4;
+    self->bounds->z = self->position.z-4;
 }
 void monster_control(Entity *self)
 {
@@ -394,9 +399,10 @@ void monster_set_cam(Entity *self, Entity *cam)
 }
 
 //Dead code
+/*
 void snap_to_ground(Entity *self)
 {
-    /*if (!self)
+    /if (!self)
         return;
     GFC_Vector3D *contact;
     int didCont;
@@ -405,8 +411,8 @@ void snap_to_ground(Entity *self)
     didCont = entity_get_floor_position(self, world_get_the(), contact);
     //slog("Did contact %i, %f, %f, %f", didCont, contact->x, contact->y, contact->z);
     // gfc_vector3d_copy(self->position, gfc_vector3d(contact->x, contact->y, contact->z+4.91));
-    free(contact);*/
-}
+    free(contact);/
+}*/
 
 void monster_data_init(Entity *self)
 {
@@ -463,12 +469,12 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
 
     // Box
     self->bounds = gfc_allocate_array(sizeof(GFC_Box), 1);
-    self->bounds->x = position.x;
-    self->bounds->y = position.y;
-    self->bounds->z = position.z;
-    self->bounds->w = 1;
-    self->bounds->h = 1;
-    self->bounds->d = 1;
+    self->bounds->x = position.x-4;
+    self->bounds->y = position.y-4;
+    self->bounds->z = position.z-4;
+    self->bounds->w = 2;
+    self->bounds->h = 2;
+    self->bounds->d = 4;
 
     //slog("HOLY %f", self->rotation.y);
     strcpy(self->name, "Alien Guy");

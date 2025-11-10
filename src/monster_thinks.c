@@ -314,7 +314,7 @@ void glide_think(Entity *self){
 }
 
 void dead_update(Entity *self){
-    self->rotation.z += .00001;
+    self->rotation.z += .001;
 
 }
 
@@ -324,7 +324,7 @@ void dead_think(Entity *self){
 
     self->position = gfc_vector3d(0,0,100);
     get_data_from_player()->cam->position = gfc_vector3d(0,0,100); 
-    slog("dead as hell");
+    //slog("dead as hell");
     if (gfc_input_command_down("jump"))
     {
         self->think = monster_think;
