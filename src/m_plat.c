@@ -17,6 +17,17 @@ void mp_update(Entity *self){
         moveBy *= -1;
         
     }
+    Entity *target;//, *pair;
+    //pair = malloc(sizeof(Entity));
+    if(!self){return;}
+    target = entity_check_collide(self, 0);
+    if(target == NULL){return;} 
+    if(target){
+        //slog("We hit it");
+        target->position.z = self->position.z+5.5;
+        target->velocity.z = -.00001;
+
+    }
 
 }
 

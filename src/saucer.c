@@ -2,6 +2,7 @@
 #define __SAUCER_H__
 #include "simple_logger.h"
 #include "entity.h"
+#include "monster.h"
 #include "monster_thinks.h"
 
 float angle = 0;
@@ -16,7 +17,11 @@ void saucer_update(Entity *self){
     if(target){
         //slog("YOU DIED OR SOMETHING");
         target->velocity.z = .5;
-        //set_think_to_dead(target);
+        if(target->position.z >= self->position.z){
+            set_think_to_dead(target);
+        }
+        //slog("self: %f, %f, %f target: %f, %f, %f", self->position.x, self->position.y, self->position.z, target->position.x, target->position.y, target->position.z);
+       
     }
 }
 

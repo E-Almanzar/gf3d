@@ -58,12 +58,12 @@ float validate_move_between(float velocity, float entpos, float targetpos, Entit
 }
 //Is this our wall cling
 void monster_push_back(Entity* self){
-    slog("PUSHING BACK");
+    //slog("PUSHING BACK");
     self->velocity.x *= -1;
     self->velocity.y *= -1;
     if (gfc_input_command_down("jump"))
     {
-        slog("WALL JUMP");
+        //slog("WALL JUMP");
                 //gfc_vector3d_negate(self->velocity,MonsterData->forward);
                 self->velocity.z = JUMP;
                 

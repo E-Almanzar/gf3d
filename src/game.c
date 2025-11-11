@@ -146,7 +146,7 @@ int main(int argc,char *argv[])
     //Bouncepads
 
     //Movepad
-    startpos =  gfc_vector3d(20,20,0); 
+    startpos =  gfc_vector3d(40,20,-10); 
     mp_spawn(startpos, GFC_COLOR_WHITE);
     //Bouncepad
     startpos =  gfc_vector3d(-25,0,-30.5); 
@@ -161,7 +161,7 @@ int main(int argc,char *argv[])
     startpos =  gfc_vector3d(100,100,10); 
     saucer_spawn(startpos, GFC_COLOR_WHITE);
     startpos =  gfc_vector3d(-100,-100,10); 
-    //bug_spawn(startpos, GFC_COLOR_WHITE);
+    bug_spawn(startpos, GFC_COLOR_WHITE);
     //Turn off the bugs for testing
     startpos =  gfc_vector3d(-100,-100,10);
     plant_spawn(startpos, GFC_COLOR_WHITE);
@@ -169,18 +169,24 @@ int main(int argc,char *argv[])
     //Longs
     startpos =  gfc_vector3d(0,-20,-28);
     powerup_spawn(startpos, GFC_COLOR_WHITE, 0);
-    startpos =  gfc_vector3d(20,-20,-28);
+    startpos =  gfc_vector3d(-20,-20,-28);
     powerup_spawn(startpos, GFC_COLOR_WHITE, 0);
 
-    
+    //Red
     startpos =  gfc_vector3d(0,20,-28);
     powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
-    startpos =  gfc_vector3d(20,20,-28);
+    startpos =  gfc_vector3d(-20,20,-28);
     powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
     
+    Uint8 ifDead = 0;
+
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
+        if(player->think == dead_think){
+            ifDead = 1;
+        } else
+            ifDead = 0;
         timer++;
         gfc_input_update();
         gf2d_mouse_update();
@@ -228,7 +234,9 @@ int main(int argc,char *argv[])
                 entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
 
                 //2D draws
-                gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
+                if(ifDead)
+                    gf2d_font_draw_line_tag("YOU ARE DEAD",FT_H1,GFC_COLOR_RED, gfc_vector2d(560,300));
+                //gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
                 gf2d_mouse_draw();
         gf3d_vgraphics_render_end();
         if (gfc_input_command_down("exit"))_done = 1; // exit condition

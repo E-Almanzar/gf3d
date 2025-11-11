@@ -46,7 +46,7 @@ void bounce_think(Entity *self){
 }
 
 void bounce_update(Entity *self){
-
+    monster_update_bounds(self);
     if (!self)
         return;
 
@@ -100,7 +100,7 @@ void bounce_update(Entity *self){
 
 
 void teleport_update(Entity *self){
-
+    monster_update_bounds(self);
     if (!self)
         return;
 
@@ -145,6 +145,7 @@ void teleport_think(Entity *self){
 
 //Roll think?
 void roll_think(Entity *self){
+    
     //If the time has been more than 100 frames, then you return to the og thinks
     //slog("roll, %lld", roll_timer);
    // GFC_Vector3D forward;
@@ -169,6 +170,7 @@ void roll_think(Entity *self){
 }
 
 void roll_update(Entity *self){
+    monster_update_bounds(self);
     GFC_Vector3D forward, right, forward_backward, horizontal, move = {0};
     forward = get_data_from_player()->camData->forward;
     
@@ -246,6 +248,7 @@ void rainbow_think(Entity *self){
 }
 
 void rainbow_update(Entity *self){
+    monster_update_bounds(self);
     /*GFC_Vector3D forward, right, forward_backward, horizontal, move = {0};
     forward = get_data_from_player()->camData->forward;
     slog("2: %f", self->velocity.z);
@@ -318,6 +321,7 @@ void glide_think(Entity *self){
 }
 
 void dead_update(Entity *self){
+    monster_update_bounds(self);
     self->rotation.z += .001;
 
 }

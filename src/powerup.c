@@ -4,15 +4,21 @@ float initalZ;
 float movestep = .01;
 
 void p_long(Entity *self, Entity *target){
-    if(target->scale.y == 10){
+    if(target->scale.y != 1){
         //slog("maeke small now?");
         target->bounds->d = 1;
+        target->bounds->x = target->position.x-4;
+        target->bounds->y = target->position.y-4;
+        target->bounds->z = target->position.z-4;
         target->speed = 1;
         target->scale = gfc_vector3d(1,1,1);
     }
     else if (target->scale.y == 1){
         //slog("make beeg");
         target->bounds->d = 10;
+        target->bounds->x = target->position.x-4;
+        target->bounds->y = target->position.y-4;
+        target->bounds->z = target->position.z-4;
         target->speed = 1.5;
         target->scale = gfc_vector3d(1,10,1);
     }
@@ -21,6 +27,9 @@ void p_long(Entity *self, Entity *target){
 //A lot of this code is in monster- search hardcoded
 void p_mini(Entity *self, Entity *target){
     if(target->scale.x == .1f){
+        target->bounds->x = target->position.x-4;
+        target->bounds->y = target->position.y-4;
+        target->bounds->z = target->position.z-4;
         target->scale = gfc_vector3d(1,1,1);
     }
     else{
