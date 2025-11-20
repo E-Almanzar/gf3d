@@ -1,39 +1,4 @@
-#include <SDL.h>            
-
-#include "simple_json.h"
-#include "simple_logger.h"
-
-#include "gfc_input.h"
-#include "gfc_config_def.h"
-#include "gfc_vector.h"
-#include "gfc_matrix.h"
-#include "gfc_audio.h"
-#include "gfc_string.h"
-#include "gfc_actions.h"
-
-#include "gf2d_sprite.h"
-#include "gf2d_font.h"
-#include "gf2d_actor.h"
-#include "gf2d_mouse.h"
-
-#include "gf3d_vgraphics.h"
-#include "gf3d_pipeline.h"
-#include "gf3d_swapchain.h"
-#include "gf3d_camera.h"
-#include "gf3d_mesh.h"
-#include "entity.h"
-#include "monster.h"
-#include "bouncepad.h"
-//#include "camera_entity.h"
-#include "m_plat.h"
-#include "tp.h"
-
-#include "saucer.h"
-#include "bug.h"
-#include "plant.h"
-
-
-#include "powerup.h"
+#include "game.h"
 
 extern int __DEBUG;
 
@@ -71,10 +36,7 @@ int main(int argc,char *argv[])
     float theta = 0;//, delta = .01;
     GFC_Vector3D cam = {0,10,10};
     //GFC_Vector3D lookingAt = gfc_vector3d(0,0,0);
-    
-    //Sky
-    Mesh *sky_mesh;
-    Texture *sky_texture;
+
     
     //initializtion    
     parse_arguments(argc,argv);
@@ -97,14 +59,13 @@ int main(int argc,char *argv[])
     gf2d_mouse_load("actors/mouse.actor");
     
     gfc_matrix4_identity(id);
-    
-    //Skybox
-    gfc_matrix4_identity(skyMat);
+    //Create Exactly 1 Level
+    level_manager_create(2);
+
     lightdir = gfc_vector3d(5,0,5); 
     startpos =  gfc_vector3d(0,0,-20); 
-    sky_mesh = gf3d_mesh_load("models/sky/sky.obj");
-    sky_texture = gf3d_texture_load("models/sky/sky5.png");
-    gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.78, .78, .78)); //It was clipping the far plane
+    gfc_matrix4_identity(skyMat);
+    //gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.78, .78, .78)); //It was clipping the far plane
     //gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(.87, .87, .87));
     
     //mesh = gf3d_mesh_load("models/dino/dino.obj");
@@ -129,57 +90,34 @@ int main(int argc,char *argv[])
     //lookingAt.x -= GFC_PI;
     */
 
-    //World
-    World * world = world_load("defs/terrain.def");
-    gfc_matrix4_multiply_scalar(terrainMat, id, 5);
-    //Camera Spawn
-    //gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
     /*for(int i = 0; i < 100; i++){
         monster_spawn(gfc_vector3d(gfc_crandom()*150,gfc_crandom()*100,gfc_crandom()*20), gfc_color(gfc_random(), gfc_random(), gfc_random(), 1));
     }*/
+
+    /* The player is spawned regardless? maybe if its not the main menu? */
+    //IF level one
+    
+    World * world;
+    //Do we need a level manager singleton?
+    //Player and camera?
     player = monster_spawn(startpos, GFC_COLOR_WHITE);    
+    gfc_matrix4_multiply_scalar(terrainMat, id, 5);
     camera = camera_entity_spawn(startpos, player);
     monster_set_cam(player, camera);
     gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
 
-    //Other ents
-    //Bouncepads
 
-    //Movepad
-    startpos =  gfc_vector3d(40,20,-10); 
-    mp_spawn(startpos, GFC_COLOR_WHITE);
-    //Bouncepad
-    startpos =  gfc_vector3d(-25,0,-30.5); 
-    bp_spawn(startpos, GFC_COLOR_WHITE);
-    //Tp's
-    startpos =  gfc_vector3d(80,0,-30.5);
-    tp_spawn(startpos, GFC_COLOR_WHITE, 1);
-    startpos =  gfc_vector3d(-70,0,-30.5);
-    tp_spawn(startpos, GFC_COLOR_WHITE, 1);
-
-    //Enemies
-    startpos =  gfc_vector3d(100,100,10); 
-    saucer_spawn(startpos, GFC_COLOR_WHITE);
-    startpos =  gfc_vector3d(-100,-100,10); 
-    bug_spawn(startpos, GFC_COLOR_WHITE);
-    //Turn off the bugs for testing
-    startpos =  gfc_vector3d(-100,-100,10);
-    plant_spawn(startpos, GFC_COLOR_WHITE);
-        
-    //Longs
-    startpos =  gfc_vector3d(0,-20,-28);
-    powerup_spawn(startpos, GFC_COLOR_WHITE, 0);
-    startpos =  gfc_vector3d(-20,-20,-28);
-    powerup_spawn(startpos, GFC_COLOR_WHITE, 0);
-
-    //Red
-    startpos =  gfc_vector3d(0,20,-28);
-    powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
-    startpos =  gfc_vector3d(-20,20,-28);
-    powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
     
     Uint8 ifDead = 0;
-
+    if(false){
+        slog("Spawing level 1");
+        spawn_level(1);
+    }
+    else{
+        slog("Spawing level 2");
+        spawn_level(2);
+    }
+    world = world_get_the();
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
@@ -230,7 +168,9 @@ int main(int argc,char *argv[])
                 //You need to make sure the edge test is edge testing?
                 //Ask in the discord what the down thing should be?
                 world_draw(world, terrainMat);// World is not being drawn rn
-                gf3d_sky_draw(sky_mesh, skyMat, GFC_COLOR_WHITE, sky_texture);
+                //In level we will have a function to do it from there
+                //gf3d_sky_draw(sky_mesh, skyMat, GFC_COLOR_WHITE, sky_texture);
+                draw_this_sky(1);
                 entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
 
                 //2D draws
