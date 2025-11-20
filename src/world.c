@@ -68,7 +68,7 @@ void spawn_by_types(SJson *ents){
     int count = sj_array_get_count(movepads);
     for (i = 0; i < count; i++) {
         SJson *mp = sj_array_get_nth(movepads, i);
-        sj_object_get_vector3d(ents,"pos", &pos);
+        sj_object_get_vector3d(mp,"pos", &pos);
         mp_spawn(pos, GFC_COLOR_WHITE);
     }
     
@@ -77,17 +77,16 @@ void spawn_by_types(SJson *ents){
         int count = sj_array_get_count(bps);
         for (int i = 0; i < count; i++) {
             SJson *bp = sj_array_get_nth(bps, i);
-        sj_object_get_vector3d(ents,"pos", &pos);
+            sj_object_get_vector3d(bp, "pos", &pos);
             bp_spawn(pos, GFC_COLOR_WHITE);
         }
     }
-
     SJson *tps = sj_object_get_value(ents, "teleporters");
     if (tps) {
         int count = sj_array_get_count(tps);
         for (int i = 0; i < count; i++) {
             SJson *tp = sj_array_get_nth(tps, i);
-            sj_object_get_vector3d(ents,"pos", &pos);
+            sj_object_get_vector3d(tp,"pos", &pos);
 
             int pair = 0;
             sj_object_get_int(tp, "pair", &pair);
@@ -101,7 +100,7 @@ void spawn_by_types(SJson *ents){
         int count = sj_array_get_count(enemies);
         for (int i = 0; i < count; i++) {
             SJson *enemy = sj_array_get_nth(enemies, i);
-            sj_object_get_vector3d(ents,"pos", &pos);
+            sj_object_get_vector3d(enemy,"pos", &pos);
 
             const char *type = sj_object_get_string(enemy, "type");
             if (strcmp(type, "saucer") == 0) {
@@ -117,7 +116,7 @@ void spawn_by_types(SJson *ents){
         int count = sj_array_get_count(pups);
         for (int i = 0; i < count; i++) {
             SJson *pu = sj_array_get_nth(pups, i);
-            sj_object_get_vector3d(ents,"pos", &pos);
+            sj_object_get_vector3d(pu,"pos", &pos);
 
             int kind = 0;
             sj_object_get_int(pu, "kind", &kind);
@@ -125,6 +124,8 @@ void spawn_by_types(SJson *ents){
             powerup_spawn(pos, GFC_COLOR_WHITE, kind);
         }
     }
+
+
 
 
 }
