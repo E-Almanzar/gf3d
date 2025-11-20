@@ -71,7 +71,7 @@ void spawn_by_types(SJson *ents){
         sj_object_get_vector3d(mp,"pos", &pos);
         mp_spawn(pos, GFC_COLOR_WHITE);
     }
-    
+
     SJson *bps = sj_object_get_value(ents, "bouncepads");
     if (bps) {
         int count = sj_array_get_count(bps);
@@ -81,6 +81,7 @@ void spawn_by_types(SJson *ents){
             bp_spawn(pos, GFC_COLOR_WHITE);
         }
     }
+
     SJson *tps = sj_object_get_value(ents, "teleporters");
     if (tps) {
         int count = sj_array_get_count(tps);
@@ -111,6 +112,7 @@ void spawn_by_types(SJson *ents){
             }
         }
     }
+
     SJson *pups = sj_object_get_value(ents, "powerups");
     if (pups) {
         int count = sj_array_get_count(pups);
@@ -125,6 +127,15 @@ void spawn_by_types(SJson *ents){
         }
     }
 
+    SJson *rigidbodies = sj_object_get_value(ents, "rigidbodies");
+    if (rigidbodies) {
+        int count = sj_array_get_count(rigidbodies);
+        for (int i = 0; i < count; i++) {
+            SJson *rbs = sj_array_get_nth(rigidbodies, i);
+            sj_object_get_vector3d(rbs,"pos", &pos);
+            rigidbody_spawn(pos, GFC_COLOR_WHITE);
+        }
+    }
 
 
 

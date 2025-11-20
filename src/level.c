@@ -119,7 +119,7 @@ void spawn_level_two(){
     }
     sky->sky_texture = gf3d_texture_load("models/sky/sky.png");
     sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
-    world_load("defs/terrain.def");
+    world_load("defs/level2.def");
 
 }
 

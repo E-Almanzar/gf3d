@@ -1,0 +1,23 @@
+{
+  "world": {
+    "terrainMesh": "models/terrain/2.obj",
+    "terrainTexture": "models/terrain/Cube.xcf",
+    "lightColor": [255, 255, 255, 255],
+    "lightPos": [0, 0, 1000, 10],
+    "Ents": {
+      "movepads": [
+      ],
+      "bouncepads": [
+      ],
+      "teleporters": [
+
+      ],
+      "enemies": [
+      ],
+      "rigidbodies": [
+        { "pos": [0, 20, -24], "color": "white", "kind": 1 },
+        { "pos": [-25, 20, -24], "color": "white", "kind": 1 }
+      ]
+    }
+  }
+}

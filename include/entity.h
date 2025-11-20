@@ -22,7 +22,7 @@ typedef struct Entity_S{
     GFC_Vector3D    velocity;
     float           speed;
 
-    // GFC_Primitive   collision; //Not a mesh primitive
+    GFC_Sphere      *s_bounds; //Not a mesh primitive
     GFC_Box         *bounds;
     void            (*draw)(struct Entity_S *self);
     void            (*think)(struct Entity_S *self);

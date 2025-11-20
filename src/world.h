@@ -13,7 +13,8 @@
 #include "plant.h"
 
 #include "powerup.h"
-
+#include "rigidbody.h"
+#include "physicsworld.h"
 
 typedef struct {
     Mesh *          mesh;
