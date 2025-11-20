@@ -4,6 +4,16 @@
 #include "gf3d_mesh.h"
 #include "gfc_primitives.h"
 #include "m_plat.h"
+#include "bouncepad.h"
+//#include "camera_entity.h"
+#include "tp.h"
+
+#include "saucer.h"
+#include "bug.h"
+#include "plant.h"
+
+#include "powerup.h"
+
 
 typedef struct {
     Mesh *          mesh;

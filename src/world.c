@@ -53,7 +53,7 @@ World * world_load(const char *name){
         return world;
     }
     spawn_by_types(ents);
-    
+
     sj_free(json);
     return world;
 }
@@ -71,6 +71,62 @@ void spawn_by_types(SJson *ents){
         sj_object_get_vector3d(ents,"pos", &pos);
         mp_spawn(pos, GFC_COLOR_WHITE);
     }
+    
+    SJson *bps = sj_object_get_value(ents, "bouncepads");
+    if (bps) {
+        int count = sj_array_get_count(bps);
+        for (int i = 0; i < count; i++) {
+            SJson *bp = sj_array_get_nth(bps, i);
+        sj_object_get_vector3d(ents,"pos", &pos);
+            bp_spawn(pos, GFC_COLOR_WHITE);
+        }
+    }
+
+    SJson *tps = sj_object_get_value(ents, "teleporters");
+    if (tps) {
+        int count = sj_array_get_count(tps);
+        for (int i = 0; i < count; i++) {
+            SJson *tp = sj_array_get_nth(tps, i);
+            sj_object_get_vector3d(ents,"pos", &pos);
+
+            int pair = 0;
+            sj_object_get_int(tp, "pair", &pair);
+
+            tp_spawn(pos, GFC_COLOR_WHITE, pair);
+        }
+    }
+
+    SJson *enemies = sj_object_get_value(ents, "enemies");
+    if (enemies) {
+        int count = sj_array_get_count(enemies);
+        for (int i = 0; i < count; i++) {
+            SJson *enemy = sj_array_get_nth(enemies, i);
+            sj_object_get_vector3d(ents,"pos", &pos);
+
+            const char *type = sj_object_get_string(enemy, "type");
+            if (strcmp(type, "saucer") == 0) {
+                saucer_spawn(pos, GFC_COLOR_WHITE);
+            }
+            else if (strcmp(type, "plant") == 0) {
+                plant_spawn(pos, GFC_COLOR_WHITE);
+            }
+        }
+    }
+    SJson *pups = sj_object_get_value(ents, "powerups");
+    if (pups) {
+        int count = sj_array_get_count(pups);
+        for (int i = 0; i < count; i++) {
+            SJson *pu = sj_array_get_nth(pups, i);
+            sj_object_get_vector3d(ents,"pos", &pos);
+
+            int kind = 0;
+            sj_object_get_int(pu, "kind", &kind);
+
+            powerup_spawn(pos, GFC_COLOR_WHITE, kind);
+        }
+    }
+
+
 }
 
 }
