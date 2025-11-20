@@ -47,6 +47,57 @@ static EntitySystem entity_system = {0};
     }
 */
 
+Uint8 mp_edge_test2(Entity *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Vector3D *contact){
+    //UGHHH above checks gross
+    GFC_Edge3D e;
+    int i, j, c, d;
+    MeshPrimitive * prim;
+    GFC_Triangle3D t; 
+
+    if(!world){
+        slog("no world in egde test"); 
+        return 0;
+    }        
+
+    
+    e = gfc_edge3d_from_vectors(start, end);
+    c = gfc_list_count(world->mesh->primitives);
+
+    //slog("start: %f, %f, %f, end: %f, %f, %f", start.x, start.y, start.z, end.x, end.y, end.z);
+
+    for(i = 0; i < c; i++){
+        prim = gfc_list_nth(world->mesh->primitives, i);
+        //if primitive bad continue
+        if(!prim){
+            continue;
+        }
+        d = prim->objData->face_count;
+        for(j = 0; j <= d; j++){
+            /* 
+                t is a triangle and its looking for a b and c,
+                a b and c are vector3ds
+            
+            */
+            t.a = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+            t.b = prim->objData->faceVertices[prim->objData->outFace[j].verts[1]].vertex;
+            t.c = prim->objData->faceVertices[prim->objData->outFace[j].verts[2]].vertex;
+            //t.a prim obj faceVertices[ prim obj outFace [j].verts[0,1,2].vertex;
+            //int x = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+            //slog("ugh trigangle %f, %f, %f", t.a, t.b, t.c);
+            //GFC_Edge3D e = gfc_edge3d_from_vectors(gfc_vector3d(0,0,0),gfc_vector3d(0,0,0));
+            if(gfc_trigfc_angle_edge_test(e,t,contact)) {
+                //slog("~~~~~~~~~~~~~~~~returning True");
+                return 1;
+            }
+            //if(gfc_point_in_box(world->bounds))
+            //slog("triangle edge test failed i:%i j:%i dc %i, %i", i, j,d,c);
+        }
+        
+
+    }
+    return 0;
+}
+
 Entity *entity_new(){
     int i;
     for(i = 0; i < entity_system.entity_max; i++){
@@ -199,7 +250,7 @@ Uint8 world_mp_edge_helper(GFC_Vector3D *downCheck, GFC_Vector3D *down, GFC_Vect
         if(!entity_system.entity_list[i]._inuse){continue;}
         if(gfc_stricmp("bp", entity_system.entity_list[i].name) == 0){
             //slog("in the check?");
-            x = mp_edge_test(&entity_system.entity_list[i], *downCheck, *down, contact);
+            x = mp_edge_test2(&entity_system.entity_list[i], *downCheck, *down, contact);
             if(x)
              return x;
         }

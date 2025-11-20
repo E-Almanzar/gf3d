@@ -3,7 +3,7 @@
 #include "simple_json.h"
 #include "gf3d_mesh.h"
 #include "gfc_primitives.h"
-
+#include "m_plat.h"
 
 typedef struct {
     Mesh *          mesh;
@@ -14,6 +14,7 @@ typedef struct {
 
 }World;
 
+void spawn_by_types(SJson *ents);
 World * world_new();
 World * world_load(const char *name);
 World * world_get_the();

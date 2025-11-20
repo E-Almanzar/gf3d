@@ -1,4 +1,5 @@
 #include "level.h"
+#include "world.h"
 
 typedef struct Level_Sky{
     Uint16      level_Index;
@@ -68,7 +69,7 @@ void spawn_level_one() {
     }
     sky->sky_texture = gf3d_texture_load("models/sky/sky5.png");
     sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
-        /*
+    /*
 
     int index = 0;
     GFC_Vector3D startpos;

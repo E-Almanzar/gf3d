@@ -10,6 +10,7 @@
 
 float initalX, initalY;
 float moveBy = .1;
+Uint8 mp_edge_test(Entity *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Vector3D *contact);
 void mp_update(Entity *self){
     
     self->position.x += self->velocity.x;

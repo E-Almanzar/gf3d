@@ -2,7 +2,7 @@
 #define __LEVEL_H__
 
 #include "gfc_matrix.h"
-#include "world.h"
+//#include "world.h"
 #include "gf3d_mesh.h"
 #include "entity.h"
 #include "monster.h"
