@@ -44,10 +44,36 @@ World * world_load(const char *name){
     sj_object_get_vector3d(config,"lightPos", &world->lightPos);
 
     world->lightColor = GFC_COLOR_WHITE;
+
+    //Ents by defs
+    SJson *ents = sj_object_get_value(config, "Ents");
+    if (!ents) {
+        slog("No Ents section in world json");
+        sj_free(json);
+        return world;
+    }
+    spawn_by_types(ents);
+    
     sj_free(json);
     return world;
 }
 
+void spawn_by_types(SJson *ents){
+    //sj_object_get_vector3d;
+    GFC_Vector3D pos;
+    int i;
+    //MP?
+    SJson *movepads = sj_object_get_value(ents, "movepads");
+    if (movepads) {
+    int count = sj_array_get_count(movepads);
+    for (i = 0; i < count; i++) {
+        SJson *mp = sj_array_get_nth(movepads, i);
+        sj_object_get_vector3d(ents,"pos", &pos);
+        mp_spawn(pos, GFC_COLOR_WHITE);
+    }
+}
+
+}
 void world_free(World * world){
     return;
 

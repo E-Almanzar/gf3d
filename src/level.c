@@ -68,7 +68,7 @@ void spawn_level_one() {
     }
     sky->sky_texture = gf3d_texture_load("models/sky/sky5.png");
     sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
-    
+        /*
 
     int index = 0;
     GFC_Vector3D startpos;
@@ -103,7 +103,7 @@ void spawn_level_one() {
     powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
     startpos = gfc_vector3d(-20, 20, -28);
     powerup_spawn(startpos, GFC_COLOR_WHITE, 1);
-
+*/
 }
 
 void spawn_level_two(){
