@@ -29,7 +29,8 @@ typedef struct Entity_S{
     void            (*update)(struct Entity_S *self);
     //do we need a copy function
     void            (*free)(struct Entity_S *self);
-    
+    //Collide function
+    void            (*collide)(struct Entity_S *self);
     //Void ptr data: it holds generic information stored about our entity
     void            *data;
     Uint8           doGenericUpdate;

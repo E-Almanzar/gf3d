@@ -128,12 +128,14 @@ void spawn_by_types(SJson *ents){
     }
 
     SJson *rigidbodies = sj_object_get_value(ents, "rigidbodies");
+    Entity * dummyEnt;
     if (rigidbodies) {
         int count = sj_array_get_count(rigidbodies);
         for (int i = 0; i < count; i++) {
             SJson *rbs = sj_array_get_nth(rigidbodies, i);
             sj_object_get_vector3d(rbs,"pos", &pos);
-            rigidbody_spawn(pos, GFC_COLOR_WHITE);
+            dummyEnt = rigidbody_spawn(pos, GFC_COLOR_WHITE);
+            physics_world_add(*(Rigidbody*)dummyEnt->data);
         }
     }
 

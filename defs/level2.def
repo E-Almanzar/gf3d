@@ -15,7 +15,7 @@
       "enemies": [
       ],
       "rigidbodies": [
-        { "pos": [0, 20, -24], "color": "white", "kind": 1 },
+        { "pos": [25, 20, -24], "color": "white", "kind": 1 },
         { "pos": [-25, 20, -24], "color": "white", "kind": 1 }
       ]
     }

@@ -5,5 +5,7 @@
 
 void physics_world_init(int maxBodies);
 int physics_world_add(Rigidbody body);
+void physics_step();
+
 
 #endif

@@ -57,7 +57,7 @@ int main(int argc,char *argv[])
     srand(SDL_GetTicks());
     slog_sync();
     gf2d_mouse_load("actors/mouse.actor");
-    
+    physics_world_init(30);
     gfc_matrix4_identity(id);
     //Create Exactly 1 Level
     level_manager_create(2);
@@ -132,7 +132,8 @@ int main(int argc,char *argv[])
         // Think all and update all
         entity_system_think_all();
         entity_system_update_all();
-        
+        physics_step();
+
         //world updates
         /*theta += delta;
         if(theta > 1 || theta < -1){
@@ -170,9 +171,10 @@ int main(int argc,char *argv[])
                 world_draw(world, terrainMat);// World is not being drawn rn
                 //In level we will have a function to do it from there
                 //gf3d_sky_draw(sky_mesh, skyMat, GFC_COLOR_WHITE, sky_texture);
-                draw_this_sky(1);
-                entity_system_draw_all(lightdir, GFC_COLOR_WHITE);
 
+                //TODO Change sky? or does it already work?
+                draw_this_sky(1);
+                entity_system_draw_all(lightdir, GFC_COLOR_WHITE);                
                 //2D draws
                 if(ifDead)
                     gf2d_font_draw_line_tag("YOU ARE DEAD",FT_H1,GFC_COLOR_RED, gfc_vector2d(560,300));

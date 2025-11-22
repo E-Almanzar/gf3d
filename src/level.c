@@ -1,6 +1,6 @@
 #include "level.h"
 #include "world.h"
-
+#include "physicsworld.h"
 typedef struct Level_Sky{
     Uint16      level_Index;
     Mesh        *sky_mesh;
@@ -56,6 +56,7 @@ void spawn_level(Uint16 ID){
         break;
     slog("No level dummy");
     }
+    //TODO we can make it different per levels
 }
 void spawn_level_one() {
     world_load("defs/terrain.def");

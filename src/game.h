@@ -38,6 +38,7 @@
 #include "powerup.h"
 
 #include "level.h"
+#include "physicsworld.h"
 long long get_timer();
 
 #endif
