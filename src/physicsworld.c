@@ -1,5 +1,6 @@
 #include "physicsworld.h"
 
+#define GRAVITY -.01
 PhysicsWorld gPhysicsWorld;
 
 void physics_world_init(int maxBodies)
@@ -21,70 +22,96 @@ int physics_world_add(Rigidbody body)
     return gPhysicsWorld.count++; // return ID
 }
 
-void circle_circle_check(Rigidbody *firstBody){
+Uint8 circle_circle_check(Rigidbody *firstBody, Rigidbody *secondBody, GFC_Vector3D *normal){
     int i, didCollide = 0;
     float dist, squaredDist = 0, radii;
-    Rigidbody *secondBody;
-    GFC_Vector3D difference, normal;
-    normal.x = 0; normal.y = 0; normal.z = 0;
-    for(i = 0; i < gPhysicsWorld.maxBodies; i++){
-        secondBody = &gPhysicsWorld.bodies[i];
-        if(!secondBody){return;} 
+    //Rigidbody *secondBody;
+    GFC_Vector3D difference;//, normal;
+    normal->x = 0; normal->y = 0; normal->z = 0;
+    //We should make it only do it for these two
+    //for(i = 0; i < gPhysicsWorld.maxBodies; i++){
+    //    secondBody = &gPhysicsWorld.bodies[i];
+    if(!secondBody){return 0;} 
 
-        //TODO fix this? it segfaults if theres a continue 
-        if( secondBody == firstBody){return;}
+    //TODO fix this? it segfaults if theres a continue - we should not continue
+    if( secondBody == firstBody){return 0;}
 
-        didCollide = gfc_sphere_overlap(*firstBody->rigid_sphere, *secondBody->rigid_sphere);
-        if(didCollide){
-            //slog("ooh we hit it");
-                        
-            /*Vector3 diff = bodyA->position - bodyB->position;
-            float dist = length(diff);
-            float r = A->radius + B->radius;
+    didCollide = gfc_sphere_overlap(*firstBody->rigid_sphere, *secondBody->rigid_sphere);
+    if(didCollide){
+        //slog("ooh we hit it");
+                    
+        /*Vector3 diff = bodyA->position - bodyB->position;
+        float dist = length(diff);
+        float r = A->radius + B->radius;
 
-            if(dist < r) {
-                float penetration = r - dist;
-                Vector3 normal = diff / dist;
-            }*/
-            difference.x = firstBody->rigid_sphere->x - secondBody->rigid_sphere->x;
-            difference.y = firstBody->rigid_sphere->y - secondBody->rigid_sphere->y;
-            difference.z = firstBody->rigid_sphere->z - secondBody->rigid_sphere->z;
-            squaredDist = difference.x*difference.x+difference.y*difference.y+difference.z*difference.z;
-            //Get the squared radius
-            radii = firstBody->rigid_sphere->r + secondBody->rigid_sphere->r;
-            radii *= radii;
+        if(dist < r) {
+            float penetration = r - dist;
+            Vector3 normal = diff / dist;
+        }*/
+        difference.x = secondBody->rigid_sphere->x - firstBody->rigid_sphere->x;
+        difference.y = secondBody->rigid_sphere->y - firstBody->rigid_sphere->y;
+        difference.z = secondBody->rigid_sphere->z - firstBody->rigid_sphere->z;
+        squaredDist = difference.x*difference.x+difference.y*difference.y+difference.z*difference.z;
+        //Get the squared radius
+        radii = firstBody->rigid_sphere->r + secondBody->rigid_sphere->r;
+        radii *= radii;
 
-            if(squaredDist < radii){
-                dist = sqrt(squaredDist);
-                //slog("Difference: %f,%f,%f",difference.x,difference.y,difference.z);
-                //slog("Dist: %f, = %f",dist, difference.x/dist);
+        if(squaredDist < radii){
+            dist = sqrt(squaredDist);
+            //slog("Difference: %f,%f,%f",difference.x,difference.y,difference.z);
+            //slog("Dist: %f, = %f",dist, difference.x/dist);
 
-                normal.x = difference.x/dist;
-                normal.y = difference.y/dist;
-                normal.z = difference.z/dist;
-                //slog("In  circle: %f, %f, %f ", normal.x, normal.y, normal.z);
-            }
-            //DO both of their collides
-            rigidbody_on_collide(firstBody->owner, normal);
-            rigidbody_on_collide(secondBody->owner, normal);
+            normal->x = difference.x/dist;
+            normal->y = difference.y/dist;
+            normal->z = difference.z/dist;
+            //slog("In  circle: %f, %f, %f ", normal.x, normal.y, normal.z);
         }
-        //else{slog("no we didnt");}
+        //DO both of their collides
+        //slog("we hit?");
+        //gfc_vector3d_negate(*normal, *normal);
+        //normal->x *=-1; normal->y *=-1; normal->z *=-1;
+        
+        
+        rigidbody_on_collide(firstBody->owner, *normal);
+        rigidbody_on_collide(secondBody->owner, *normal);
+        return 1;
     }
+    return 0;
+        //else{slog("no we didnt");}
+    //}
 }
 
+
+//Theres a big problem- everyone checks velocites, then checks collisions, then moves! bad
+//Is that even an issue? It checks, then looks for collisions, 
 void physics_step(){
-     for (int i = 0; i <= gPhysicsWorld.count; i++) {
-        Rigidbody *rb = &gPhysicsWorld.bodies[i];
+
+    Rigidbody *A, *B, *rb;
+    Uint8 weCollided = 0;
+    float velNormal, impulseScalar, e;
+    GFC_Vector3D relativeVelocity, normal, impulse, temp;
+     for (int i = 0; i < gPhysicsWorld.count; i++) {
+        rb = &gPhysicsWorld.bodies[i];
         //slog("%f, %f, %f", rb->velocity.x, rb->velocity.y, rb->velocity.z);
-                if(!rb->owner){
+        if(!rb->owner){
             //slog("no owner %i", i);
             return;
         }
+
         //slog("B4??");
         rb->velocity.x = rb->owner->velocity.x;
         rb->velocity.y = rb->owner->velocity.y;
         rb->velocity.z = rb->owner->velocity.z;
         //slog("after?");
+        
+        //APPLY GRAVITY TO BODIES AT THE START OF EACH STEP?
+        //GRAVITY OFF
+        //body_apply_gravity(rb);
+        
+        //We want to only apply the positions if theyre valid?
+        //body_validate_position(rb);
+
+        //Move the actual positions?
         rb->position.x += rb->velocity.x;
         rb->position.y += rb->velocity.y;
         rb->position.z += rb->velocity.z;
@@ -97,15 +124,88 @@ void physics_step(){
         rb->rigid_sphere->x = rb->position.x;
         rb->rigid_sphere->y = rb->position.y;
         rb->rigid_sphere->z = rb->position.z;
-
-        if(rb->owner->data){
-            circle_circle_check(rb);
-        }
-
-        gfc_vector3d_copy(rb->owner->position, rb->position);
     }
 
+
+    for(int i = 0; i < gPhysicsWorld.count; i++) {
+        for(int j = i + 1; j < gPhysicsWorld.count; j++) {
+            A = &gPhysicsWorld.bodies[i];
+            B = &gPhysicsWorld.bodies[j];
+
+            if(A->owner->data && B->owner->data){
+                if(A->rigid_sphere && B->rigid_sphere){
+                    circle_circle_check(A, B, &normal);
+                }
+            }
+            //Two rigidbodies collided
+            if((normal.x || normal.y) || normal.z){
+                //Calculate R.V.
+                //If A is zero then 
+                gfc_vector3d_sub(relativeVelocity, A->velocity, B->velocity);
+                velNormal = gfc_vector3d_dot_product(relativeVelocity, normal);
+                //No clue but this breaks it
+                //if (velNormal > 0) return;
+                
+                e = A->bounciness < B->bounciness ? A->bounciness: B->bounciness;
+                impulseScalar = -(1 + e) * velNormal / (A->mass_inverse + B->mass_inverse);
+                gfc_vector3d_scale(impulse, normal, impulseScalar);
+                //slog("%f, %f, %f", normal.x, normal.y, normal.z);
+                slog("VelNormal: %f, Red Inv Mass: %f, Blue Inv Mass: %f", velNormal,A->mass_inverse,B->mass_inverse);
+
+                //Apply the impulses 
+                //Why do they explode????
+                gfc_vector3d_scale(temp, impulse, A->mass_inverse);
+                gfc_vector3d_add(A->velocity, A->velocity, temp);
+                gfc_vector3d_scale(temp, impulse, B->mass_inverse);
+                gfc_vector3d_sub(B->velocity, B->velocity, temp);
+                
+                slog("%s: %f, %f, %f",A->owner->name, A->velocity.x,A->velocity.y,A->velocity.z);
+                slog("%s: %f, %f, %f",B->owner->name, B->velocity.x,B->velocity.y,B->velocity.z);
+
+            }
+
+            //We want to check and do the same funny against the ground
+            if(A->owner->data && A->rigid_sphere){
+                //circle_ground_check(A);
+            }
+
+        }
+    }
+
+    for (int i = 0; i < gPhysicsWorld.count; i++) {
+        rb = &gPhysicsWorld.bodies[i];
+        gfc_vector3d_copy(rb->owner->velocity, rb->velocity);
+        gfc_vector3d_copy(rb->owner->position, rb->position);
+    }
 
     //Sync back
     
 }
+
+void body_apply_gravity(Rigidbody *rb){
+    if(rb->velocity.z > -1){
+    rb->velocity.z += GRAVITY;}
+}
+Uint8 circle_ground_check(Rigidbody *rb){
+    //We want to check to see if it hits the ground
+    //So we want to check if it hits the bottom mesh- lets export the mesh so we get just the floor?
+    //No, thats stupid, lets do all of it
+    //slog("Velocity z: %f", rb->velocity.z);
+    if(rb->position.z < -25){
+        rb->velocity.z*=-1;
+        if(rb->position.z + 25 < .1 || rb->position.z + 25 >-.1)
+            rb->velocity.z = 0;
+    }
+}
+/*
+void body_validate_position(Rigidbody *rb){
+
+    float x, y, z;
+    x = rb->position.x + rb->velocity.x;
+    y = rb->position.y + rb->velocity.y;
+    z = rb->position.z + rb->velocity.z;
+
+    //Check to see if its generally bound
+    //TODO greater than like 100,000 dont move, or set the xyz
+
+}*/
