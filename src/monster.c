@@ -6,6 +6,7 @@
 #include "camera_entity.h"
 #include "world.h"
 #include "monster_thinks.h"
+#include "rigidbody.h"
 //Monster is in timeout until we can get physics without it
 
 
@@ -32,33 +33,7 @@ GFC_Vector3D lapsePos;
 
     TODO move into entity.c
 */
-float validate_move_between(float velocity, float entpos, float targetpos, Entity *self)
-{
-    if (!velocity || !entpos || !targetpos)
-    {
-        slog("Nothing in validate move");
-        return 0;
-    }
-    float distance = entpos - targetpos;
-    if (fabs(distance) > fabs(velocity))
-    {
-        // slog("difference, velocity %f, >  %f, %i", fabs(distance), fabs(velocity), fabs(distance) > fabs(velocity));
-        return velocity;
-    }
 
-    /*
-        If the difference is less than or equal to velocity- theres a problem
-        calculate the allowed distance
-
-        do we set the v velocity to zero here?
-
-    */
-    self->velocity.z = 0;
-    // slog("Distance: %f", distance);
-    if (velocity < 0)
-        return -1 * distance;
-    return distance;
-}
 //Is this our wall cling
 void monster_push_back(Entity* self){
     //slog("PUSHING BACK");
@@ -493,6 +468,29 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
     // Its just gonna be hardcoded?
     // snap_to_ground(self);
     lapsePos = self->position;
+
+    //Rigidbody
+        //Rigidbody
+    self->s_bounds = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    self->s_bounds->x = position.x-5;
+    self->s_bounds->y = position.y-5;
+    self->s_bounds->z = position.z;
+    self->s_bounds->r = 10;
+
+    self->rigidbody_data = gfc_allocate_array(sizeof(Rigidbody), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->bounciness = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->owner = self;
+    gfc_vector3d_copy(((struct Rigidbody*)self->rigidbody_data)->position, self->position);
+    
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 10;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x-5;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y-5;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
+    ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
+
+    physics_world_add(*(Rigidbody*)self->rigidbody_data);
     return self;
 }
 

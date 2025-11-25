@@ -492,3 +492,36 @@ Entity *entity_find_tp_partner(Entity *pair, Entity *self,Uint16 tpPair){
     }
     return NULL;
 }
+
+float validate_move_between(float velocity, float entpos, float targetpos, Entity *self)
+{
+    //Stupid- if its zero it stops
+    /*if (!velocity || !entpos || !targetpos)
+    {
+        slog("Nothing in validate move");
+        return 0;
+    }*/
+    /*if(targetpos > 1000000 || targetpos < 1000000){
+        slog("Nothing in validate move for targetpos");
+        return 0;
+    }*/
+    float distance = entpos - targetpos;
+    if (fabs(distance) > fabs(velocity))
+    {
+        // slog("difference, velocity %f, >  %f, %i", fabs(distance), fabs(velocity), fabs(distance) > fabs(velocity));
+        return velocity;
+    }
+
+    /*
+        If the difference is less than or equal to velocity- theres a problem
+        calculate the allowed distance
+
+        do we set the v velocity to zero here?
+
+    */
+    self->velocity.z = 0;
+    // slog("Distance: %f", distance);
+    if (velocity < 0)
+        return -1 * distance;
+    return distance;
+}

@@ -12,6 +12,8 @@ typedef struct Rigidbody{
     GFC_Vector3D    position;
     Entity*         owner;
     GFC_Sphere      *rigid_sphere;
+    Uint8           onFloor;
+
 }Rigidbody;
 
 typedef struct PhysicsWorld {

@@ -33,6 +33,8 @@ typedef struct Entity_S{
     void            (*collide)(struct Entity_S *self);
     //Void ptr data: it holds generic information stored about our entity
     void            *data;
+    void            *rigidbody_data;
+
     Uint8           doGenericUpdate;
 } Entity;
 
@@ -71,4 +73,5 @@ void entity_system_update_all();
 Entity *entity_check_collide(Entity *self, Uint16 flag);
 Uint8 ents_mesh_collide_check(Entity *one, Entity *two);
 Entity *entity_find_tp_partner(Entity *pair, Entity *self, Uint16 tpPair);
+float validate_move_between(float velocity, float entpos, float targetpos, Entity *self);
 #endif

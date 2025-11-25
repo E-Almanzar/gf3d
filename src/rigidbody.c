@@ -31,9 +31,9 @@ void rigidbody_think(Entity *self){
     if(self->velocity.z > -1){
     //self->velocity.z -=.001;
     }
-    ((struct Rigidbody*)self->data)->velocity.x = self->velocity.x;
-    ((struct Rigidbody*)self->data)->velocity.y = self->velocity.y;
-    ((struct Rigidbody*)self->data)->velocity.z = self->velocity.z;
+    ((struct Rigidbody*)self->rigidbody_data)->velocity.x = self->velocity.x;
+    ((struct Rigidbody*)self->rigidbody_data)->velocity.y = self->velocity.y;
+    ((struct Rigidbody*)self->rigidbody_data)->velocity.z = self->velocity.z;
    //slog("%f, %f, %f", self->velocity.x, self->velocity.y, self->velocity.z);
 
 }
@@ -63,18 +63,19 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     self->s_bounds->z = position.z;
     self->s_bounds->r = 10;
 
-    self->data = gfc_allocate_array(sizeof(Rigidbody), 1);
-    ((struct Rigidbody*)self->data)->mass_inverse = 1;
-    ((struct Rigidbody*)self->data)->bounciness = 1;
-    ((struct Rigidbody*)self->data)->owner = self;
-    gfc_vector3d_copy(((struct Rigidbody*)self->data)->position, self->position);
+    self->rigidbody_data = gfc_allocate_array(sizeof(Rigidbody), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->bounciness = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->owner = self;
+    gfc_vector3d_copy(((struct Rigidbody*)self->rigidbody_data)->position, self->position);
     
-    ((struct Rigidbody*)self->data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
-    ((struct Rigidbody*)self->data)->rigid_sphere->r = 10;
-    ((struct Rigidbody*)self->data)->rigid_sphere->x = position.x-5;
-    ((struct Rigidbody*)self->data)->rigid_sphere->y = position.y-5;
-    ((struct Rigidbody*)self->data)->rigid_sphere->z = position.z;
-    
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 10;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x-5;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y-5;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
+    ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
+
     //iNITAL 
     if(self->position.x == 0){
         self->velocity.x = .1;
@@ -83,7 +84,7 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     else{
         self->color = GFC_COLOR_RED;
         //self->velocity.x;
-        ((struct Rigidbody*)self->data)->mass_inverse = .5;
+        ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = .5;
         //self->scale.x*=11;self->scale.y*=11;self->scale.z*=11;
         strcpy(self->name, "Red");
 

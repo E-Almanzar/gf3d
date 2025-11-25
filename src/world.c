@@ -135,7 +135,7 @@ void spawn_by_types(SJson *ents){
             SJson *rbs = sj_array_get_nth(rigidbodies, i);
             sj_object_get_vector3d(rbs,"pos", &pos);
             dummyEnt = rigidbody_spawn(pos, GFC_COLOR_WHITE);
-            physics_world_add(*(Rigidbody*)dummyEnt->data);
+            physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
         }
     }
 

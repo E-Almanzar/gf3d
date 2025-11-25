@@ -114,8 +114,10 @@ void physics_step(){
         //Move the actual positions?
         rb->position.x += rb->velocity.x;
         rb->position.y += rb->velocity.y;
-        rb->position.z += rb->velocity.z;
-
+        //rb->position.z += rb->velocity.z;
+        //The Z will be handled by apply
+        if(gfc_stricmp("Alien Guy", rb->owner->name) != 0){
+        body_apply_gravity(rb);}
         if(!rb->owner){
             //slog("no owner %i", i);
             return;
@@ -132,7 +134,7 @@ void physics_step(){
             A = &gPhysicsWorld.bodies[i];
             B = &gPhysicsWorld.bodies[j];
 
-            if(A->owner->data && B->owner->data){
+            if(A->owner->rigidbody_data && B->owner->rigidbody_data){
                 if(A->rigid_sphere && B->rigid_sphere){
                     circle_circle_check(A, B, &normal);
                 }
@@ -165,7 +167,7 @@ void physics_step(){
             }
 
             //We want to check and do the same funny against the ground
-            if(A->owner->data && A->rigid_sphere){
+            if(A->owner->rigidbody_data && A->rigid_sphere){
                 //circle_ground_check(A);
             }
 
@@ -174,17 +176,68 @@ void physics_step(){
 
     for (int i = 0; i < gPhysicsWorld.count; i++) {
         rb = &gPhysicsWorld.bodies[i];
-        gfc_vector3d_copy(rb->owner->velocity, rb->velocity);
-        gfc_vector3d_copy(rb->owner->position, rb->position);
+        if(gfc_stricmp("Alien Guy", rb->owner->name) != 0){
+            //NOT alien
+            gfc_vector3d_copy(rb->owner->velocity, rb->velocity);
+            gfc_vector3d_copy(rb->owner->position, rb->position);
+        }
+        else{
+            gfc_vector3d_copy(rb->velocity, rb->owner->velocity);
+            gfc_vector3d_copy(rb->position, rb->owner->position);
+        }
     }
 
     //Sync back
     
 }
+Uint8 body_get_floor_position(Entity *entity, World *world, GFC_Vector3D *contact){
+    GFC_Vector3D contactHold;
+    GFC_Vector3D downCheck, down;
+    int x, mp=0;
+    float footoffset = 4.91;
+    downCheck = entity->position;
+    downCheck.z -= 50000;
+    gfc_vector3d_add(down, entity->position, gfc_vector3d(0,0,3));
+    x = world_edge_test(world_get_the(), downCheck, down, &contactHold);
+    contact->z = contactHold.z;
+    return x;
+}
+void body_apply_gravity(Rigidbody *self){
 
-void body_apply_gravity(Rigidbody *rb){
-    if(rb->velocity.z > -1){
-    rb->velocity.z += GRAVITY;}
+    GFC_Vector3D *contact;
+    //int hitFloor;//, i;
+    float moveValid = 0;
+    //Self is rb
+    contact = malloc(sizeof(GFC_Vector3D));
+    body_get_floor_position(self->owner, world_get_the(), contact);
+
+
+    //Did we hit the moving platform too?
+    if(self->velocity.z > -10){
+    self->velocity.z += GRAVITY;}
+
+    //Movevalid is the distance you can move- this is bad, it skips
+    moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z, self->owner);
+    //ITs just velocity? It should hit at some point
+
+    if(moveValid != self->velocity.z){
+        self->velocity.z = 0;
+    }
+    slog("MV: %f Contact: %f", moveValid,  contact->z);
+    
+    // Uint8 t = self->position.z == contact->z;
+    // slog("%f, pos %f, con %f", t, self->position.z, contact->z);
+    if (fabs(moveValid) >= .0001){
+        /*
+            If you can move vertically, move vertically
+            zero out our horizontal v for a second?
+            When youre on the ground and you didnt jump dont fall just yet
+            Techinally this is not a deliverable so we should just ignore it- move on
+        */
+        self->position.z += moveValid;
+    }
+
+
 }
 Uint8 circle_ground_check(Rigidbody *rb){
     //We want to check to see if it hits the ground
