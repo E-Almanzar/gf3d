@@ -13,7 +13,11 @@ void rigidbody_on_collide(Entity *self, GFC_Vector3D normal){
     slog("%f, %f, %f ", normal.x, normal.y, normal.z);
     //How do we deal with energy tranfser? We have one thing not moving and one thing moving
     self->velocity = gfc_vector3d_multiply(normal, self->velocity);
-    */
+    /
+   if(gfc_stricmp("Alien Guy", self->name) != 0){
+    ((struct Rigidbody*)self->rigidbody_data)->velocity.z+=10;
+    slog("%f: %f", self->velocity.z,  ((struct Rigidbody*)self->rigidbody_data)->velocity.z);
+   }*/
 }
 
 //Lowercase r rigidbody is the entity, and big R is the rigidbody data aka not that
@@ -22,6 +26,7 @@ void rigidbody_update(Entity *self){
     //Convert decisions into physics inputs.
     // entity does not write position
     // entity only writes velocity / forces
+
 }
 
 void rigidbody_think(Entity *self){

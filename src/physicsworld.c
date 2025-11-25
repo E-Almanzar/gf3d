@@ -1,6 +1,6 @@
 #include "physicsworld.h"
 
-#define GRAVITY -.01
+#define GRAVITY -.4
 PhysicsWorld gPhysicsWorld;
 
 void physics_world_init(int maxBodies)
@@ -74,6 +74,7 @@ Uint8 circle_circle_check(Rigidbody *firstBody, Rigidbody *secondBody, GFC_Vecto
         
         rigidbody_on_collide(firstBody->owner, *normal);
         rigidbody_on_collide(secondBody->owner, *normal);
+        // /slog("F: %f, S: %f", firstBody->velocity.z, secondBody->velocity.z);
         return 1;
     }
     return 0;
@@ -89,7 +90,7 @@ void physics_step(){
     Rigidbody *A, *B, *rb;
     Uint8 weCollided = 0;
     float velNormal, impulseScalar, e;
-    GFC_Vector3D relativeVelocity, normal, impulse, temp;
+    GFC_Vector3D relativeVelocity, normal, impulse, temp, distance;
      for (int i = 0; i < gPhysicsWorld.count; i++) {
         rb = &gPhysicsWorld.bodies[i];
         //slog("%f, %f, %f", rb->velocity.x, rb->velocity.y, rb->velocity.z);
@@ -152,7 +153,7 @@ void physics_step(){
                 impulseScalar = -(1 + e) * velNormal / (A->mass_inverse + B->mass_inverse);
                 gfc_vector3d_scale(impulse, normal, impulseScalar);
                 //slog("%f, %f, %f", normal.x, normal.y, normal.z);
-                slog("VelNormal: %f, Red Inv Mass: %f, Blue Inv Mass: %f", velNormal,A->mass_inverse,B->mass_inverse);
+                //slog("VelNormal: %f, %s Inv Mass: %f, %s Inv Mass: %f", velNormal, A->owner->name, A->mass_inverse,B->owner->name,B->mass_inverse);
 
                 //Apply the impulses 
                 //Why do they explode????
@@ -161,10 +162,40 @@ void physics_step(){
                 gfc_vector3d_scale(temp, impulse, B->mass_inverse);
                 gfc_vector3d_sub(B->velocity, B->velocity, temp);
                 
-                slog("%s: %f, %f, %f",A->owner->name, A->velocity.x,A->velocity.y,A->velocity.z);
-                slog("%s: %f, %f, %f",B->owner->name, B->velocity.x,B->velocity.y,B->velocity.z);
+                //slog("%s: %f, %f, %f",A->owner->name, A->velocity.x,A->velocity.y,A->velocity.z);
+                //slog("%s: %f, %f, %f",B->owner->name, B->velocity.x,B->velocity.y,B->velocity.z);
+            
+                /*
+                Collision Correction
+               
+                float percent = .80f;
+                float slop = 0.01f; 
+                distance.x = B->rigid_sphere->x - A->rigid_sphere->x;
+                distance.y = B->rigid_sphere->y - A->rigid_sphere->y;
+                distance.z = B->rigid_sphere->z - A->rigid_sphere->z;
+                float squaredDist = distance.x*distance.x+distance.y*distance.y+distance.z*distance.z;
+                squaredDist = sqrtf(squaredDist);
+                float penetration = A->rigid_sphere->r + B->rigid_sphere->r- squaredDist;
 
-            }
+                if (penetration > slop) {
+                    float correctionMagnitude =
+                        (penetration - slop) / (A->mass_inverse + B->mass_inverse) * percent;
+
+                    GFC_Vector3D correction;
+                    gfc_vector3d_scale(correction, normal, correctionMagnitude);
+
+                    GFC_Vector3D A_corr, B_corr;
+
+                    gfc_vector3d_scale(A_corr, correction, A->mass_inverse);
+                    gfc_vector3d_scale(B_corr, correction, B->mass_inverse);
+                    if(A_corr.z <0)
+                    A_corr.z = 0; 
+                    if(B_corr.z <0)
+                    B_corr.z = 0;
+                    gfc_vector3d_sub(A->position, A->position, A_corr);
+                    gfc_vector3d_add(B->position, B->position, B_corr);
+                }*/
+            } 
 
             //We want to check and do the same funny against the ground
             if(A->owner->rigidbody_data && A->rigid_sphere){
@@ -223,7 +254,7 @@ void body_apply_gravity(Rigidbody *self){
     if(moveValid != self->velocity.z){
         self->velocity.z = 0;
     }
-    slog("MV: %f Contact: %f", moveValid,  contact->z);
+    //slog("MV: %f Contact: %f", moveValid,  contact->z);
     
     // Uint8 t = self->position.z == contact->z;
     // slog("%f, pos %f, con %f", t, self->position.z, contact->z);
