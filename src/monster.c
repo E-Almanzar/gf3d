@@ -256,6 +256,12 @@ void monster_update(Entity *self)
     self->bounds->x = self->position.x-4;
     self->bounds->y = self->position.y-4;
     self->bounds->z = self->position.z-4;
+
+    //Set the other guys things?
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = self->position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = self->position.y;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = self->position.z;
+   // slog("self: %f, %f, %f", self->position.x, self->position.y, self->position.z);
 }
 void monster_control(Entity *self)
 {

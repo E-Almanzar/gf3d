@@ -76,8 +76,8 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 10;
-    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x-5;
-    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y-5;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
     ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
 

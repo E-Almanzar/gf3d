@@ -145,31 +145,28 @@ void physics_step(){
                 //Calculate R.V.
                 //If A is zero then 
                 gfc_vector3d_sub(relativeVelocity, A->velocity, B->velocity);
+                //slog("A->v: %f, %f B->v: %f, %f", A->velocity.x, A->velocity.y, B->velocity.x, B->velocity.y);
                 velNormal = gfc_vector3d_dot_product(relativeVelocity, normal);
+                //slog("%f", velNormal);
                 //No clue but this breaks it
-                //if (velNormal > 0) return;
+                if (velNormal < 0){
+                    velNormal *=-1;
+                }
                 
                 e = A->bounciness < B->bounciness ? A->bounciness: B->bounciness;
                 impulseScalar = -(1 + e) * velNormal / (A->mass_inverse + B->mass_inverse);
                 gfc_vector3d_scale(impulse, normal, impulseScalar);
-                //slog("%f, %f, %f", normal.x, normal.y, normal.z);
-                //slog("VelNormal: %f, %s Inv Mass: %f, %s Inv Mass: %f", velNormal, A->owner->name, A->mass_inverse,B->owner->name,B->mass_inverse);
 
-                //Apply the impulses 
-                //Why do they explode????
                 gfc_vector3d_scale(temp, impulse, A->mass_inverse);
                 gfc_vector3d_add(A->velocity, A->velocity, temp);
                 gfc_vector3d_scale(temp, impulse, B->mass_inverse);
                 gfc_vector3d_sub(B->velocity, B->velocity, temp);
                 
-                //slog("%s: %f, %f, %f",A->owner->name, A->velocity.x,A->velocity.y,A->velocity.z);
-                //slog("%s: %f, %f, %f",B->owner->name, B->velocity.x,B->velocity.y,B->velocity.z);
-            
-                /*
-                Collision Correction
+                /*Collision Correction*/
                
                 float percent = .80f;
-                float slop = 0.01f; 
+                float slop = 0.2f;
+                 
                 distance.x = B->rigid_sphere->x - A->rigid_sphere->x;
                 distance.y = B->rigid_sphere->y - A->rigid_sphere->y;
                 distance.z = B->rigid_sphere->z - A->rigid_sphere->z;
@@ -178,8 +175,8 @@ void physics_step(){
                 float penetration = A->rigid_sphere->r + B->rigid_sphere->r- squaredDist;
 
                 if (penetration > slop) {
-                    float correctionMagnitude =
-                        (penetration - slop) / (A->mass_inverse + B->mass_inverse) * percent;
+                    normal.z = 0;
+                    float correctionMagnitude = (penetration - slop) / (A->mass_inverse + B->mass_inverse) * percent;
 
                     GFC_Vector3D correction;
                     gfc_vector3d_scale(correction, normal, correctionMagnitude);
@@ -192,9 +189,12 @@ void physics_step(){
                     A_corr.z = 0; 
                     if(B_corr.z <0)
                     B_corr.z = 0;
+                    //A_corr.x *=2;B_corr.x *=2;A_corr.y *=2;B_corr.y *=2;
+                    //A_corr.x *=-1;B_corr.x *=-1;A_corr.y *=-1;B_corr.y *=-1;
                     gfc_vector3d_sub(A->position, A->position, A_corr);
                     gfc_vector3d_add(B->position, B->position, B_corr);
-                }*/
+                    //slog("x: %f y: %f \nx: %f y:%f",A_corr.x, A_corr.y,B_corr.x,B_corr.y); 
+                }
             } 
 
             //We want to check and do the same funny against the ground

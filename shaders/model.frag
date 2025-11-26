@@ -19,9 +19,17 @@ void main()
     //- +
     vec3 lightDir = normalize(worldPosition.xyz-lightPos.xyz);
     vec4 texColor = texture(texSampler, fragTexCoord);
+    //vec4 temp;
+    float intensity = dot(-lightDir,inNormal);
     //did he un negative the lightdir
-    texColor.xyz = texColor.xyz * max(0.4,(dot(-lightDir,inNormal)+.2));
 
+    if(intensity > 1){intensity = 1;}
+    else if(intensity > .50){intensity = .75;}
+    else if(intensity > .05){intensity =  .45;}
+    else{intensity = .35;}
+
+    texColor.xyz = texColor.xyz *intensity;
+    
     outColor = texColor * colorMod;
 }
 
@@ -44,4 +52,35 @@ void main()
     
     vec4 texColor = texture(texSampler, fragTexCoord);
     outColor = texColor * colorMod;
+
+    Correct shadow
+    texColor.xyz = texColor.xyz * max(.4,(dot(-lightDir,inNormal)));
+
+    Wrong
+        temp = texColor;
+    temp.xyz = temp.xyz / .49;
+    //temp.xyz *= .294;
+    /*
+    if(temp.x > 2){temp.x = 2;}
+    else if(temp.x > 1){temp.x = 1;}
+    else{temp.x = .5;}
+    /////////////////////
+    if(temp.y > 2){temp.y = 2;}
+    else if(temp.y > 1){temp.y = 1;}
+    else{temp.y = .5;}    
+    /////////////////////
+    if(temp.z > 2){temp.z = 2;}
+    else if(temp.z > 1){temp.z = 1;}
+    else{temp.z = .5;}
+    /////////////////////
+    //temp.xyz = (temp.xyz / 2) + .4;
+    temp.xyz *= .294;
+
+    if(intensity > 1){texColor.x = 1;texColor.y = 1;texColor.z = 1;}
+    else if(intensity > .50){texColor.x = .75; texColor.y = .75; texColor.z = .75;}
+    else if(intensity > .05){texColor.x = .35; texColor.y = .35; texColor.z = .35;}
+    else{texColor.x = .25; texColor.y = .25; texColor.z = .25;}
+
+ 
+
 }*/

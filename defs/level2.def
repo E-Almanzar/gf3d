@@ -3,7 +3,7 @@
     "terrainMesh": "models/terrain/2.obj",
     "terrainTexture": "models/terrain/Cube.xcf",
     "lightColor": [255, 255, 255, 255],
-    "lightPos": [0, 0, 1000, 10],
+    "lightPos": [-100, 0, 250, 1000],
     "Ents": {
       "movepads": [
       ],

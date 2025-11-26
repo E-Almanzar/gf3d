@@ -33,14 +33,16 @@ void main()
     mat3 normalMatrix;
     mat4 mvp = ubo.proj * ubo.view * ubo.model;
 
-    //positions
-    gl_Position =  mvp * vec4(inPosition, 1.0);
-    worldPosition = ubo.model * vec4(inPosition,1.0);
 
     //normals
     normalMatrix = transpose(inverse(mat3(ubo.model)));
     outNormal = normalize(normalMatrix*inNormal);
     //outNormal = normalize(inNormal*normalMatrix);
+
+
+    //positions
+    gl_Position =  mvp * vec4(inPosition, 1.0);
+    worldPosition = ubo.model * vec4(inPosition,1.0);
 
     //pass throughs
     colorMod = ubo.color;

@@ -172,6 +172,8 @@ void entity_draw(Entity *ent, GFC_Vector3D lightPos, GFC_Color lightColor){
     //Use the function that will create the matrix from the vectors pos rot and scale
     if(!ent) return;
     GFC_Matrix4 modelMat;
+    World *world;
+    world = world_get_the();
     gfc_matrix4_from_vectors(
         modelMat,
         ent->position,
@@ -182,7 +184,7 @@ void entity_draw(Entity *ent, GFC_Vector3D lightPos, GFC_Color lightColor){
         modelMat,
         ent->color, 
         ent->texture, 
-        lightPos, //????
+        world->lightPos, //????
         lightColor
     );
     //entity_draw_shadow(ent);

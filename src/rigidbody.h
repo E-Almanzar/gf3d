@@ -10,7 +10,7 @@ typedef struct Rigidbody{
     float           bounciness; 
     GFC_Vector3D    velocity;
     GFC_Vector3D    position;
-    Entity*         owner;
+    Entity          *owner;
     GFC_Sphere      *rigid_sphere;
     Uint8           onFloor;
 

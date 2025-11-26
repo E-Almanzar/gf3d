@@ -42,7 +42,7 @@ World * world_load(const char *name){
     world->mesh = gf3d_mesh_load(str);
     world->texture = gf3d_texture_load(sj_object_get_string(config, "terrainTexture"));
     sj_object_get_vector3d(config,"lightPos", &world->lightPos);
-
+    //slog("%f, %f, %f", world->lightPos.x,  world->lightPos.y,  world->lightPos.z); 
     world->lightColor = GFC_COLOR_WHITE;
 
     //Ents by defs
