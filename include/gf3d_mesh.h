@@ -35,7 +35,13 @@ typedef struct
     GFC_Matrix4     proj;
     GFC_Vector4D    color;
 }SkyUBO;
-
+typedef struct
+{
+    GFC_Matrix4     model;
+    GFC_Matrix4     view;
+    GFC_Matrix4     proj;
+    GFC_Vector4D    camera;
+}OutlineUbo;
 
 typedef struct
 {
@@ -99,6 +105,8 @@ void gf3d_mesh_draw(Mesh *mesh,GFC_Matrix4 modelMat,GFC_Color mod, Texture *text
  * @brief draw a sky mesh
  */
 void gf3d_sky_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture);
+
+void gf3d_outline_draw(Mesh *mesh, GFC_Matrix4 modelMat);
 
 /**
  * @brief allocate a zero initialized mesh primitive

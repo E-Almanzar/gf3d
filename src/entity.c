@@ -187,6 +187,8 @@ void entity_draw(Entity *ent, GFC_Vector3D lightPos, GFC_Color lightColor){
         world->lightPos, //????
         lightColor
     );
+    //slog("drawing %s %f, %f, %f", ent->name, modelMat[0][0],modelMat[1][1],modelMat[2][2]);
+    gf3d_outline_draw(ent->mesh,modelMat);
     //entity_draw_shadow(ent);
     //entity system init before srand sdl
 }
