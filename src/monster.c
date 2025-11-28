@@ -424,9 +424,9 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
     */
     // DATA = GFC_ALLOCATE from camera
     // self->data , self->free
-    self->mesh = gf3d_mesh_load("models/alien/alien.obj");
-    self->texture = gf3d_texture_load("models/alien/alien.png");
-    strcpy(self->mesh->filename, "models/alien/alien.obj");
+    self->mesh = gf3d_mesh_load("models/alien/AlienwSaucer.obj");
+    self->texture = gf3d_texture_load("models/alien/Alien2.png");
+    strcpy(self->mesh->filename, "models/alien/AlienwSaucer.obj");
 
     self->color = Color;
     self->position = position;

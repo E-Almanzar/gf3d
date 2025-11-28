@@ -38,12 +38,25 @@ void main()
     normalMatrix = transpose(inverse(mat3(ubo.model)));
     outNormal = normalize(normalMatrix*inNormal);
     //outNormal = normalize(inNormal*normalMatrix);
+    gl_Position =  mvp * vec4(inPosition, 1.0);
 
-
+    /*
     //positions
     //int outlineThickness = 1;
-    vec3 expandedPosition = inPosition + outNormal * .01;
+    vec3 expandedPosition = inPosition + outNormal *0.02;
     gl_Position =  mvp * vec4(expandedPosition, 1.0);
+    /
+        mat4 mv = ubo.view * ubo.model;
+    mat3 normalMatrix = transpose(inverse(mat3(mv)));
+    vec3 viewNormal = normalize(mat3(ubo.view * ubo.model) * normalize(inNormal));
+    //vec3 viewNormal = normalize(normalMatrix * inNormal);
+    
+    vec4 viewPos = mv * vec4(inPosition, 1.0);
+    viewPos.xyz += viewNormal * 0.2; // Extrude in view space
+    
+    gl_Position = ubo.proj * viewPos;*/
+
+    
     worldPosition = ubo.model * vec4(inPosition,1.0);
 
     //pass throughs

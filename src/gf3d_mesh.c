@@ -213,6 +213,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         sizeof(MeshUBO),
         VK_INDEX_TYPE_UINT16
     );
+
     mesh_manager.outline_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/outline_pipeline.cfg",
@@ -225,6 +226,9 @@ void gf3d_mesh_init(Uint32 mesh_max)
         VK_INDEX_TYPE_UINT16
     );
     
+    /*    VkVertexInputBindingDescription *binding;
+    binding = gf3d_mesh_manager_get_bind_description();
+    slog("Binding: %i, %i, %i",binding->binding, binding->stride, sizeof(Vertex));*/
 
 
     mesh_manager.defaultTexture = gf3d_texture_load("images/default.png");
