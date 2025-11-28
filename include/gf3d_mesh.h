@@ -40,8 +40,11 @@ typedef struct
     GFC_Matrix4     model;
     GFC_Matrix4     view;
     GFC_Matrix4     proj;
+    GFC_Vector4D    color;
     GFC_Vector4D    camera;
-}OutlineUbo;
+    GFC_Vector4D    lightPos;
+    GFC_Vector4D    lightColor;
+}OutlineUBO;
 
 typedef struct
 {
@@ -106,8 +109,7 @@ void gf3d_mesh_draw(Mesh *mesh,GFC_Matrix4 modelMat,GFC_Color mod, Texture *text
  */
 void gf3d_sky_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture);
 
-void gf3d_outline_draw(Mesh *mesh, GFC_Matrix4 modelMat);
-
+void gf3d_outline_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture, GFC_Vector3D lightPos, GFC_Color lightColor);
 /**
  * @brief allocate a zero initialized mesh primitive
  * @return NULL on error or the primitive

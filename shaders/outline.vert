@@ -38,25 +38,10 @@ void main()
     normalMatrix = transpose(inverse(mat3(ubo.model)));
     outNormal = normalize(normalMatrix*inNormal);
     //outNormal = normalize(inNormal*normalMatrix);
-    gl_Position =  mvp * vec4(inPosition, 1.0);
 
-    /*
+
     //positions
-    //int outlineThickness = 1;
-    vec3 expandedPosition = inPosition + outNormal *0.02;
-    gl_Position =  mvp * vec4(expandedPosition, 1.0);
-    /
-        mat4 mv = ubo.view * ubo.model;
-    mat3 normalMatrix = transpose(inverse(mat3(mv)));
-    vec3 viewNormal = normalize(mat3(ubo.view * ubo.model) * normalize(inNormal));
-    //vec3 viewNormal = normalize(normalMatrix * inNormal);
-    
-    vec4 viewPos = mv * vec4(inPosition, 1.0);
-    viewPos.xyz += viewNormal * 0.2; // Extrude in view space
-    
-    gl_Position = ubo.proj * viewPos;*/
-
-    
+    gl_Position =  mvp * vec4(inPosition, 1.0);
     worldPosition = ubo.model * vec4(inPosition,1.0);
 
     //pass throughs
@@ -66,42 +51,3 @@ void main()
     lightPos = ubo.lightPos;
     lightColor = ubo.lightColor;
 }
-
-/*
-layout(binding = 0) uniform UniformBufferObject
-{
-    mat4     model; // We added this to fix a compilation error
-    mat4     view;
-    mat4     proj;
-    vec4     color;
-    vec4     camera;
-    } ubo;
-
-out gl_PerVertex
-{
-    vec4 gl_Position;
-};
-
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inNormal;
-layout(location = 2) in vec2 inTexCoord;
-
-layout(location = 0) out vec2 fragTexCoord;
-layout(location = 1) out vec3 outNormal;
-layout(location = 2) out vec4 colorMod;
-layout(location = 3) out vec4 worldPosition;
-layout(location = 4) out vec4 cameraPos;
-
-void main(){
-    mat3 normalMatrix;
-    mat4 mvp = ubo.proj * ubo.view * ubo.model;
-    gl_Position =  mvp * vec4(inPosition, 1.0);
-    //normalMatrix = transpose(inverse(mat3(ubo.model)));
-    //outNormal = normalize(normalMatrix * inNormal);
-    //colorMod = ubo.color;
-    //cameraPos = ubo.camera;
-    //worldPosition = vec4(inPosition, 1.0);
-    fragTexCoord = inTexCoord;
-
-}
-*/

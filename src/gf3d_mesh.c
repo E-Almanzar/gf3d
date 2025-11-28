@@ -108,17 +108,20 @@ void gf3d_sky_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *tex
 }
 
 
-void gf3d_outline_draw(Mesh *mesh, GFC_Matrix4 modelMat){
+void gf3d_outline_draw(Mesh *mesh, GFC_Matrix4 modelMat, GFC_Color mod, Texture *texture, GFC_Vector3D lightPos, GFC_Color lightColor){
 
-    OutlineUbo ubo = {0};
+    OutlineUBO ubo = {0};
 
     if (!mesh)return;
     gfc_matrix4_copy(ubo.model,modelMat);
     gf3d_vgraphics_get_view(&ubo.view);
     gf3d_vgraphics_get_projection_matrix(&ubo.proj);
 
+    ubo.color = gfc_color_to_vector4f(mod);
+    ubo.lightColor = gfc_color_to_vector4f(lightColor);
+    ubo.lightPos = gfc_vector3dw(lightPos,1.0);
     ubo.camera = gfc_vector3dw(gf3d_camera_get_position(),1.0);
-    gf3d_mesh_queue_render(mesh, mesh_manager.outline_pipe,&ubo, NULL);
+    gf3d_mesh_queue_render(mesh, mesh_manager.outline_pipe,&ubo, texture);
 }
 
 void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe, void  *uboData, Texture *texture)
@@ -201,6 +204,18 @@ void gf3d_mesh_init(Uint32 mesh_max)
         VK_INDEX_TYPE_UINT16
     );
 
+    mesh_manager.outline_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/outline_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_manager_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        sizeof(OutlineUBO),
+        VK_INDEX_TYPE_UINT16
+    );
+    
 
     mesh_manager.pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
@@ -214,18 +229,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         VK_INDEX_TYPE_UINT16
     );
 
-    mesh_manager.outline_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/outline_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_manager_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        sizeof(OutlineUbo),
-        VK_INDEX_TYPE_UINT16
-    );
-    
+
     /*    VkVertexInputBindingDescription *binding;
     binding = gf3d_mesh_manager_get_bind_description();
     slog("Binding: %i, %i, %i",binding->binding, binding->stride, sizeof(Vertex));*/
