@@ -9,11 +9,15 @@
 #include "rigidbody.h"
 //Monster is in timeout until we can get physics without it
 
-
-
+typedef struct player_anim{
+    Mesh        **mesh_list;
+    Texture     **texture_list;
+    Uint16      iterator;
+}player_anim;
+void anim_init(Entity *self);
 #define GRAVITY -.4
 #define JUMP 10
-
+#define MAX_ANIMS 3
 long long lazy_timer = 0;
 long long last_time_rolled = -500;
 
@@ -369,6 +373,16 @@ void monster_think(Entity *self)
         // slog("Lapsepos: %f, %f, %f", self->position.x, self->position.y, self->position.z);
         lapsePos = self->position;
     }
+
+    //ANIM
+    if(((struct player_anim*)self->anim_data)->iterator < MAX_ANIMS){
+        ((struct player_anim*)self->anim_data)->iterator++;
+    }
+    else{
+        ((struct player_anim*)self->anim_data)->iterator = 0;
+    }
+    
+    //self->mesh = ((struct player_anim*)self->anim_data)->mesh_list[((struct player_anim*)self->anim_data)->iterator];
 }
 // This has to run AFTER monster data init
 // This should fix the very messyness
@@ -424,9 +438,6 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
     */
     // DATA = GFC_ALLOCATE from camera
     // self->data , self->free
-    self->mesh = gf3d_mesh_load("models/alien/AlienwSaucer.obj");
-    self->texture = gf3d_texture_load("models/alien/Alien2.png");
-    strcpy(self->mesh->filename, "models/alien/AlienwSaucer.obj");
 
     self->color = Color;
     self->position = position;
@@ -495,9 +506,21 @@ Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
     ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
-
+    anim_init(self);
     physics_world_add(*(Rigidbody*)self->rigidbody_data);
     return self;
+}
+void anim_init(Entity *self){
+    self->anim_data = gfc_allocate_array(sizeof(player_anim), 3);
+    ((struct player_anim*)self->anim_data)->mesh_list = gfc_allocate_array(sizeof(Mesh), 3);
+    ((struct player_anim*)self->anim_data)->mesh_list[0] = gf3d_mesh_load("models/alien/AlienwSaucer.obj");
+    ((struct player_anim*)self->anim_data)->mesh_list[1] = gf3d_mesh_load("models/alien/tiltL.obj");
+    ((struct player_anim*)self->anim_data)->mesh_list[2] = gf3d_mesh_load("models/alien/tiltR.obj");
+
+    self->mesh = ((struct player_anim*)self->anim_data)->mesh_list[0];
+    self->texture = gf3d_texture_load("models/alien/Alien2.png");
+    strcpy(self->mesh->filename, "models/alien/AlienwSaucer.obj");
+
 }
 
 void monster_free()

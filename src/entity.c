@@ -179,6 +179,7 @@ void entity_draw(Entity *ent, GFC_Vector3D lightPos, GFC_Color lightColor){
         ent->position,
         ent->rotation,
         ent->scale);
+    //slog("Here i am? drawing %s", ent->name);
     gf3d_outline_draw(
         ent->mesh,
         modelMat,

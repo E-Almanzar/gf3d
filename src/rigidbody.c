@@ -82,17 +82,17 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
 
     //iNITAL 
-    if(self->position.x == 0){
+    //if(self->position.x == 0){
         self->velocity.x = .1;
         strcpy(self->name, "Blue");
-    }
-    else{
+    //}
+    /*else{
         self->color = GFC_COLOR_RED;
         //self->velocity.x;
         ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = .5;
         //self->scale.x*=11;self->scale.y*=11;self->scale.z*=11;
         strcpy(self->name, "Red");
 
-    }
+    }*/
     return self;
 }

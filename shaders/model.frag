@@ -24,6 +24,7 @@ void main()
     //did he un negative the lightdir
 
     if(intensity > 1){intensity = 1;}
+    else if(intensity > .98){intensity = 1.25;}
     else if(intensity > .50){intensity = .75;}
     else if(intensity > .05){intensity =  .45;}
     else{intensity = .35;}

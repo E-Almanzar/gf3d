@@ -34,7 +34,7 @@ typedef struct Entity_S{
     //Void ptr data: it holds generic information stored about our entity
     void            *data;
     void            *rigidbody_data;
-
+    void            *anim_data;
     Uint8           doGenericUpdate;
 } Entity;
 
