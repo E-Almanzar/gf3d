@@ -139,7 +139,19 @@ void spawn_by_types(SJson *ents){
         }
     }
 
-
+    SJson *goal = sj_object_get_value(ents, "goal");
+    //Entity * dummyEnt;
+    //slog("Here?");
+    if (goal) {
+        int count = sj_array_get_count(goal);
+        for (int i = 0; i < count; i++) {
+            SJson *goals = sj_array_get_nth(goal, i);
+            sj_object_get_vector3d(goals,"pos", &pos);
+            //dummyEnt = 
+            goal_spawn(pos, GFC_COLOR_WHITE);
+            //physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
+        }
+    }
 
 }
 

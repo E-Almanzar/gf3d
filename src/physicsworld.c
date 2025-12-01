@@ -2,7 +2,7 @@
 
 #define GRAVITY -.4
 PhysicsWorld gPhysicsWorld;
-
+void hit_wall(Rigidbody *rb);
 void physics_world_init(int maxBodies)
 {
     gPhysicsWorld.bodies = calloc(maxBodies, sizeof(Rigidbody));
@@ -113,12 +113,14 @@ void physics_step(){
         //body_validate_position(rb);
 
         //Move the actual positions?
+
         rb->position.x += rb->velocity.x;
         rb->position.y += rb->velocity.y;
-        //rb->position.z += rb->velocity.z;
-        //The Z will be handled by apply
         if(gfc_stricmp("Alien Guy", rb->owner->name) != 0){
         body_apply_gravity(rb);}
+        //rb->position.z += rb->velocity.z;
+        //The Z will be handled by apply
+
         if(!rb->owner){
             //slog("no owner %i", i);
             return;
@@ -238,9 +240,11 @@ void body_apply_gravity(Rigidbody *self){
     GFC_Vector3D *contact;
     //int hitFloor;//, i;
     float moveValid = 0;
+    Uint8 hitfloor;
     //Self is rb
     contact = malloc(sizeof(GFC_Vector3D));
-    body_get_floor_position(self->owner, world_get_the(), contact);
+
+    hitfloor = body_get_floor_position(self->owner, world_get_the(), contact);
 
 
     //Did we hit the moving platform too?
@@ -267,7 +271,18 @@ void body_apply_gravity(Rigidbody *self){
         */
         self->position.z += moveValid;
     }
-
+    //slog("what");
+    if(!hitfloor){
+        //slog("Here? %f, %f", self->velocity.x, self->velocity.y);
+        //To make it interesting you only flip one of them
+        hit_wall(self);
+        //self->velocity.x *= -1;
+        //self->velocity.y *= -1;
+        //self->position.x += self->velocity.x*2;
+        //self->position.y += self->velocity.y*2;
+        
+        //slog("Here? %f, %f", self->velocity.x, self->velocity.y);
+    }
 
 }
 Uint8 circle_ground_check(Rigidbody *rb){
@@ -275,12 +290,45 @@ Uint8 circle_ground_check(Rigidbody *rb){
     //So we want to check if it hits the bottom mesh- lets export the mesh so we get just the floor?
     //No, thats stupid, lets do all of it
     //slog("Velocity z: %f", rb->velocity.z);
-    if(rb->position.z < -25){
+    /*if(rb->position.z < -25){
         rb->velocity.z*=-1;
         if(rb->position.z + 25 < .1 || rb->position.z + 25 >-.1)
             rb->velocity.z = 0;
-    }
+    }*/
+   return 0;
 }
+
+void hit_wall(Rigidbody *self){
+    //Hitting a wall is when you will deflect but the other object won't and you know that
+    //Aka a platform, wall, or out of bounds
+    //OHH ok so we are out of bounds rn, good!      
+    Uint8 hitfloor, flipX = 0, flipY = 0;
+    GFC_Vector3D *contact;
+    contact = malloc(sizeof(GFC_Vector3D));
+    float initX, initY;
+    initX = self->position.x;
+    initY = self->position.y;
+    //flipX and flipY are misleading, they are the opposite of what we say, so
+    //notice they are flipped in the last checks
+    self->position.x += self->velocity.x*-2;
+    self->owner->position.x = self->position.x;
+    hitfloor = body_get_floor_position(self->owner, world_get_the(), contact);
+    if(!hitfloor){flipX = 1;}
+    self->owner->position.x = initX;
+
+    self->position.y += self->velocity.y*-2;
+    self->owner->position.y = self->position.y;
+    hitfloor = body_get_floor_position(self->owner, world_get_the(), contact);
+    if(!hitfloor){flipY = 1;}
+    self->owner->position.y = initY;
+
+    if(!flipX){self->velocity.x *=-1;}
+    if(!flipY){self->velocity.y *=-1;}
+    self->position.x = initX + self->velocity.x*2;
+    self->position.y = initY + self->velocity.y*2;
+
+}
+
 /*
 void body_validate_position(Rigidbody *rb){
 

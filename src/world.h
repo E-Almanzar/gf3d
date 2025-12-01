@@ -15,7 +15,7 @@
 #include "powerup.h"
 #include "rigidbody.h"
 #include "physicsworld.h"
-
+#include "goal.h"
 typedef struct {
     Mesh *          mesh;
     Texture         *texture;

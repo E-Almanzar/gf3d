@@ -54,6 +54,8 @@ void spawn_level(Uint16 ID){
         break;
     case 2: spawn_level_two();
         break;
+    case 3: spawn_level_three();
+        break;
     slog("No level dummy");
     }
     //TODO we can make it different per levels
@@ -123,6 +125,22 @@ void spawn_level_two(){
     world_load("defs/level2.def");
 
 }
+void spawn_level_three(){
+    slog("Level 3 is spawned");
+        if (!level_manager || !level_manager->levels) {
+        slog("Level manager not initialized!");
+        return;
+    }
+   
+    if(!sky){
+        sky = malloc(sizeof(Level_Sky));
+    }
+    sky->sky_texture = gf3d_texture_load("models/sky/sky5.png");
+    sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
+    world_load("defs/level3.def");
+
+}
+
 
 void draw_this_sky(Uint16 ID){
     //Level *level = &level_manager->levels[ID];

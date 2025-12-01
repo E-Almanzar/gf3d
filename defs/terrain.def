@@ -24,7 +24,10 @@
         { "pos": [-20, -20, -28], "color": "white", "kind": 0 },
         { "pos": [0, 20, -28], "color": "white", "kind": 1 },
         { "pos": [-20, 20, -28], "color": "white", "kind": 1 }
-      ]
+      ],
+       "goal": [
+        
+       ],
     }
   }
 }

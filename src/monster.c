@@ -66,6 +66,7 @@ void monster_gravity(Entity *self)
     hitFloor = entity_get_floor_position(self, world_get_the(), contact);
     
     //Did we hit the moving platform too?
+    //TODO look here- platform?
     target = entity_check_collide(self, 1);
     if(target){
         //We found a moving platform

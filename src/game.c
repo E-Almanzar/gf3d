@@ -113,9 +113,13 @@ int main(int argc,char *argv[])
         slog("Spawing level 1");
         spawn_level(1);
     }
-    else{
+    else if(false){
         slog("Spawing level 2");
         spawn_level(2);
+    }
+    else{
+        //slog("Spawing level 2");
+        spawn_level(3);
     }
     world = world_get_the();
     //main loop: everything in here is run repeatedly
