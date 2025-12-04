@@ -25,8 +25,9 @@ void mp_update(Entity *self){
     if(target == NULL){return;} 
     if(target){
         //slog("We hit it");
-        target->position.z = self->position.z+5.5;
-        target->velocity.z = -.00001;
+        target->position.z = self->position.z+8;
+        //target->velocity.z = -.00001;
+        //slog("target %f", target->velocity.z);
 
     }
 
@@ -45,7 +46,7 @@ void mp_think(Entity *self){
     }
     */
     self->velocity.x = moveBy;
-    self->bounds->x = self->position.x-14;
+    self->bounds->x = self->position.x-12;//
     self->bounds->y = self->position.y-14;
     self->bounds->z = self->position.z;
 
@@ -57,9 +58,9 @@ Entity *mp_spawn(GFC_Vector3D position, GFC_Color color){
     self = entity_new();
     if(!self) return NULL;
 
-    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad2.obj");
-    self->texture = gf3d_texture_load("models/bouncepad/movepad.png");
-    strcpy(self->mesh->filename, "models/bouncepad/bouncepad2.obj");
+    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad3.obj");
+    self->texture = gf3d_texture_load("models/bouncepad/movepad2.png");
+    strcpy(self->mesh->filename, "models/bouncepad/bouncepad3.obj");
     //self->scale = gfc_vector3d(4,4,4);
     self->color = color;
     self->position = position;
@@ -73,9 +74,9 @@ Entity *mp_spawn(GFC_Vector3D position, GFC_Color color){
     //self->bounds->x = position.x-12;
     //self->bounds->y = position.y-27;
     //self->bounds->z = position.z+10;
-    self->bounds->w = 16;
-    self->bounds->h = 16;
-    self->bounds->d = 4;
+    self->bounds->w = 24;
+    self->bounds->h = 24;
+    self->bounds->d = 4;//?
 
     //Uh oh we did a fucky wucky and broke it :<
     initalX = self->position.x;

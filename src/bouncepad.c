@@ -30,9 +30,9 @@ Entity *bp_spawn(GFC_Vector3D position, GFC_Color color){
     self = entity_new();
     if(!self) return NULL;
 
-    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad2.obj");
-    self->texture = gf3d_texture_load("models/bouncepad/bouncepad.png");
-    strcpy(self->mesh->filename, "models/bouncepad/bouncepad2.obj");
+    self->mesh = gf3d_mesh_load("models/bouncepad/bouncepad3.obj");
+    self->texture = gf3d_texture_load("models/bouncepad/bouncepad3.png");
+    strcpy(self->mesh->filename, "models/bouncepad/bouncepad3.obj");
     self->scale = gfc_vector3d(1,1,1);
     self->color = color;
     self->position = position;
@@ -41,13 +41,20 @@ Entity *bp_spawn(GFC_Vector3D position, GFC_Color color){
 
     self->bounds = gfc_allocate_array(sizeof(GFC_Box),1);
     //slog("Position? %f, %f, %f", position.x, position.y, position.z);
-    self->bounds->x = position.x-8;
+    /*self->bounds->x = position.x-8;
     self->bounds->y = position.y-8;
     self->bounds->z = position.z;
-
     self->bounds->w = 16;
     self->bounds->h = 16;
     self->bounds->d = 16;
+
+    */    
+    self->bounds->x = self->position.x-12;//
+    self->bounds->y = self->position.y-14;
+    self->bounds->z = self->position.z;
+    self->bounds->w = 24;
+    self->bounds->h = 24;
+    self->bounds->d = 4;//?
     
     strcpy(self->name, "bp");
     return self;

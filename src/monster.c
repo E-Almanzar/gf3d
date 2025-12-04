@@ -72,7 +72,7 @@ void monster_gravity(Entity *self)
         //We found a moving platform
         //Oh i think here is the issue with the moving platform
        
-
+        //slog("here?");
         //Were gonna do the game design choice to let you jump below
         if(self->position.z >= target->position.z){
             //slog("%f %s target: %f %s", self->position.z, self->name, target->position.z, target->name);
@@ -91,13 +91,11 @@ void monster_gravity(Entity *self)
     
             }*/
            hitmplat = true;
-          
-        }
+            //  slog("hit mplat");
+        }   
         else{
             //We are below the mplat
             self->velocity.z = 0;
-
-        
         }
 
 
@@ -130,8 +128,10 @@ void monster_gravity(Entity *self)
     if(!hitmplat){
         moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z, self);
     }else{
+
         self->velocity.z = 0;
         jumpAllowed = 1;
+        //slog("We hit mplat so we can jump. Right? %i", jumpAllowed);
         return;
 
     }
@@ -373,15 +373,14 @@ void monster_control(Entity *self)
     if (jumpAllowed)
     {
         move = self->velocity.z;
-        if (gfc_input_command_down("jump") && (self->velocity.z == 0 ))
+        if (gfc_input_command_down("jump"))//&& (self->velocity.z == 0 || self->velocity.z == JUMP )
         {
-            if(self->velocity.z == -.00001){
-                slog("MAN WTF");
-            }
+               //slog("MAN WTF");
+
 
             // jumping = 1;
             jumpAllowed = 0;
-            slog("jumpin? %lf", self->velocity.z);
+            //slog("jumpin? %lf", self->velocity.z);
 
             // if(self->position.z < JUMP){
             self->velocity.z = JUMP;
