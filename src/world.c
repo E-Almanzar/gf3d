@@ -53,7 +53,7 @@ World * world_load(const char *name){
         return world;
     }
     spawn_by_types(ents);
-
+    //slog("we?");
     sj_free(json);
     return world;
 }
@@ -61,21 +61,21 @@ World * world_load(const char *name){
 void spawn_by_types(SJson *ents){
     //sj_object_get_vector3d;
     GFC_Vector3D pos;
-    int i;
+    int i, count, kind, pair;
     //MP?
     SJson *movepads = sj_object_get_value(ents, "movepads");
     if (movepads) {
-    int count = sj_array_get_count(movepads);
-    for (i = 0; i < count; i++) {
-        SJson *mp = sj_array_get_nth(movepads, i);
-        sj_object_get_vector3d(mp,"pos", &pos);
-        mp_spawn(pos, GFC_COLOR_WHITE);
-    }
-
+        count = sj_array_get_count(movepads);
+        for (i = 0; i < count; i++) {
+            SJson *mp = sj_array_get_nth(movepads, i);
+            sj_object_get_vector3d(mp, "pos", &pos);
+            mp_spawn(pos, GFC_COLOR_WHITE);
+        }
+    }   
     SJson *bps = sj_object_get_value(ents, "bouncepads");
     if (bps) {
-        int count = sj_array_get_count(bps);
-        for (int i = 0; i < count; i++) {
+        count = sj_array_get_count(bps);
+        for (i = 0; i < count; i++) {
             SJson *bp = sj_array_get_nth(bps, i);
             sj_object_get_vector3d(bp, "pos", &pos);
             bp_spawn(pos, GFC_COLOR_WHITE);
@@ -84,22 +84,23 @@ void spawn_by_types(SJson *ents){
 
     SJson *tps = sj_object_get_value(ents, "teleporters");
     if (tps) {
-        int count = sj_array_get_count(tps);
-        for (int i = 0; i < count; i++) {
+        count = sj_array_get_count(tps);
+        for (i = 0; i < count; i++) {
             SJson *tp = sj_array_get_nth(tps, i);
             sj_object_get_vector3d(tp,"pos", &pos);
 
-            int pair = 0;
+            pair = 0;
             sj_object_get_int(tp, "pair", &pair);
 
             tp_spawn(pos, GFC_COLOR_WHITE, pair);
         }
     }
 
+    Entity * dummyEnt;
     SJson *enemies = sj_object_get_value(ents, "enemies");
     if (enemies) {
-        int count = sj_array_get_count(enemies);
-        for (int i = 0; i < count; i++) {
+         count = sj_array_get_count(enemies);
+        for (i = 0; i < count; i++) {
             SJson *enemy = sj_array_get_nth(enemies, i);
             sj_object_get_vector3d(enemy,"pos", &pos);
 
@@ -110,17 +111,26 @@ void spawn_by_types(SJson *ents){
             else if (strcmp(type, "plant") == 0) {
                 plant_spawn(pos, GFC_COLOR_WHITE);
             }
+            else if (strcmp(type, "bug") == 0) {
+                dummyEnt = bug_spawn(pos, GFC_COLOR_WHITE);
+                physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
+            } 
+            else if (strcmp(type, "evilball") == 0) {
+                //slog("here?");
+                dummyEnt = evilball_spawn(pos, GFC_COLOR_RED);
+                physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
+            } 
         }
     }
 
     SJson *pups = sj_object_get_value(ents, "powerups");
     if (pups) {
-        int count = sj_array_get_count(pups);
-        for (int i = 0; i < count; i++) {
+         count = sj_array_get_count(pups);
+        for ( i = 0; i < count; i++) {
             SJson *pu = sj_array_get_nth(pups, i);
             sj_object_get_vector3d(pu,"pos", &pos);
 
-            int kind = 0;
+            kind = 0;
             sj_object_get_int(pu, "kind", &kind);
 
             powerup_spawn(pos, GFC_COLOR_WHITE, kind);
@@ -128,10 +138,9 @@ void spawn_by_types(SJson *ents){
     }
 
     SJson *rigidbodies = sj_object_get_value(ents, "rigidbodies");
-    Entity * dummyEnt;
     if (rigidbodies) {
-        int count = sj_array_get_count(rigidbodies);
-        for (int i = 0; i < count; i++) {
+         count = sj_array_get_count(rigidbodies);
+        for ( i = 0; i < count; i++) {
             SJson *rbs = sj_array_get_nth(rigidbodies, i);
             sj_object_get_vector3d(rbs,"pos", &pos);
             dummyEnt = rigidbody_spawn(pos, GFC_COLOR_WHITE);
@@ -143,8 +152,8 @@ void spawn_by_types(SJson *ents){
     //Entity * dummyEnt;
     //slog("Here?");
     if (goal) {
-        int count = sj_array_get_count(goal);
-        for (int i = 0; i < count; i++) {
+         count = sj_array_get_count(goal);
+        for ( i = 0; i < count; i++) {
             SJson *goals = sj_array_get_nth(goal, i);
             sj_object_get_vector3d(goals,"pos", &pos);
             //dummyEnt = 
@@ -155,7 +164,7 @@ void spawn_by_types(SJson *ents){
 
 }
 
-}
+
 void world_free(World * world){
     return;
 

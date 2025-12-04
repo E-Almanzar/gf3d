@@ -145,7 +145,11 @@ void spawn_level_three(){
 void draw_this_sky(Uint16 ID){
     //Level *level = &level_manager->levels[ID];
     GFC_Matrix4 skyMat;
+
     gfc_matrix4_identity(skyMat);
+    //gfc_matrix4_scale(skyMat, skyMat, gfc_vector3d(1.2,1.02,1.02));
+    //Entity *player = player_get_the();
+    //gfc_matrix4_rotate_z(skyMat, skyMat, player->rotation.z);
     gf3d_sky_draw(sky->sky_mesh, skyMat, GFC_COLOR_WHITE, sky->sky_texture);
 
 }

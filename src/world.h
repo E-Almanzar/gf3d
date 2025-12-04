@@ -16,13 +16,15 @@
 #include "rigidbody.h"
 #include "physicsworld.h"
 #include "goal.h"
+#include "evilball.h"
+#include "bug.h"
 typedef struct {
     Mesh *          mesh;
     Texture         *texture;
     GFC_List        entities;
     GFC_Vector3D    lightPos;
     GFC_Color       lightColor;
-
+    
 }World;
 
 void spawn_by_types(SJson *ents);

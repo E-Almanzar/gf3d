@@ -3,6 +3,11 @@
 #define GRAVITY -.4
 PhysicsWorld gPhysicsWorld;
 void hit_wall(Rigidbody *rb);
+
+void set_position_to_origin(Rigidbody *rb){
+    rb->position;
+}
+
 void physics_world_init(int maxBodies)
 {
     gPhysicsWorld.bodies = calloc(maxBodies, sizeof(Rigidbody));
@@ -116,11 +121,11 @@ void physics_step(){
 
         rb->position.x += rb->velocity.x;
         rb->position.y += rb->velocity.y;
-        if(gfc_stricmp("Alien Guy", rb->owner->name) != 0){
-        body_apply_gravity(rb);}
+
+        if(gfc_stricmp("Alien Guy", rb->owner->name) != 0){body_apply_gravity(rb);}
         //rb->position.z += rb->velocity.z;
         //The Z will be handled by apply
-
+        //body_apply_gravity(rb);
         if(!rb->owner){
             //slog("no owner %i", i);
             return;
@@ -215,7 +220,8 @@ void physics_step(){
             gfc_vector3d_copy(rb->owner->position, rb->position);
         }
         else{
-            gfc_vector3d_copy(rb->velocity, rb->owner->velocity);
+            //gfc_vector3d_copy(rb->velocity, rb->owner->velocity);
+            //rb->owner->velocity.z = rb->velocity.z;
             gfc_vector3d_copy(rb->position, rb->owner->position);
         }
     }
@@ -275,6 +281,7 @@ void body_apply_gravity(Rigidbody *self){
     if(!hitfloor){
         //slog("Here? %f, %f", self->velocity.x, self->velocity.y);
         //To make it interesting you only flip one of them
+        self->outOfBounds++;
         hit_wall(self);
         //self->velocity.x *= -1;
         //self->velocity.y *= -1;
@@ -282,6 +289,14 @@ void body_apply_gravity(Rigidbody *self){
         //self->position.y += self->velocity.y*2;
         
         //slog("Here? %f, %f", self->velocity.x, self->velocity.y);
+    }
+    else{self->outOfBounds = 0;}
+
+    if(self->outOfBounds > 10){
+        //slog("Freeing meee");
+        //free(self->rigid_sphere);
+        //entity_free(self->owner);
+        set_position_to_origin(self);
     }
 
 }

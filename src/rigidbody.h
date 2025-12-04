@@ -13,6 +13,7 @@ typedef struct Rigidbody{
     Entity          *owner;
     GFC_Sphere      *rigid_sphere;
     Uint8           onFloor;
+    int             outOfBounds;
 
 }Rigidbody;
 

@@ -519,7 +519,7 @@ float validate_move_between(float velocity, float entpos, float targetpos, Entit
     float distance = entpos - targetpos;
     if (fabs(distance) > fabs(velocity))
     {
-        // slog("difference, velocity %f, >  %f, %i", fabs(distance), fabs(velocity), fabs(distance) > fabs(velocity));
+        //slog("difference, velocity %f, >  %f, %i", fabs(distance), fabs(velocity), fabs(distance) > fabs(velocity));
         return velocity;
     }
 

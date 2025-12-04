@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "monster_thinks.h"
 #include "monster.h"
+#include "rigidbody.h"  
 
 void bug_update(Entity *self){
  Entity *target;
@@ -17,7 +18,7 @@ void bug_update(Entity *self){
     }
 }
 GFC_Vector3D  startpos;  
-float moveVal = .1;
+float moveVal = 1;
 void bug_think(Entity *self){
     self->bounds->x = self->position.x-8.5;
     self->bounds->y = self->position.y-8.5; //this is a fucking lie
@@ -35,25 +36,29 @@ void bug_think(Entity *self){
         if(fabs(sPos.x - pPos.x) >= .25){
             if(sPos.x > pPos.x){
                 //Youre x is Greater; subtract to approach
-                self->position.x -= moveVal;
+                //self->position.x -= moveVal;
+                self->velocity.x -= moveVal;
             }else{
-                self->position.x += moveVal;
+                //self->position.x += moveVal;
+                self->velocity.x += moveVal;
             }
         }
 
         if(fabs(sPos.y - pPos.y) >= .25){
             if(sPos.y > pPos.y){
-                self->position.y -= moveVal;
+                //self->position.y -= moveVal;
+                self->velocity.y -= moveVal;
             }else{
-                self->position.y += moveVal;
+                //self->position.y += moveVal;
+                self->velocity.y += moveVal;
             }
         }
             
         if(fabs(sPos.z - (pPos.z-5.5)) >= .25){
             if(sPos.z > (pPos.z-5.5)){
-                self->position.z -= moveVal;
+                //self->position.z -= moveVal;
             }else{
-                self->position.z += moveVal;
+                //self->position.z += moveVal;
             }
         }
         self->rotation.z += .01;
@@ -68,7 +73,7 @@ Entity *bug_spawn(GFC_Vector3D position, GFC_Color Color){
     self = entity_new();
     if (!self)
         return NULL;
-    startpos = gfc_vector3d(-100,-100,10); 
+    gfc_vector3d_copy(startpos, position); 
     self->mesh = gf3d_mesh_load("models/enemies/bug.obj");
     self->texture = gf3d_texture_load("models/bug.png");
     strcpy(self->mesh->filename, "models/enemies/bug.obj");
@@ -95,7 +100,19 @@ Entity *bug_spawn(GFC_Vector3D position, GFC_Color Color){
     self->bounds->d = 10; //This is the real height :eyeroll:
 
     strcpy(self->name, "bug");
-
+    slog("bug");
+        self->rigidbody_data = gfc_allocate_array(sizeof(Rigidbody), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->bounciness = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->owner = self;
+    gfc_vector3d_copy(((struct Rigidbody*)self->rigidbody_data)->position, self->position);
+    
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
+    ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
     return self;
 }
 

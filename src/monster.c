@@ -16,7 +16,7 @@ typedef struct player_anim{
 }player_anim;
 void anim_init(Entity *self);
 #define GRAVITY -.4
-#define JUMP 10
+#define JUMP 6
 #define MAX_ANIMS 3
 long long lazy_timer = 0;
 long long last_time_rolled = -500;
@@ -43,7 +43,7 @@ void monster_push_back(Entity* self){
     //slog("PUSHING BACK");
     self->velocity.x *= -1;
     self->velocity.y *= -1;
-    if (gfc_input_command_down("jump"))
+    /*if (gfc_input_command_down("jump"))
     {
         //slog("WALL JUMP");
                 //gfc_vector3d_negate(self->velocity,MonsterData->forward);
@@ -51,14 +51,14 @@ void monster_push_back(Entity* self){
                 
                 monster_move(self, 1);
                 return;
-    }
+    }*/
     monster_move(self, 1);
 }
 // How the hell do we do coyote time?
 void monster_gravity(Entity *self)
 {
     GFC_Vector3D *contact;
-    int hitFloor;//, i;
+    int hitFloor, hitmplat = false;//, i;
     float moveValid;
     Entity *target;
 
@@ -71,16 +71,35 @@ void monster_gravity(Entity *self)
     if(target){
         //We found a moving platform
         //Oh i think here is the issue with the moving platform
-        if(self->position.z >= target->bounds->z){
+       
+
+        //Were gonna do the game design choice to let you jump below
+        if(self->position.z >= target->position.z){
             //slog("%f %s target: %f %s", self->position.z, self->name, target->position.z, target->name);
             //slog("were higher? or does this not work idiot, you gotta collide to collide");
             hitFloor = true;
             contact->x = self->position.x;
             contact->y = self->position.y;
-            contact->z = target->bounds->z;
-
+            //HOW DO I GET CONTACT.z properly???
+            contact->z = target->position.z;
+            
             self->position.x += target->velocity.x;
+            //self->velocity.z = 0;
+            //slog("Here? %f", self->velocity.z);
+            /*if(self->position.z - target->bounds->z < 1){
+                jumpAllowed = 1;
+    
+            }*/
+           hitmplat = true;
+          
         }
+        else{
+            //We are below the mplat
+            self->velocity.z = 0;
+
+        
+        }
+
 
     }
 
@@ -100,14 +119,22 @@ void monster_gravity(Entity *self)
         //slog("Didnt hit the floor??");
         return;
     }
-    if(self->velocity.z > -10){
-    self->velocity.z += GRAVITY;}
+
+    if(self->velocity.z > -4){
+        self->velocity.z += GRAVITY;
+    }
     //This is where the mplat breaks?
     //If we are on a mplat, we need to calculate it? or just drop the feature imo.
     //or just leave it idgaf 
 
+    if(!hitmplat){
+        moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z, self);
+    }else{
+        self->velocity.z = 0;
+        jumpAllowed = 1;
+        return;
 
-    moveValid = validate_move_between(self->velocity.z, self->position.z, contact->z, self);
+    }
     // Uint8 t = self->position.z == contact->z;
     // slog("%f, pos %f, con %f", t, self->position.z, contact->z);
     if (fabs(moveValid) >= .0001)
@@ -119,14 +146,23 @@ void monster_gravity(Entity *self)
             Techinally this is not a deliverable so we should just ignore it- move on
         */
         jumpAllowed = 0;
-
-        self->position.z += moveValid;
+        
+        //slog("fabs of movevalid %f ", fabs(moveValid));
+        //So why does it hit here?
+        //slog("what the juice?");
+        //self->position.z += self->velocity.z;
+        //self->position.z += moveValid;
+        self->velocity.z = moveValid;
     }
-    else if (self->position.z - contact->z < .01)
+    else if (self->position.z - contact->z < .01 )//|| hitmplat
     {
         // On the floor
+        self->velocity.z = 0;
         jumpAllowed = 1;
     }
+   //You can jump at peak- bad
+   /*else{jumpAllowed = 1;}*/
+    //slog("Velocity: %f", self->velocity.z);
 }
 float sprintHelpy = 0; 
 int forwardposneg = 1, sidesideposneg = 1;
@@ -230,19 +266,31 @@ void monster_move(Entity *self, Uint8 calledByPushback)
         //}
         MonsterData->forward = forward;
         // TODO- Jump w/ gravity
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GRAVITY
+        //slog("Right before gravity %f", self->velocity.z);
         monster_gravity(self);
-
+        //slog("Right after gravity %f", self->velocity.z);
         // This is the actual jump
-        // slog(" jumpallowed: %i, pVelocity:%f ",jumpAllowed, pVelocity);
-        if (jumpAllowed && pVelocity > 0)
+        //slog("Bruh jumpallowed: %i, pVelocity:%f ",jumpAllowed, pVelocity);
+        /*if (jumpAllowed && pVelocity > 0)
         {
-            // slog("Both?");
-            self->position.z += pVelocity;
+            //Jump on mplat fix
+            slog("Both?, vel: %f , Pvel: %f", self->velocity.z, pVelocity);
+            self->velocity.z += 10;
+            //self->velocity.z += pVelocity;
         }
         else
         {
-            // slog("JumpAllowed: %i, Jumpin %i,vel: %f", jumpAllowed, jumping, self->velocity.z);
-        }
+            //slog("JumpAllowed: %i, Jumpin %i,vel: %f", jumpAllowed, jumping, self->velocity.z);
+        }*/
+            //self->velocity.z += .1;
+            //Its set to zero in validate move between
+
+            if (jumpAllowed && pVelocity > 0){
+                self->velocity.z += JUMP;
+            }
+            //slog("self vel %f, %i", self->velocity.z, jumpAllowed);
+        
     }
 
     //Set the previous
@@ -258,6 +306,9 @@ void monster_update(Entity *self)
     if (!self)
         return;
     monster_move(self, 0);
+    //slog("%f, %f", self->position.z, self->velocity.z);
+    self->position.z += self->velocity.z;
+
     self->bounds->x = self->position.x-4;
     self->bounds->y = self->position.y-4;
     self->bounds->z = self->position.z-4;
@@ -322,15 +373,18 @@ void monster_control(Entity *self)
     if (jumpAllowed)
     {
         move = self->velocity.z;
-        if (gfc_input_command_down("jump"))
+        if (gfc_input_command_down("jump") && (self->velocity.z == 0 ))
         {
+            if(self->velocity.z == -.00001){
+                slog("MAN WTF");
+            }
 
             // jumping = 1;
             jumpAllowed = 0;
-            // slog("jumpin? %i", jumping);
+            slog("jumpin? %lf", self->velocity.z);
 
             // if(self->position.z < JUMP){
-            self->velocity.z += JUMP;
+            self->velocity.z = JUMP;
             //}
         }
     }

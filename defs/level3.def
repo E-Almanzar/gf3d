@@ -1,11 +1,12 @@
 {
   "world": {
     "terrainMesh": "models/terrain/terrain5.obj",
-    "terrainTexture": "models/bug.png",
+    "terrainTexture": "models/sky/sky3.png",
     "lightColor": [255, 255, 255, 255],
     "lightPos": [-100, 0, 250, 1000],
     "Ents": {
       "movepads": [
+        { "pos": [40, 20, -40], "color": "white" }
       ],
       "bouncepads": [
         { "pos": [-25, 0, -30.5], "color": "white" }
@@ -14,11 +15,29 @@
 
       ],
       "enemies": [
+        { "type": "evilball", "pos": [0, 0, 10], "color": "red" }
       ],
       "rigidbodies": [
         { "pos": [50, 20, 0], "color": "white", "kind": 1 },
         { "pos": [0, 20, 0], "color": "white", "kind": 1 }
         { "pos": [-50, 20, 0], "color": "white", "kind": 1 }
+                
+        { "pos": [50, 40, 30], "color": "white", "kind": 1 },
+        { "pos": [0, 40, 30], "color": "white", "kind": 1 }
+        { "pos": [-50, 40, 30], "color": "white", "kind": 1 }
+        
+        { "pos": [50, 60, 60], "color": "white", "kind": 1 },
+        { "pos": [0, 60, 60], "color": "white", "kind": 1 }
+        { "pos": [-50, 60, 60], "color": "white", "kind": 1 }
+        
+        { "pos": [50, 120, 90], "color": "white", "kind": 1 },
+        { "pos": [0, 120, 90], "color": "white", "kind": 1 }
+        { "pos": [-50, 120, 90], "color": "white", "kind": 1 }
+        
+        
+        { "pos": [50, 220, 100], "color": "white", "kind": 1 },
+        { "pos": [0, 220, 100], "color": "white", "kind": 1 }
+        { "pos": [-50, 220, 100], "color": "white", "kind": 1 }
       ],
       "goal": [
         { "pos": [40, 20, -24], "color": "white" }
