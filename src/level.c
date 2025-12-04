@@ -41,24 +41,22 @@ void level_manager_create(int num_Levels) {
         level_manager->levels->level_entity_list = malloc(15 * sizeof(Entity*));
     }
 }
-void spawn_level(Uint16 ID){
-    Level *level = &level_manager->levels[ID];
-    if (!level) {
-        slog("Invalid level ID %d", ID);
+
+void spawn_level_main_menu(){
+        slog("Main menu");
+        if (!level_manager || !level_manager->levels) {
+        slog("Level manager not initialized!");
         return;
-    }else{slog("In level %i", ID);}
-
-
-    switch(ID){
-    case 1: spawn_level_one();
-        break;
-    case 2: spawn_level_two();
-        break;
-    case 3: spawn_level_three();
-        break;
-    slog("No level dummy");
     }
-    //TODO we can make it different per levels
+   
+    if(!sky){
+        sky = malloc(sizeof(Level_Sky));
+    }
+    sky->sky_texture = gf3d_texture_load("models/sky/sky5.png");
+    sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
+    world_load("defs/level3.def");
+    ///Entity *player = player_get_the();
+    set_think_to_dead(player_get_the());
 }
 void spawn_level_one() {
     world_load("defs/terrain.def");
@@ -141,6 +139,28 @@ void spawn_level_three(){
 
 }
 
+void spawn_level(Uint16 ID){
+    Level *level = &level_manager->levels[ID];
+    if (!level) {
+        slog("Invalid level ID %d", ID);
+        return;
+    }else{slog("In level %i", ID);}
+
+
+    switch(ID){
+    case 0: spawn_level_main_menu();
+        break;
+    case 1: spawn_level_one();
+        break;
+    case 2: spawn_level_two();
+        break;
+    case 3: spawn_level_three();
+        break;
+    slog("No level dummy");
+    }
+    //TODO we can make it different per levels
+}
+
 
 void draw_this_sky(Uint16 ID){
     //Level *level = &level_manager->levels[ID];
@@ -153,3 +173,4 @@ void draw_this_sky(Uint16 ID){
     gf3d_sky_draw(sky->sky_mesh, skyMat, GFC_COLOR_WHITE, sky->sky_texture);
 
 }
+

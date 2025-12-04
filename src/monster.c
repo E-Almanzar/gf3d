@@ -651,6 +651,7 @@ void set_think_for_movement(Entity *self, Uint8 flag){
 }
 
 void set_think_to_dead(Entity *self){
+    self->rotation.z = GFC_PI*2;
     self->think = dead_think;
     self->update = dead_update;
 

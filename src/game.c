@@ -108,7 +108,10 @@ int main(int argc,char *argv[])
 
 
     
-    Uint8 ifDead = 0;
+    Uint8 ifDead = 0; Uint8 started = 0; 
+    //We want to initally spawn the main menu
+    spawn_level(0);
+    /*
     if(false){
         slog("Spawing level 1");
         spawn_level(1);
@@ -120,24 +123,29 @@ int main(int argc,char *argv[])
     else{
         //slog("Spawing level 2");
         spawn_level(3);
-    }
+    }*/
     world = world_get_the();
     //main loop: everything in here is run repeatedly
     while(!_done)
     {
         if(player->think == dead_think){
             ifDead = 1;
-        } else
+        } else{
             ifDead = 0;
+            started = true;
+        }
         timer++;
+            
+
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
         // Think all and update all
         entity_system_think_all();
-        entity_system_update_all();
-        physics_step();
-
+        if(started){
+            entity_system_update_all();
+            physics_step();
+        }
         //world updates
         /*theta += delta;
         if(theta > 1 || theta < -1){
@@ -180,10 +188,18 @@ int main(int argc,char *argv[])
                 draw_this_sky(1);
                 entity_system_draw_all(lightdir, GFC_COLOR_WHITE);                
                 //2D draws
-                if(ifDead)
+                if(ifDead && started){
                     gf2d_font_draw_line_tag("YOU ARE DEAD",FT_H1,GFC_COLOR_RED, gfc_vector2d(560,300));
-                //gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
-                gf2d_mouse_draw();
+                }
+                if(!started){
+                    gf2d_font_draw_line_tag("THAT GUY FROM BEYOND THE FIFTH DIMENSION",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,20));
+                    
+                    gf2d_font_draw_line_tag("Press Space to Begin",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,60));
+                    
+                    gf2d_font_draw_line_tag("Alt + F4 to Quit",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,100));
+                }
+                    //gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
+                //gf2d_mouse_draw();
         gf3d_vgraphics_render_end();
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();
