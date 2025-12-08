@@ -173,7 +173,8 @@ void roll_update(Entity *self){
     monster_update_bounds(self);
     GFC_Vector3D forward, right, forward_backward, horizontal, move = {0};
     forward = get_data_from_player()->camData->forward;
-    
+    forward.z = 0;
+    slog("%f, %f, %f", forward.x, forward.y, forward.z);
     gfc_vector3d_cross_product(&right, forward, gfc_vector3d(0, 0, 1));
     gfc_vector3d_scale(forward_backward, forward, self->velocity.y);
     gfc_vector3d_scale(horizontal, right, self->velocity.x);
@@ -193,6 +194,7 @@ void roll_update(Entity *self){
             else
                 gfc_vector3d_add(move, move, right);
         }
+        move.z = 0;
 }
 
 float rainbowdir = 1;
@@ -284,6 +286,16 @@ void glide_update(Entity *self){
         if (!self)
         return;
     monster_move(self, 2);
+    self->position.z += self->velocity.z;
+
+    self->bounds->x = self->position.x-4;
+    self->bounds->y = self->position.y-4;
+    self->bounds->z = self->position.z-4;
+
+    //Set the other guys things?
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = self->position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = self->position.y;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = self->position.z;
     //Set your rotation funky
         //self->rotation.z +=.01;
         self->rotation.x +=.01;
@@ -310,6 +322,9 @@ void glide_think(Entity *self){
         self->update = monster_update;
     }*/
     monster_control(self);
+    //self->rotation.z += .001;
+//    self->rotation.x += .001;
+
     self->velocity.x *= 1.3;
     self->velocity.y *= 1.3;
     self->velocity.z *= .5;
@@ -322,7 +337,6 @@ void glide_think(Entity *self){
 
 void dead_update(Entity *self){
     monster_update_bounds(self);
-    self->rotation.z += .001;
 
 }
 

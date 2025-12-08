@@ -9,13 +9,13 @@
         { "pos": [40, 20, -40], "color": "white" }
       ],
       "bouncepads": [
-        { "pos": [-25, 0, -30.5], "color": "white" }
+        { "pos": [-25, 0, -65.5], "color": "white" }
       ],
       "teleporters": [
 
       ],
       "enemies": [
-        { "type": "evilball", "pos": [0, 0, 10], "color": "red" }
+        { "type": "evilball", "pos": [0, 100, 200], "color": "red" }
       ],
       "rigidbodies": [
         { "pos": [50, 20, 0], "color": "white", "kind": 1 },
@@ -40,7 +40,7 @@
         { "pos": [-50, 220, 100], "color": "white", "kind": 1 }
       ],
       "goal": [
-        { "pos": [40, 20, -24], "color": "white" }
+        { "pos": [0, 1000, -65.5], "color": "white" }
       ],
     }
   }

@@ -645,7 +645,7 @@ void set_think_for_movement(Entity *self, Uint8 flag){
     if(flag == 2){
         self->think = glide_think;
         self->update = glide_update;
-        self->rotation.y = GFC_PI/2;
+        //self->rotation.y = GFC_PI/.33;
     }
 
 }
