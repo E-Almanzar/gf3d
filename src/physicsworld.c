@@ -201,7 +201,7 @@ void physics_step(){
                 float penetration = A->rigid_sphere->r + B->rigid_sphere->r- squaredDist;
 
                 if (penetration > slop) {
-                    normal.z = 0;
+                    if(normal.z < 0){normal.z *= -2;}
                     float correctionMagnitude = (penetration - slop) / (A->mass_inverse + B->mass_inverse) * percent;
 
                     GFC_Vector3D correction;
@@ -212,9 +212,9 @@ void physics_step(){
                     gfc_vector3d_scale(A_corr, correction, A->mass_inverse);
                     gfc_vector3d_scale(B_corr, correction, B->mass_inverse);
                     if(A_corr.z <0)
-                    A_corr.z = 0; 
+                    A_corr.z *= -1; 
                     if(B_corr.z <0)
-                    B_corr.z = 0;
+                    B_corr.z *= -1;
                     //A_corr.x *=2;B_corr.x *=2;A_corr.y *=2;B_corr.y *=2;
                     //A_corr.x *=-1;B_corr.x *=-1;A_corr.y *=-1;B_corr.y *=-1;
                     gfc_vector3d_sub(A->position, A->position, A_corr);
