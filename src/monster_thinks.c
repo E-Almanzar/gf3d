@@ -8,14 +8,31 @@
 #include "monster.h"
 #include "monster_thinks.h"
 #include "game.h"
+#include "rigidbody.h"
 
 long long roll_timer = -100;
 long long rainbow_timer = -100;
 
+void set_think_for_ents(Entity *self){
+    if(!self->name){
+        return;
+    }
+    if(gfc_stricmp(self->name, "Alien Guy") == 0){
+        self->think = monster_think;
+        self->update = monster_update;
+    }
+    if(gfc_stricmp(self->name, "Ball") == 0){
+        self->think = rigidbody_think;
+        self->update = rigidbody_update;
+    }
+}
+
 void monster_update_bounds(Entity *self){
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
+    if(self->bounds){
+        self->bounds->x = self->position.x;
+        self->bounds->y = self->position.y;
+        self->bounds->z = self->position.z;
+    }
 }
 
 
@@ -36,65 +53,83 @@ void bounce_think(Entity *self){
     self->velocity.z += .10;
 */
     //Ok so it takes the negative value
+    if(self->rigidbody_data && gfc_stricmp(self->name, "Alien Guy") != 0){
+       self->velocity.z = ((struct Rigidbody*)self->rigidbody_data)->velocity.z;
+    }
     self->velocity.z = fabs(self->velocity.z * 1.1 + .1); 
+    //slog("bounce think %f", self->velocity.z);
+
     //gfc_vector3d_add(self->velocity, self->velocity, MonsterData->forward);
     if(self->velocity.z > 10){
-        self->think = monster_think;
-        self->update = monster_update;
+        //self->think = monster_think;
+        //self->update = monster_update;
+        set_think_for_ents(self);
     }
     //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
 }
 
 void bounce_update(Entity *self){
-    monster_update_bounds(self);
-    if (!self)
-        return;
+    if(gfc_stricmp(self->name, "Alien Guy") == 0){
+        monster_update_bounds(self);
+        if (!self)
+            return;
 
-    GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack, up;
+        GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack, up;
 
-    camForward = get_data_from_player()->camData->forward;
+        camForward = get_data_from_player()->camData->forward;
 
-    forward.x = camForward.x;
-    forward.y = camForward.y;
-    forward.z = 0;
+        forward.x = camForward.x;
+        forward.y = camForward.y;
+        forward.z = 0;
 
-    up = gfc_vector3d(0, 0, 1);
-    gfc_vector3d_cross_product(&right, forward, up);
-    gfc_vector3d_scale(mHoriz, right, self->velocity.x);
-    gfc_vector3d_scale(mForBack, forward, self->velocity.y);
-    gfc_vector3d_scale(up, up, self->velocity.z);
+        up = gfc_vector3d(0, 0, 1);
+        gfc_vector3d_cross_product(&right, forward, up);
+        gfc_vector3d_scale(mHoriz, right, self->velocity.x);
+        gfc_vector3d_scale(mForBack, forward, self->velocity.y);
+        gfc_vector3d_scale(up, up, self->velocity.z);
 
-    if (self->velocity.x)
-    {
-        gfc_vector3d_sub(self->position, self->position, mHoriz);
-        if (self->velocity.x < 0)
-            gfc_vector3d_add(move, move, forward);
-        else
-            gfc_vector3d_sub(move, move, forward);
+        if (self->velocity.x)
+        {
+            gfc_vector3d_sub(self->position, self->position, mHoriz);
+            if (self->velocity.x < 0)
+                gfc_vector3d_add(move, move, forward);
+            else
+                gfc_vector3d_sub(move, move, forward);
+        }
+        if (self->velocity.y)
+        {
+            gfc_vector3d_sub(self->position, self->position, mForBack);
+            if (self->velocity.y < 0)
+                gfc_vector3d_sub(move, move, right);
+            else
+                gfc_vector3d_add(move, move, right);
+        }
+        if (self->velocity.z)
+        {
+            gfc_vector3d_add(self->position, self->position, up);
+
+        }
+
+        if ((self->velocity.x) || (self->velocity.y))
+        {
+            self->rotation.z = atan2(move.y, move.x);
+        }
+        get_data_from_player()->forward = forward;
     }
-    if (self->velocity.y)
-    {
-        gfc_vector3d_sub(self->position, self->position, mForBack);
-        if (self->velocity.y < 0)
-            gfc_vector3d_sub(move, move, right);
-        else
-            gfc_vector3d_add(move, move, right);
-    }
-    if (self->velocity.z)
-    {
-        gfc_vector3d_add(self->position, self->position, up);
-
+    else{
+        if(self->rigidbody_data){
+            ((struct Rigidbody*)self->rigidbody_data)->velocity.x = self->velocity.x;
+            ((struct Rigidbody*)self->rigidbody_data)->velocity.y = self->velocity.y;
+            ((struct Rigidbody*)self->rigidbody_data)->velocity.z = self->velocity.z;
+        }
     }
 
-    if ((self->velocity.x) || (self->velocity.y))
-    {
-        self->rotation.z = atan2(move.y, move.x);
+    if(self->bounds){
+        self->bounds->x = self->position.x;
+        self->bounds->y = self->position.y;
+        self->bounds->z = self->position.z;
     }
-    get_data_from_player()->forward = forward;
 
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
 }
 
 

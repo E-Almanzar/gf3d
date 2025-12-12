@@ -448,10 +448,10 @@ Uint8 entity_to_entity_test(){
 //Use the new function to get the player and see if its the same
 
 //Flags
-//0 is player, 1 is bouncepad
+//0 is player, 1 is movepad, 2 is player and other movement thingies
 Entity *entity_check_collide(Entity *self, Uint16 flag){
     int i;
-    //if(flag == 1){slog("looking for a bouncepad");}
+    //if(flag == 1){slog("looking for a movepad");}
 
     if(!self){slog("no self in entity check collide"); return NULL;}
     if(!self->bounds){slog("You dont have a freaking box"); return NULL;}
@@ -464,14 +464,20 @@ Entity *entity_check_collide(Entity *self, Uint16 flag){
             //if(strcmp("Alien Guy",entity_system.entity_list[i].name)){
             //K so this is also wrong? IDK
             
-            if(flag == 0){
+            if(flag == 0 || flag == 2){
+                //Flag 0 is what interacts with the certain things
                 if(player_get_the() == &entity_system.entity_list[i]){
                     //slog("alien?");
                     return &entity_system.entity_list[i];
                 }
+                if(flag == 2){
+                    if(gfc_stricmp(entity_system.entity_list[i].name, "Ball") == 0)
+                        return &entity_system.entity_list[i];
+                }
             }
             
             if(flag == 1){
+                //omg DOES THIS ONLY WORK IF THERES 1?
                 //For a mving plat, if you collide with it then do something?
                 if(gfc_stricmp(entity_system.entity_list[i].name, "mp") == 0){
                     //slog("returning %s",entity_system.entity_list[i].name );

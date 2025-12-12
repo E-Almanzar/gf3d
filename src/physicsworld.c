@@ -1,5 +1,5 @@
 #include "physicsworld.h"
-
+#include "monster_thinks.h"
 #define GRAVITY -.4
 #define MU .9
 PhysicsWorld gPhysicsWorld;
@@ -80,8 +80,8 @@ Uint8 circle_circle_check(Rigidbody *firstBody, Rigidbody *secondBody, GFC_Vecto
         //normal->x *=-1; normal->y *=-1; normal->z *=-1;
         
         
-        rigidbody_on_collide(firstBody->owner, *normal);
-        rigidbody_on_collide(secondBody->owner, *normal);
+        rigidbody_on_collide(firstBody->owner, secondBody->owner, *normal);
+        rigidbody_on_collide(secondBody->owner, firstBody->owner, *normal);
         // /slog("F: %f, S: %f", firstBody->velocity.z, secondBody->velocity.z);
         return 1;
     }
@@ -140,8 +140,15 @@ void physics_step(){
 
         rb->position.x += rb->velocity.x;
         rb->position.y += rb->velocity.y;
+        if((gfc_stricmp("Alien Guy", rb->owner->name) != 0)){
+            if(rb->owner->think == bounce_think){
+                rb->position.z += rb->velocity.z;
 
-        if(gfc_stricmp("Alien Guy", rb->owner->name) != 0){body_apply_gravity(rb);}
+            }
+            else {
+                body_apply_gravity(rb);
+            }
+        }
         //rb->position.z += rb->velocity.z;
         //The Z will be handled by apply
         //body_apply_gravity(rb);
@@ -212,9 +219,9 @@ void physics_step(){
                     gfc_vector3d_scale(A_corr, correction, A->mass_inverse);
                     gfc_vector3d_scale(B_corr, correction, B->mass_inverse);
                     if(A_corr.z <0)
-                    A_corr.z *= -1; 
+                    A_corr.z *= 0; 
                     if(B_corr.z <0)
-                    B_corr.z *= -1;
+                    B_corr.z *= 0;
                     //A_corr.x *=2;B_corr.x *=2;A_corr.y *=2;B_corr.y *=2;
                     //A_corr.x *=-1;B_corr.x *=-1;A_corr.y *=-1;B_corr.y *=-1;
                     gfc_vector3d_sub(A->position, A->position, A_corr);

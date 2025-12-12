@@ -15,10 +15,12 @@ void bp_think(Entity *self){
     if(!self){return;}
     target = player_get_the();
     //We check through the entity list to see if their box collides with our box?
-    target = entity_check_collide(self, 0);
+    target = entity_check_collide(self,2);
+    //target = NULL;
     if(target == NULL){return;} 
     if(target){
         //Bounce em
+        slog("what?");
         set_think_to_bounce(target, 0);
     }
 

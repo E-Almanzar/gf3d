@@ -3,7 +3,11 @@
 //Exern?
 extern PhysicsWorld gPhysicsWorld;
 
-void rigidbody_on_collide(Entity *self, GFC_Vector3D normal){
+void rigidbody_on_collide(Entity *self, Entity * other, GFC_Vector3D normal){
+    if(gfc_stricmp(other->name, "bp") == 0){
+        slog("I, %s, Collided with a(n) %s", self->name, other->name);
+        set_think_to_bounce(self, 0);
+    }
     //slog("we on collided biatch");
     //What we want to do is modify its velocity based 
     //OK we have to deal with the zero normal case
@@ -87,8 +91,8 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
 
     //iNITAL 
     //if(self->position.x == 0){
-        self->velocity.x = .1;
-        strcpy(self->name, "Blue");
+    self->velocity.x = .1;
+    strcpy(self->name, "Ball");
     //}
     /*else{
         self->color = GFC_COLOR_RED;
