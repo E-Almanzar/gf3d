@@ -10,6 +10,7 @@ typedef struct
     GFC_Vector3D        forward;
     Uint8               jumpAllowed;
     Uint8               sprinting;
+    int                 collected;
 } MonsterEntityData; // Padding?
 
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color);
@@ -29,6 +30,7 @@ void monster_control(Entity *self);
 void set_think_to_bounce(Entity *self, Uint8 flag);
 void set_think_for_movement(Entity *self, Uint8 flag);
 void set_think_to_dead(Entity *self);
+void monster_collect(Entity *self, Entity *target);
 
 long long get_timer_from_player();
 

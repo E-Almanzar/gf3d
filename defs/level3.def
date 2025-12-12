@@ -15,7 +15,8 @@
 
       ],
       "enemies": [
-        { "type": "evilball", "pos": [0, 100, 200], "color": "red" }
+        { "type": "evilball", "pos": [0, 100, 200], "color": "red" },
+        { "type": "plant", "pos": [0, 0, 0], "color": "white" }
       ],
       "rigidbodies": [
         { "pos": [50, 20, 0], "color": "white", "kind": 1 },

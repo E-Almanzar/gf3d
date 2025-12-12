@@ -124,6 +124,7 @@ int main(int argc,char *argv[])
         //slog("Spawing level 2");
         spawn_level(3);
     }*/
+    int collected = 0;
     world = world_get_the();
     //main loop: everything in here is run repeatedly
     while(!_done)
@@ -135,7 +136,7 @@ int main(int argc,char *argv[])
             started = true;
         }
         timer++;
-            
+        collected = monster_get_collected();
 
         gfc_input_update();
         gf2d_mouse_update();
@@ -197,6 +198,10 @@ int main(int argc,char *argv[])
                     gf2d_font_draw_line_tag("Press Space to Begin",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,60));
                     
                     gf2d_font_draw_line_tag("Alt + F4 to Quit",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,100));
+                }
+                else{
+                    //TODO To string the stupid thing
+                     gf2d_font_draw_line_tag("",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,100));
                 }
                     //gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
                 //gf2d_mouse_draw();

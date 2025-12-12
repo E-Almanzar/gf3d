@@ -286,6 +286,7 @@ void glide_update(Entity *self){
         if (!self)
         return;
     monster_move(self, 2);
+    
     self->position.z += self->velocity.z;
 
     self->bounds->x = self->position.x-4;
@@ -298,7 +299,8 @@ void glide_update(Entity *self){
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = self->position.z;
     //Set your rotation funky
         //self->rotation.z +=.01;
-        self->rotation.x +=.01;
+        self->rotation.z +=.01;
+        self->rotation.y +=.01;
 
     monster_update_bounds(self);
 }

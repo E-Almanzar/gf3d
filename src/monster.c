@@ -477,6 +477,7 @@ void monster_data_init(Entity *self)
     MonsterEntityData *data;
     data = malloc(sizeof(MonsterEntityData));
     MonsterData = data;
+    MonsterData->collected = 0;
 }
 
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
@@ -647,6 +648,14 @@ void set_think_for_movement(Entity *self, Uint8 flag){
         self->update = glide_update;
         //self->rotation.y = GFC_PI/.33;
     }
+    
+    if(flag == 3){
+        self->think = monster_think;
+        self->update = monster_update;
+        self->rotation.y = 0;
+        self->rotation.x = 0;
+        //self->rotation.y = GFC_PI/.33;
+    }
 
 }
 
@@ -666,6 +675,13 @@ long long get_timer_from_player(){
 MonsterEntityData * get_data_from_player(){
     return MonsterData;
 
+}
+void monster_collect(Entity *self, Entity *target){
+    MonsterData->collected++;
+}
+
+int monster_get_collected(){
+    return MonsterData->collected;
 }
 
 /*eol@eof*/

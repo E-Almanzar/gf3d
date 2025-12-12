@@ -7,6 +7,7 @@
 #include "gf3d_obj_load.h"
 #include "world.h"
 #include "m_plat.h"
+#include "monster_thinks.h"
 
 float initalX, initalY;
 float moveBy = .1;
@@ -25,7 +26,11 @@ void mp_update(Entity *self){
     if(target == NULL){return;} 
     if(target){
         //slog("We hit it");
+        if(target->think = glide_think){
+            set_think_for_movement(target, 3);
+        }
         target->position.z = self->position.z+8;
+        
         //target->velocity.z = -.00001;
         //slog("target %f", target->velocity.z);
 

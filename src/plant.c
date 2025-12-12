@@ -4,9 +4,11 @@
 #include "entity.h"
 #include "monster_thinks.h"
 #include "monster.h"
+#include "rigidbody.h"
 
+//Plant will be my collectable
 void snap_to_ground(Entity *self);
-
+void plant_free(Entity *self);
 
 void plant_update(Entity *self){
  Entity *target;
@@ -14,11 +16,21 @@ void plant_update(Entity *self){
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
     if(target){
-//        slog("huh");
-        set_think_to_dead(target);
-    
+    //        slog("huh");
+        if(self->data){
+            set_think_to_dead(target);
+        }
+        else{
+            slog("we are collected");
+            monster_collect(target, self);
+            //if(self->free)self->free(self);
+            entity_free(self);
+        }
+
     }
+
 }
+
 GFC_Vector3D startPosPlant,  plantVelocityX, plantVelocityY;  
 float moveValForPlant = .1;
 
@@ -67,7 +79,7 @@ void plant_think(Entity *self){
     }*/
 }
 
-Entity *plant_spawn(GFC_Vector3D position, GFC_Color Color){
+Entity *plant_spawn(GFC_Vector3D position, GFC_Color Color, int isToxic){
     Entity *self;
     self = entity_new();
     if (!self)
@@ -82,7 +94,7 @@ Entity *plant_spawn(GFC_Vector3D position, GFC_Color Color){
 
     self->think = plant_think;
     self->update = plant_update;
-
+    //self->free = plant_free;
 
     //The plant has radius 40 and height 20
     //Centered at the bottom middle
@@ -98,6 +110,21 @@ Entity *plant_spawn(GFC_Vector3D position, GFC_Color Color){
     self->bounds->h = 2; //this is a fucking lie
     self->bounds->d = 10; //This is the real height :eyeroll:
 
+    self->rigidbody_data = gfc_allocate_array(sizeof(Rigidbody), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->bounciness = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->owner = self;
+    gfc_vector3d_copy(((struct Rigidbody*)self->rigidbody_data)->position, self->position);
+    
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
+    ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
+
+    self->data = gfc_allocate_array(sizeof(int), 1);
+    self->data = isToxic;
     strcpy(self->name, "plant");
 
     return self;
@@ -117,6 +144,13 @@ void snap_to_ground(Entity *self)
     self->position.z = contact->z-5;
     
     free(contact);
+}
+
+void plant_free(Entity *self){
+    slog("we are free in theory");
+    //rigidbody_free(self->rigidbody_data);
+    //entity_free(self);
+    //free(self);
 }
 
 #endif

@@ -2,6 +2,7 @@
 #include "entity.h"
 #include "world.h"
 #include "monster.h"
+#include "rigidbody.h"
 
 int i = 0;
 
@@ -55,7 +56,20 @@ Entity *bp_spawn(GFC_Vector3D position, GFC_Color color){
     self->bounds->w = 24;
     self->bounds->h = 24;
     self->bounds->d = 4;//?
+        
+    self->rigidbody_data = gfc_allocate_array(sizeof(Rigidbody), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->bounciness = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->owner = self;
+    gfc_vector3d_copy(((struct Rigidbody*)self->rigidbody_data)->position, self->position);
     
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
+    ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
+
     strcpy(self->name, "bp");
     return self;
 }

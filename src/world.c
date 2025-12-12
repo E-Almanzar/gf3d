@@ -63,6 +63,7 @@ void spawn_by_types(SJson *ents){
     GFC_Vector3D pos;
     int i, count, kind, pair;
     //MP?
+        Entity * dummyEnt;
     SJson *movepads = sj_object_get_value(ents, "movepads");
     if (movepads) {
         count = sj_array_get_count(movepads);
@@ -78,7 +79,8 @@ void spawn_by_types(SJson *ents){
         for (i = 0; i < count; i++) {
             SJson *bp = sj_array_get_nth(bps, i);
             sj_object_get_vector3d(bp, "pos", &pos);
-            bp_spawn(pos, GFC_COLOR_WHITE);
+            dummyEnt = bp_spawn(pos, GFC_COLOR_WHITE);
+            physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
         }
     }
 
@@ -96,7 +98,7 @@ void spawn_by_types(SJson *ents){
         }
     }
 
-    Entity * dummyEnt;
+
     SJson *enemies = sj_object_get_value(ents, "enemies");
     if (enemies) {
          count = sj_array_get_count(enemies);
@@ -109,7 +111,8 @@ void spawn_by_types(SJson *ents){
                 saucer_spawn(pos, GFC_COLOR_WHITE);
             }
             else if (strcmp(type, "plant") == 0) {
-                plant_spawn(pos, GFC_COLOR_WHITE);
+                //TODO Put the isToxic flag
+                plant_spawn(pos, GFC_COLOR_WHITE, false);
             }
             else if (strcmp(type, "bug") == 0) {
                 dummyEnt = bug_spawn(pos, GFC_COLOR_WHITE);

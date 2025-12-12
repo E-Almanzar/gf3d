@@ -8,4 +8,4 @@
 #include "monster_thinks.h"
 
 
-Entity *plant_spawn(GFC_Vector3D position, GFC_Color Color);
+Entity *plant_spawn(GFC_Vector3D position, GFC_Color Color, int isToxic);
