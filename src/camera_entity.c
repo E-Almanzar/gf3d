@@ -93,24 +93,24 @@ void camera_entity_think(Entity *self){
     vangle = data->vangle;
     mousePosition = gf2d_mouse_get_position();
     if(mousePosition.x <= 0){
-        slog("We hit the x 0");
+        //slog("We hit the x 0");
         SDL_WarpMouseInWindow(NULL, 1278, mousePosition.y);
                 gf2d_mouse_update();
 
     }
     if(mousePosition.x >= 1279){
-        slog("We hit the X max");
+        //slog("We hit the X max");
         SDL_WarpMouseInWindow(NULL, 1, mousePosition.y);
         gf2d_mouse_update();
     }
     if(mousePosition.y <= 0){
-        slog("We hit the y 0");
+        //slog("We hit the y 0");
         SDL_WarpMouseInWindow(NULL, mousePosition.x, 719);
         gf2d_mouse_update();
 
     }
     if(mousePosition.y >= 719){
-        slog("We hit the Y max");
+        //slog("We hit the Y max");
         SDL_WarpMouseInWindow(NULL, mousePosition.x, 1);
         gf2d_mouse_update();
     }
@@ -126,7 +126,7 @@ void camera_entity_think(Entity *self){
         smoothedVel.y = mouseMovement.y;
         mouseMovement.x = floor(mouseMovement.x);
         mouseMovement.y = floor(mouseMovement.y);
-        slog("Mouse Move: X: %f Y: %f", mouseMovement.x, mouseMovement.y);        
+        //slog("Mouse Move: X: %f Y: %f", mouseMovement.x, mouseMovement.y);        
 
         angle -= mouseMovement.x / 100;
         vangle += mouseMovement.y / 10; 
@@ -150,7 +150,7 @@ void camera_entity_think(Entity *self){
     if(gfc_input_command_down("pandown")){
         vangle -= vpanStep;
     }*/
-    if(vangle < -12.25){vangle = -12.25;}
+    if(vangle < -4.75){vangle = -4.75;}
     if(vangle > 30.75){vangle = 30.75;}
     data->vangle = vangle;
 

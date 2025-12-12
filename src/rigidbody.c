@@ -26,6 +26,7 @@ void rigidbody_update(Entity *self){
     //Convert decisions into physics inputs.
     // entity does not write position
     // entity only writes velocity / forces
+    //slog("My velocity is %f", self->velocity.z);
 
 }
 
@@ -81,6 +82,7 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
     ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
     ((struct Rigidbody*)self->rigidbody_data)->friction = .995;
+    ((struct Rigidbody*)self->rigidbody_data)->isBouncy = true;
 
 
     //iNITAL 

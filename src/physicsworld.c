@@ -109,6 +109,8 @@ void physics_step(){
 
         //slog("B4??");
 
+        rb->velocity.x = rb->velocity.x < .000001 ? 0 : rb->velocity.x;
+        rb->velocity.y = rb->velocity.y < .000001 ? 0 : rb->velocity.y;
 
         rb->velocity.x = rb->owner->velocity.x;
         rb->velocity.y = rb->owner->velocity.y;
@@ -121,9 +123,10 @@ void physics_step(){
         else{
             rb->velocity.x *= rb->friction;
             rb->velocity.y *= rb->friction;
-        }
+        }/*
         rb->velocity.x = rb->velocity.x < .000001 ? 0 : rb->velocity.x;
         rb->velocity.y = rb->velocity.y < .000001 ? 0 : rb->velocity.y;
+        */
         //slog("after?");
         
         //APPLY GRAVITY TO BODIES AT THE START OF EACH STEP?
@@ -263,6 +266,7 @@ void body_apply_gravity(Rigidbody *self){
     //int hitFloor;//, i;
     float moveValid = 0;
     Uint8 hitfloor;
+    float initalZ = self->velocity.z;
     //Self is rb
     contact = malloc(sizeof(GFC_Vector3D));
 
@@ -279,6 +283,7 @@ void body_apply_gravity(Rigidbody *self){
 
     if(moveValid != self->velocity.z){
         self->velocity.z = 0;
+        
     }
     //slog("MV: %f Contact: %f", moveValid,  contact->z);
     
@@ -292,6 +297,12 @@ void body_apply_gravity(Rigidbody *self){
             Techinally this is not a deliverable so we should just ignore it- move on
         */
         self->position.z += moveValid;
+        
+        if(moveValid != self->velocity.z && fabs(initalZ) > .01){
+            //slog("waaa %f %f", self->velocity.z, initalZ);
+            self->velocity.z = initalZ*-.67;
+            self->position.z += self->velocity.z;
+        }
     }
     //slog("what");
     if(!hitfloor){

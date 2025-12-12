@@ -15,6 +15,8 @@ typedef struct Rigidbody{
     Uint8           onFloor;
     int             outOfBounds;
     float           friction;
+    float           isBouncy;
+
 
 }Rigidbody;
 
