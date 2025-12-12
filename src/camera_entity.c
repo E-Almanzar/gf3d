@@ -3,8 +3,10 @@
 #include "gf3d_camera.h"
 #include "entity.h"
 #include "camera_entity.h"
+#include "gf2d_mouse.h"
 
-
+#define SMOOTH_FACTOR .9
+GFC_Vector2D smoothedVel;
 //relative mouse state?
 
 
@@ -77,28 +79,79 @@ void camera_entity_think(Entity *self){
     followDist = data->followDist;
     angle = data->angle;
     offset = gfc_vector3d(0,1,0);
-
+    GFC_Vector2D mousePosition, mouseMovement;
+    mouseMovement.x = 0; mouseMovement.y = 0;
     //Camera Movement
+    /*
     if(gfc_input_command_down("panright")){
         angle += panStep;
     }
     if(gfc_input_command_down("panleft")){
         angle -= panStep;
+    }*/
+    angle = data->angle;
+    vangle = data->vangle;
+    mousePosition = gf2d_mouse_get_position();
+    if(mousePosition.x <= 0){
+        slog("We hit the x 0");
+        SDL_WarpMouseInWindow(NULL, 1278, mousePosition.y);
+                gf2d_mouse_update();
+
     }
+    if(mousePosition.x >= 1279){
+        slog("We hit the X max");
+        SDL_WarpMouseInWindow(NULL, 1, mousePosition.y);
+        gf2d_mouse_update();
+    }
+    if(mousePosition.y <= 0){
+        slog("We hit the y 0");
+        SDL_WarpMouseInWindow(NULL, mousePosition.x, 719);
+        gf2d_mouse_update();
+
+    }
+    if(mousePosition.y >= 719){
+        slog("We hit the Y max");
+        SDL_WarpMouseInWindow(NULL, mousePosition.x, 1);
+        gf2d_mouse_update();
+    }
+    else if(gf2d_mouse_moved()){
+        mouseMovement = gf2d_mouse_get_movement();
+
+        if(fabs(mouseMovement.x) > 1000){mouseMovement.x = 1;}
+        if(fabs(mouseMovement.y) > 500){mouseMovement.y = 1;}
+
+        mouseMovement.x =  smoothedVel.x * (1 - SMOOTH_FACTOR) + mouseMovement.x * SMOOTH_FACTOR;
+        smoothedVel.x = mouseMovement.x;
+        mouseMovement.y =  smoothedVel.y * (1 - SMOOTH_FACTOR) + mouseMovement.y * SMOOTH_FACTOR;
+        smoothedVel.y = mouseMovement.y;
+        mouseMovement.x = floor(mouseMovement.x);
+        mouseMovement.y = floor(mouseMovement.y);
+        slog("Mouse Move: X: %f Y: %f", mouseMovement.x, mouseMovement.y);        
+
+        angle -= mouseMovement.x / 100;
+        vangle += mouseMovement.y / 10; 
+    }
+    else{
+        //WINDOW X
+        //if(mousePosition.x >= 1280){SDL_WarpMouseInWindow(NULL, 0, mousePosition.y);}
+
+        //SDL_WarpMouseInWindow(NULL, 0, 0);
+    }
+    //slog("X: %f Y: %f", mousePosition.x, mousePosition.y);
     data->angle = angle;
     //dampen? is it fine till we get our mouse setup?
     gfc_vector3d_rotate_about_z(&offset, angle);
 
     //Up and down: part of vangle
-    vangle = data->vangle;
-    if(gfc_input_command_down("panup")){
+    
+    /* if(gfc_input_command_down("panup")){
         vangle += vpanStep;
     }
     if(gfc_input_command_down("pandown")){
         vangle -= vpanStep;
-    }
-    if(vangle < -2.25){vangle = -2.25;}
-    if(vangle > 10.75){vangle = 10.75;}
+    }*/
+    if(vangle < -12.25){vangle = -12.25;}
+    if(vangle > 30.75){vangle = 30.75;}
     data->vangle = vangle;
 
    
@@ -145,13 +198,13 @@ Entity *camera_entity_spawn(GFC_Vector3D position, Entity *target){
     //self->free = camera_entity_free;
     data->target = target;
     //15 and 8 originally
-    data->followDist = 20;
+    data->followDist = 40;
     data->followHeight = 13;
     data->angle = GFC_PI;
     //set the data tartget as target
     //subtract to get the unit vector in front of our face?
     //gfc_vector3d_sub()
-
+    smoothedVel = gfc_vector2d(0,0);
     return self;
 
 }

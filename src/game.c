@@ -31,7 +31,6 @@ int main(int argc,char *argv[])
 
     Entity *player;
     Entity *camera;
-
     //OG camera and movement
     float theta = 0;//, delta = .01;
     GFC_Vector3D cam = {0,10,10};
@@ -98,6 +97,7 @@ int main(int argc,char *argv[])
     //IF level one
     
     World * world;
+    
     //Do we need a level manager singleton?
     //Player and camera?
     player = monster_spawn(startpos, GFC_COLOR_WHITE);    
@@ -106,8 +106,6 @@ int main(int argc,char *argv[])
     monster_set_cam(player, camera);
     gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
 
-
-    
     Uint8 ifDead = 0; Uint8 started = 0; 
     //We want to initally spawn the main menu
     spawn_level(0);

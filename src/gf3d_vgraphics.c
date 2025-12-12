@@ -225,7 +225,6 @@ void gf3d_vgraphics_setup(
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
     Uint32 enabledExtensionCount = 0;
-    
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         slog("Unable to initilaize SDL system: %s",SDL_GetError());
@@ -260,7 +259,8 @@ void gf3d_vgraphics_setup(
     }
 	slog_sync();
     // instance extension configuration
-    
+    SDL_SetWindowGrab(gf3d_vgraphics.main_window, true);
+    //SDL_SetRelativeMouseMode(true);
     gf3d_extensions_instance_init(config);
     
 	slog_sync();
