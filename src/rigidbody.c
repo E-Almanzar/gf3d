@@ -80,6 +80,8 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
     ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->friction = .995;
+
 
     //iNITAL 
     //if(self->position.x == 0){

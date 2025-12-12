@@ -1,11 +1,14 @@
 #include "physicsworld.h"
 
 #define GRAVITY -.4
+#define MU .9
 PhysicsWorld gPhysicsWorld;
 void hit_wall(Rigidbody *rb);
 
 void set_position_to_origin(Rigidbody *rb){
-    rb->position;
+    rb->position.x = 0;
+    rb->position.y = 0; 
+    rb->position.z = 0;
 }
 
 void physics_world_init(int maxBodies)
@@ -105,9 +108,22 @@ void physics_step(){
         }
 
         //slog("B4??");
+
+
         rb->velocity.x = rb->owner->velocity.x;
         rb->velocity.y = rb->owner->velocity.y;
         rb->velocity.z = rb->owner->velocity.z;
+        //Apply Friction
+        if(!rb->friction){
+            rb->velocity.x *= MU;
+            rb->velocity.y *= MU;
+        }
+        else{
+            rb->velocity.x *= rb->friction;
+            rb->velocity.y *= rb->friction;
+        }
+        rb->velocity.x = rb->velocity.x < .000001 ? 0 : rb->velocity.x;
+        rb->velocity.y = rb->velocity.y < .000001 ? 0 : rb->velocity.y;
         //slog("after?");
         
         //APPLY GRAVITY TO BODIES AT THE START OF EACH STEP?
