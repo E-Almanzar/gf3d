@@ -1,4 +1,5 @@
 #include "game.h"
+#include "dialogue.h"
 
 extern int __DEBUG;
 
@@ -122,6 +123,7 @@ int main(int argc,char *argv[])
         //slog("Spawing level 2");
         spawn_level(3);
     }*/
+    dialogue_init();
     int collected = 0;
     world = world_get_the();
     //main loop: everything in here is run repeatedly
@@ -203,6 +205,8 @@ int main(int argc,char *argv[])
                 }
                     //gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
                 //gf2d_mouse_draw();
+                //DIALOGUE
+                draw_dialogue();
         gf3d_vgraphics_render_end();
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();
