@@ -1,6 +1,8 @@
 #include "level.h"
 #include "world.h"
 #include "physicsworld.h"
+#include "monster.h"
+#include "entity.h"
 typedef struct Level_Sky{
     Uint16      level_Index;
     Mesh        *sky_mesh;
@@ -20,6 +22,7 @@ typedef struct Level{
 
 typedef struct Level_Manager{
     Level       *levels;
+    int         currentLevel;
 }Level_Manager;
 Level_Manager *level_manager;
 
@@ -57,6 +60,7 @@ void spawn_level_main_menu(){
     world_load("defs/level3.def");
     ///Entity *player = player_get_the();
     set_think_to_dead(player_get_the());
+    level_manager->currentLevel = 0;
 }
 void spawn_level_one() {
     world_load("defs/terrain.def");
@@ -64,12 +68,12 @@ void spawn_level_one() {
         slog("Level manager not initialized!");
         return;
     }
-   
     if(!sky){
         sky = malloc(sizeof(Level_Sky));
     }
     sky->sky_texture = gf3d_texture_load("models/sky/sky5.png");
     sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
+    level_manager->currentLevel = 1;
     /*
 
     int index = 0;
@@ -121,6 +125,8 @@ void spawn_level_two(){
     sky->sky_texture = gf3d_texture_load("models/sky/sky.png");
     sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
     world_load("defs/level2.def");
+    level_manager->currentLevel = 2;
+
 
 }
 void spawn_level_three(){
@@ -136,7 +142,7 @@ void spawn_level_three(){
     sky->sky_texture = gf3d_texture_load("models/sky/sky5.png");
     sky->sky_mesh = gf3d_mesh_load("models/sky/sky2.obj");
     world_load("defs/level3.def");
-
+    level_manager->currentLevel = 3;
 }
 
 void spawn_level(Uint16 ID){
@@ -149,15 +155,16 @@ void spawn_level(Uint16 ID){
 
     switch(ID){
     case 0: spawn_level_main_menu();
-        break;
+        return;
     case 1: spawn_level_one();
-        break;
+        return;
     case 2: spawn_level_two();
-        break;
+        return;
     case 3: spawn_level_three();
-        break;
-    slog("No level dummy");
+        return;
     }
+    slog("No level dummy");
+
     //TODO we can make it different per levels
 }
 
@@ -174,3 +181,25 @@ void draw_this_sky(Uint16 ID){
 
 }
 
+void spawn_next_level(){
+    //Cleanup on aisle- this level
+    //Delete all the ents besides the player?
+    //Change the sky
+    //clear the physics system?
+    //Or just move everything out of view lol
+    //physics_world_close();
+    //physics_world_init(100);
+    entity_system_close();
+    entity_system_init(1024);
+    GFC_Vector3D startpos =  gfc_vector3d(0,0,-20); 
+    slog("after both?");
+    Entity *player, *camera;
+    player = monster_spawn(startpos, GFC_COLOR_WHITE);  
+    camera = camera_entity_spawn(startpos, player);
+    monster_set_cam(player, camera);
+    GFC_Vector3D cam = {0,10,10};
+    gf3d_camera_look_at(gfc_vector3d(0,0,0),&cam);
+    //PLAYER?
+    spawn_level(level_manager->currentLevel+1);
+
+}

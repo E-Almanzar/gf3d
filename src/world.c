@@ -37,7 +37,7 @@ World * world_load(const char *name){
     if(!config){
         //free that shit
     }
-
+    
     str = sj_object_get_string(config, "terrainMesh");
     world->mesh = gf3d_mesh_load(str);
     world->texture = gf3d_texture_load(sj_object_get_string(config, "terrainTexture"));

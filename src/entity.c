@@ -131,10 +131,24 @@ void entity_free(Entity *ent){
     if(!ent){return;}
     if(ent->rigidbody_data){
         rigidbody_free(ent->rigidbody_data);
+        ent->rigidbody_data = NULL;
+    }
+    if(ent->bounds){
+        memset(ent->bounds, 0, sizeof(GFC_Box));
+        ent->bounds= NULL;
+    }
+    if(ent->s_bounds){
+        memset(ent->s_bounds, 0, sizeof(GFC_Sphere));
+        ent->s_bounds= NULL;
     }
     if(ent->free)ent->free(ent);
-    gf3d_mesh_free(ent->mesh);
-    gf3d_texture_free(ent->texture);
+    if(ent->mesh){
+        gf3d_mesh_free(ent->mesh);
+    }
+
+    if(ent->texture){
+        gf3d_texture_free(ent->texture);
+    }
     memset(ent,0,sizeof(Entity));
 
     //mesh and texture free?
@@ -142,7 +156,8 @@ void entity_free(Entity *ent){
 
 }
 
-void entity_system_close(Entity *ent){
+//Frees every ent in the list 
+void entity_system_close(){
     int i;
     for(i = 0; i < entity_system.entity_max; i++){
         if(entity_system.entity_list[i]._inuse){

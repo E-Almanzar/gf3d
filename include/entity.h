@@ -74,4 +74,5 @@ Entity *entity_check_collide(Entity *self, Uint16 flag);
 Uint8 ents_mesh_collide_check(Entity *one, Entity *two);
 Entity *entity_find_tp_partner(Entity *pair, Entity *self, Uint16 tpPair);
 float validate_move_between(float velocity, float entpos, float targetpos, Entity *self);
+void entity_system_close();
 #endif

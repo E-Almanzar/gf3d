@@ -21,4 +21,5 @@ void spawn_level_one();
 void spawn_level_two();
 void level_manager_create(int num_Levels);
 void draw_this_sky(Uint16 ID);
+void spawn_next_level();
 #endif

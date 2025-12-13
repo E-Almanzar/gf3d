@@ -9,4 +9,5 @@ void physics_step();
 void body_apply_gravity(Rigidbody *rb);
 void body_validate_position(Rigidbody *rb);
 Uint8 circle_ground_check(Rigidbody *rb);
+void physics_world_close();
 #endif

@@ -57,7 +57,7 @@ int main(int argc,char *argv[])
     srand(SDL_GetTicks());
     slog_sync();
     gf2d_mouse_load("actors/mouse.actor");
-    physics_world_init(30);
+    physics_world_init(100);
     gfc_matrix4_identity(id);
     //Create Exactly 1 Level
     level_manager_create(2);

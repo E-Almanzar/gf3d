@@ -15,9 +15,9 @@ long long roll_timer = -100;
 long long rainbow_timer = -100;
 long long previous_time = -100;
 void set_think_for_ents(Entity *self){
-    if(!self->name){
+    /*if(!self->name){
         return;
-    }
+    }*/
     if(gfc_stricmp(self->name, "Alien Guy") == 0){
         self->think = monster_think;
         self->update = monster_update;

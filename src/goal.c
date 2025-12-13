@@ -13,12 +13,14 @@ void goal_update(Entity *self){
     if(!self){return;}
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
-    if(target && boss_key){
+    if((target && boss_key)){
     //slog("We get it %i", p++);
     /*
     *   Request the level manager to change levels based on the current level
     */
     slog("Changing levels"); 
+    boss_key = false;
+    spawn_next_level();
    }
 
 }

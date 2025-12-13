@@ -25,9 +25,14 @@
         { "pos": [0, 20, -28], "color": "white", "kind": 1 },
         { "pos": [-20, 20, -28], "color": "white", "kind": 1 }
       ],
-       "goal": [
-        
-       ],
+      "rigidbodies": [
+        { "pos": [50, 20, 0], "color": "white", "kind": 1 },
+        { "pos": [0, 20, 0], "color": "white", "kind": 1 }
+        { "pos": [-50, 20, 0], "color": "white", "kind": 1 }
+      ],
+      "goal": [
+        { "pos": [40, 20, -24], "color": "white" }
+      ],
     }
   }
 }

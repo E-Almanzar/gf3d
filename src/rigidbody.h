@@ -16,6 +16,7 @@ typedef struct Rigidbody{
     int             outOfBounds;
     float           friction;
     float           isBouncy;
+    int             _inuse;
 
 
 }Rigidbody;

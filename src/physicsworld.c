@@ -28,6 +28,7 @@ int physics_world_add(Rigidbody body)
     }
 
     gPhysicsWorld.bodies[gPhysicsWorld.count] = body;
+    gPhysicsWorld.bodies[gPhysicsWorld.count]._inuse = true;
     return gPhysicsWorld.count++; // return ID
 }
 
@@ -385,6 +386,19 @@ void hit_wall(Rigidbody *self){
     self->position.x = initX + self->velocity.x*2;
     self->position.y = initY + self->velocity.y*2;
 
+}
+void physics_world_close(){
+    int i;
+    for(i = 0; i < gPhysicsWorld.maxBodies; i++){
+        //if(gPhysicsWorld.bodies[i]._inuse){
+            //entity_free(&entity_system.entity_list[i]);
+        //}
+        if(gPhysicsWorld.bodies[i]._inuse){
+            rigidbody_free(&gPhysicsWorld.bodies[i]);
+        }
+    }
+    //free(entity_system.entity_list);
+    free(gPhysicsWorld.bodies);
 }
 
 /*
