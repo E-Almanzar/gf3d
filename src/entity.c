@@ -454,7 +454,7 @@ Entity *entity_check_collide(Entity *self, Uint16 flag){
     //if(flag == 1){slog("looking for a movepad");}
 
     if(!self){slog("no self in entity check collide"); return NULL;}
-    if(!self->bounds){slog("You dont have a freaking box"); return NULL;}
+    if(!self->bounds){slog("You dont have a freaking box %s", self->name); return NULL;}
     for(i = 0; i < entity_system.entity_max; i++){
         if(!entity_system.entity_list[i]._inuse || !entity_system.entity_list[i].bounds){continue;}
         //We check with our box and the ents box

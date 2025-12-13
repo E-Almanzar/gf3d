@@ -27,7 +27,7 @@ typedef struct PhysicsWorld {
 } PhysicsWorld;
 
 Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color);
-void rigidbody_on_collide(Entity *self, Entity *other, GFC_Vector3D normal);
+float rigidbody_on_collide(Entity *self, Entity *other, GFC_Vector3D normal);
 void rigidbody_think(Entity *self);
 void rigidbody_update(Entity *self);
 

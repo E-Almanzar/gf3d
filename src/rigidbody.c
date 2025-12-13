@@ -1,12 +1,21 @@
 #include "rigidbody.h"
-
+#include "monster.h"
+#include "monster_thinks.h"
 //Exern?
 extern PhysicsWorld gPhysicsWorld;
 
-void rigidbody_on_collide(Entity *self, Entity * other, GFC_Vector3D normal){
+float rigidbody_on_collide(Entity *self, Entity * other, GFC_Vector3D normal){
     if(gfc_stricmp(other->name, "bp") == 0){
         slog("I, %s, Collided with a(n) %s", self->name, other->name);
         set_think_to_bounce(self, 0);
+    }
+        if(gfc_stricmp(other->name, "tp") == 0){
+        slog("I, %s, Collided with a(n) %s", self->name, other->name);
+        set_think_to_bounce(self, 1);
+    }
+    if(other->think == roll_think){
+        slog(" I, %s, Collided with a ROLLING %s", self->name, other->name);
+        return 1;
     }
     //slog("we on collided biatch");
     //What we want to do is modify its velocity based 
@@ -22,6 +31,7 @@ void rigidbody_on_collide(Entity *self, Entity * other, GFC_Vector3D normal){
     ((struct Rigidbody*)self->rigidbody_data)->velocity.z+=10;
     slog("%f: %f", self->velocity.z,  ((struct Rigidbody*)self->rigidbody_data)->velocity.z);
    }*/
+  return 0;
 }
 
 //Lowercase r rigidbody is the entity, and big R is the rigidbody data aka not that

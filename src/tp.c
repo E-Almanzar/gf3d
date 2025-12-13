@@ -7,7 +7,7 @@
 #include "gf3d_obj_load.h"
 #include "world.h"
 #include "tp.h"
-
+#include "rigidbody.h"
 long long global_tp_timer = -500;
 
 void tp_update(Entity *self){
@@ -90,6 +90,19 @@ Entity *tp_spawn(GFC_Vector3D position, GFC_Color color, Uint16 tpPair){
     self->data = gfc_allocate_array(sizeof(TeleportData), 1);
     ((struct TeleportData*)self->data)->tpPair = tpPair; 
     strcpy(self->name, "tp");
+    self->rigidbody_data = gfc_allocate_array(sizeof(Rigidbody), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->mass_inverse = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->bounciness = 0;
+    ((struct Rigidbody*)self->rigidbody_data)->owner = self;
+    gfc_vector3d_copy(((struct Rigidbody*)self->rigidbody_data)->position, self->position);
+    
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere = gfc_allocate_array(sizeof(GFC_Sphere), 1);
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->r = 1;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = position.x;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = position.y;
+    ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = position.z;
+    ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
+
     return self;
 }
 

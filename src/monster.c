@@ -264,7 +264,6 @@ void monster_move(Entity *self, Uint8 calledByPushback)
                 self->rotation.z = atan2(move.y, move.x);
             }
         //}
-        MonsterData->forward = forward;
         // TODO- Jump w/ gravity
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GRAVITY
         //slog("Right before gravity %f", self->velocity.z);
@@ -336,7 +335,7 @@ void monster_control(Entity *self)
     //if(lazy_timer - last_time_rolled > 500){
         if(gfc_input_command_down("roll")){
             set_think_for_movement(self, 0);
-            last_time_rolled = lazy_timer;
+            //last_time_rolled = get_timer();
             return;
         }   
     //}
@@ -604,7 +603,8 @@ GFC_Vector3D player_get_forward(Entity *player)
     return MonsterData->forward;
 }
 
-//These are for ONLY the jumppads and other world things that change the player state
+//These are for ONLY the jumppads and other world things that change the player state    
+//Flag: 0- bounce 1- teleport
 void set_think_to_bounce(Entity *self, Uint8 flag){
     //Flag: 0 is bounce
     //1 is teleport
@@ -633,6 +633,13 @@ void set_think_for_movement(Entity *self, Uint8 flag){
     //Roll
     if(!flag){
         //slog("we rolled");
+        /*if(self->velocity.x == 0 && self->velocity.y == 0){
+            slog("self vel %f %f Monster %f %f",self->velocity.x, self->velocity.y,  MonsterData->camData->forward.x,  MonsterData->camData->forward.y);
+            self->velocity.x = MonsterData->camData->forward.x*-1;
+            self->velocity.y = MonsterData->camData->forward.y*-1;
+            
+        }*/
+       if(self->velocity.x == 0 && self->velocity.y == 0){return;}
         self->think = roll_think;
         self->update = roll_update;
     }

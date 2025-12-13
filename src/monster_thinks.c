@@ -12,7 +12,7 @@
 
 long long roll_timer = -100;
 long long rainbow_timer = -100;
-
+long long previous_time = -100;
 void set_think_for_ents(Entity *self){
     if(!self->name){
         return;
@@ -36,11 +36,11 @@ void monster_update_bounds(Entity *self){
 }
 
 
-Uint8 timer_check(long long * previous_time, float how_long_until_again){
-    //slog("checking %lld - %lld = %lld >= %f", get_timer(), *previous_time, get_timer() - *previous_time, how_long_until_again);
-    if(get_timer() - *previous_time >=  how_long_until_again){
+Uint8 timer_check(float how_long_until_again){
+    slog("checking %lld - %lld = %lld >= %f", get_timer(), previous_time, get_timer() - previous_time, how_long_until_again);
+    if(get_timer() - previous_time >=  how_long_until_again){
         //Are they racing???
-        *previous_time = get_timer();
+        previous_time = get_timer();
         return 1;    
     }
     return 0;
@@ -122,7 +122,48 @@ void bounce_update(Entity *self){
             ((struct Rigidbody*)self->rigidbody_data)->velocity.y = self->velocity.y;
             ((struct Rigidbody*)self->rigidbody_data)->velocity.z = self->velocity.z;
         }
+            if(self->bounds){
+        self->bounds->x = self->position.x;
+        self->bounds->y = self->position.y;
+        self->bounds->z = self->position.z;
     }
+
+    }
+
+
+}
+
+
+
+void teleport_update(Entity *self){
+    if(gfc_stricmp(self->name, "Alien Guy") == 0){
+        monster_update_bounds(self);
+        if (!self)
+            return;
+
+        GFC_Vector3D forward, camForward, up;//,right, move = {0}, mHoriz, mForBack, up;
+
+        camForward = get_data_from_player()->camData->forward;
+
+        forward.x = camForward.x;
+        forward.y = camForward.y;
+        forward.z = 0;
+        up = gfc_vector3d(0, 0, 1);
+        gfc_vector3d_scale(up, up, self->velocity.z);
+        if (self->velocity.z)
+        {
+            gfc_vector3d_add(self->position, self->position, up);
+        }
+        get_data_from_player()->forward = forward;
+    }
+    else{
+        if(self->rigidbody_data){
+            ((struct Rigidbody*)self->rigidbody_data)->velocity.x = self->velocity.x;
+            ((struct Rigidbody*)self->rigidbody_data)->velocity.y = self->velocity.y;
+            ((struct Rigidbody*)self->rigidbody_data)->velocity.z = self->velocity.z;
+        }
+    }
+
 
     if(self->bounds){
         self->bounds->x = self->position.x;
@@ -130,33 +171,6 @@ void bounce_update(Entity *self){
         self->bounds->z = self->position.z;
     }
 
-}
-
-
-
-void teleport_update(Entity *self){
-    monster_update_bounds(self);
-    if (!self)
-        return;
-
-    GFC_Vector3D forward, camForward, up;//,right, move = {0}, mHoriz, mForBack, up;
-
-    camForward = get_data_from_player()->camData->forward;
-
-    forward.x = camForward.x;
-    forward.y = camForward.y;
-    forward.z = 0;
-    up = gfc_vector3d(0, 0, 1);
-    gfc_vector3d_scale(up, up, self->velocity.z);
-    if (self->velocity.z)
-    {
-        gfc_vector3d_add(self->position, self->position, up);
-    }
-    get_data_from_player()->forward = forward;
-
-    self->bounds->x = self->position.x;
-    self->bounds->y = self->position.y;
-    self->bounds->z = self->position.z;
 }
 
 void teleport_think(Entity *self){
@@ -171,14 +185,19 @@ void teleport_think(Entity *self){
     self->rotation.z +=.1;
     //gfc_vector3d_add(self->velocity, self->velocity, MonsterData->forward);
     if(self->velocity.z > 5){
-        self->think = monster_think;
-        self->update = monster_update;
+        //self->think = monster_think;
+        //self->update = monster_update;
+        set_think_for_ents(self);
+
     }
     //slog("velocity.x: %f, velocity.y: %f, velocity.z: %f", self->velocity.x, self->velocity.y, self->velocity.z);
 }
 
 
 //Roll think?
+int frames_to_roll = 0;
+float rotation_velocity = .2;
+float rotation_acceleration = 0;
 void roll_think(Entity *self){
     
     //If the time has been more than 100 frames, then you return to the og thinks
@@ -186,17 +205,34 @@ void roll_think(Entity *self){
    // GFC_Vector3D forward;
    // forward = get_data_from_player()->camData->forward;
 
-    if(timer_check(&roll_timer, 50)){
+    if(frames_to_roll > 75){
         //slog("timer end");
         self->think = monster_think;
         self->update = monster_update;
         self->rotation.y = 0;
         self->rotation.x = 0;
+        frames_to_roll = 0;
+        rotation_velocity = .2;
         //slog("END %f", self->rotation.y);
         return;
     }
+    frames_to_roll++;
     //gfc_vector3d_add(self->velocity, self->velocity, forward);
-    self->rotation.y++;
+    self->rotation.z +=.25;
+    if(fabs(self->rotation.x) < .2){
+        //slog("%f", self->rotation.x);
+
+        self->rotation.x += rotation_velocity;
+    }
+    else{
+        self->rotation.x -= rotation_velocity;
+    }
+    //TODO SOUND
+    
+    //self->rotation.x += .1;
+    // /rotation_velocity += rotation_acceleration;
+
+    //self->rotation.y++;
     //slog("HOLY %f", self->rotation.y);
 
 
@@ -206,15 +242,24 @@ void roll_think(Entity *self){
 
 void roll_update(Entity *self){
     monster_update_bounds(self);
-    GFC_Vector3D forward, right, forward_backward, horizontal, move = {0};
+    GFC_Vector3D forward, right, forward_backward, horizontal, move = {0}, *contact;
+    contact = malloc(sizeof(GFC_Vector3D));
     forward = get_data_from_player()->camData->forward;
     forward.z = 0;
-    slog("%f, %f, %f", forward.x, forward.y, forward.z);
+    //slog("%f, %f, %f", forward.x, forward.y, forward.z);
+    
     gfc_vector3d_cross_product(&right, forward, gfc_vector3d(0, 0, 1));
     gfc_vector3d_scale(forward_backward, forward, self->velocity.y);
     gfc_vector3d_scale(horizontal, right, self->velocity.x);
-
+    //slog("forward_backward?? %f %f %f", forward_backward.x, forward_backward.y, forward_backward.z);
+    //slog("Horizontal?? %f %f %f", horizontal.x, horizontal.y, horizontal.z);
+    if(!entity_get_floor_position(self, world_get_the(), contact)){
+        return;
+    }
+  
     if (self->velocity.x){
+
+        slog("Horizontal?? %f %f %f", horizontal.x, horizontal.y, horizontal.z);
         gfc_vector3d_sub(self->position, self->position, horizontal);
         if (self->velocity.x < 0)
             gfc_vector3d_add(move, move, forward);
@@ -223,6 +268,7 @@ void roll_update(Entity *self){
     }
         if (self->velocity.y)
         {
+            //forward_backward.x = validate_move_between(horizontal.x, self->position.x, self->position.x-forward_backward.x, self);
             gfc_vector3d_sub(self->position, self->position, forward_backward);
             if (self->velocity.y < 0)
                 gfc_vector3d_sub(move, move, right);
@@ -242,7 +288,7 @@ void rainbow_think(Entity *self){
         rainbowdir*=-1;
     }
     monster_move(self, 0);
-    if(timer_check(&rainbow_timer, 50)){
+    if(timer_check(50)){
         //slog("timer end %f", rainbowdir);
         self->think = monster_think;
         self->update = monster_update;

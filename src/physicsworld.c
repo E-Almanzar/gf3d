@@ -79,11 +79,9 @@ Uint8 circle_circle_check(Rigidbody *firstBody, Rigidbody *secondBody, GFC_Vecto
         //gfc_vector3d_negate(*normal, *normal);
         //normal->x *=-1; normal->y *=-1; normal->z *=-1;
         
-        
         rigidbody_on_collide(firstBody->owner, secondBody->owner, *normal);
         rigidbody_on_collide(secondBody->owner, firstBody->owner, *normal);
-        // /slog("F: %f, S: %f", firstBody->velocity.z, secondBody->velocity.z);
-        return 1;
+        //0 means do nothing, 1 means we collidied and would like to multiply on firstbody
     }
     return 0;
         //else{slog("no we didnt");}
@@ -167,12 +165,13 @@ void physics_step(){
         for(int j = i + 1; j < gPhysicsWorld.count; j++) {
             A = &gPhysicsWorld.bodies[i];
             B = &gPhysicsWorld.bodies[j];
-
+            float didcol = 0;
             if(A->owner->rigidbody_data && B->owner->rigidbody_data){
                 if(A->rigid_sphere && B->rigid_sphere){
                     circle_circle_check(A, B, &normal);
                 }
             }
+
             //Two rigidbodies collided
             if((normal.x || normal.y) || normal.z){
                 //Calculate R.V.
@@ -206,7 +205,6 @@ void physics_step(){
                 float squaredDist = distance.x*distance.x+distance.y*distance.y+distance.z*distance.z;
                 squaredDist = sqrtf(squaredDist);
                 float penetration = A->rigid_sphere->r + B->rigid_sphere->r- squaredDist;
-
                 if (penetration > slop) {
                     if(normal.z < 0){normal.z *= -2;}
                     float correctionMagnitude = (penetration - slop) / (A->mass_inverse + B->mass_inverse) * percent;
