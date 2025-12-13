@@ -30,5 +30,6 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color);
 float rigidbody_on_collide(Entity *self, Entity *other, GFC_Vector3D normal);
 void rigidbody_think(Entity *self);
 void rigidbody_update(Entity *self);
+void rigidbody_free(Rigidbody *self);
 
 #endif

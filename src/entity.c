@@ -6,6 +6,7 @@
 #include "gf3d_mesh.h"
 #include "m_plat.h"
 #include "tp.h"
+#include "rigidbody.h"
 //List of mesh pointers to create a bunch of objs
 typedef struct{
     Entity *entity_list;
@@ -128,6 +129,9 @@ Entity *entity_new(){
 */
 void entity_free(Entity *ent){
     if(!ent){return;}
+    if(ent->rigidbody_data){
+        rigidbody_free(ent->rigidbody_data);
+    }
     if(ent->free)ent->free(ent);
     gf3d_mesh_free(ent->mesh);
     gf3d_texture_free(ent->texture);
@@ -449,6 +453,7 @@ Uint8 entity_to_entity_test(){
 
 //Flags
 //0 is player, 1 is movepad, 2 is player and other movement thingies
+//Flag 3 is for balls only
 Entity *entity_check_collide(Entity *self, Uint16 flag){
     int i;
     //if(flag == 1){slog("looking for a movepad");}
@@ -481,6 +486,11 @@ Entity *entity_check_collide(Entity *self, Uint16 flag){
                 //For a mving plat, if you collide with it then do something?
                 if(gfc_stricmp(entity_system.entity_list[i].name, "mp") == 0){
                     //slog("returning %s",entity_system.entity_list[i].name );
+                    return &entity_system.entity_list[i];
+                }
+            }
+            if(flag == 3){
+                if(gfc_stricmp(entity_system.entity_list[i].name, "Ball") == 0){
                     return &entity_system.entity_list[i];
                 }
             }

@@ -6,17 +6,26 @@ extern PhysicsWorld gPhysicsWorld;
 
 float rigidbody_on_collide(Entity *self, Entity * other, GFC_Vector3D normal){
     if(gfc_stricmp(other->name, "bp") == 0){
-        slog("I, %s, Collided with a(n) %s", self->name, other->name);
+        //slog("I, %s, Collided with a(n) %s", self->name, other->name);
         set_think_to_bounce(self, 0);
     }
-        if(gfc_stricmp(other->name, "tp") == 0){
-        slog("I, %s, Collided with a(n) %s", self->name, other->name);
+    if(gfc_stricmp(other->name, "tp") == 0){
+        //slog("I, %s, Collided with a(n) %s", self->name, other->name);
         set_think_to_bounce(self, 1);
     }
+    if(gfc_stricmp(other->name, "Alien Guy") == 0){
+        //slog(" I, %s, Collided with a %s", self->name, other->name);
+        if(gfc_stricmp(self->name, "Evil Ball") == 0){
+            set_think_to_dead(other);
+        }
+    }
+
     if(other->think == roll_think){
-        slog(" I, %s, Collided with a ROLLING %s", self->name, other->name);
+        //slog(" I, %s, Collided with a ROLLING %s", self->name, other->name);
         return 1;
     }
+    
+
     //slog("we on collided biatch");
     //What we want to do is modify its velocity based 
     //OK we have to deal with the zero normal case
@@ -55,6 +64,9 @@ void rigidbody_think(Entity *self){
     ((struct Rigidbody*)self->rigidbody_data)->velocity.y = self->velocity.y;
     ((struct Rigidbody*)self->rigidbody_data)->velocity.z = self->velocity.z;
    //slog("%f, %f, %f", self->velocity.x, self->velocity.y, self->velocity.z);
+    self->bounds->x = self->position.x-7;
+    self->bounds->y = self->position.y-8.5;
+    self->bounds->z = self->position.z;
 
 }
 
@@ -76,6 +88,14 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
     self->update = rigidbody_update;
     self->think = rigidbody_think;
     self->collide = rigidbody_on_collide;
+
+    self->bounds = gfc_allocate_array(sizeof(GFC_Box), 1);
+    self->bounds->x = position.x-7;
+    self->bounds->y = position.y-8.5;
+    self->bounds->z = position.z;
+    self->bounds->w = 15;
+    self->bounds->h = 15; 
+    self->bounds->d = 15; 
 
     self->s_bounds = gfc_allocate_array(sizeof(GFC_Sphere), 1);
     self->s_bounds->x = position.x-5;
@@ -113,4 +133,7 @@ Entity *rigidbody_spawn(GFC_Vector3D position, GFC_Color color){
 
     }*/
     return self;
+}
+void rigidbody_free(Rigidbody *self){
+
 }

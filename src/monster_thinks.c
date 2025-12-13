@@ -260,7 +260,7 @@ void roll_update(Entity *self){
   
     if (self->velocity.x){
 
-        slog("Horizontal?? %f %f %f", horizontal.x, horizontal.y, horizontal.z);
+        //slog("Horizontal?? %f %f %f", horizontal.x, horizontal.y, horizontal.z);
         gfc_vector3d_sub(self->position, self->position, horizontal);
         if (self->velocity.x < 0)
             gfc_vector3d_add(move, move, forward);

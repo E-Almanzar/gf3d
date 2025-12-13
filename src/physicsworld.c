@@ -1,5 +1,6 @@
 #include "physicsworld.h"
 #include "monster_thinks.h"
+#include "evilball.h"
 #define GRAVITY -.4
 #define MU .9
 PhysicsWorld gPhysicsWorld;
@@ -78,10 +79,21 @@ Uint8 circle_circle_check(Rigidbody *firstBody, Rigidbody *secondBody, GFC_Vecto
         //slog("we hit?");
         //gfc_vector3d_negate(*normal, *normal);
         //normal->x *=-1; normal->y *=-1; normal->z *=-1;
-        
         rigidbody_on_collide(firstBody->owner, secondBody->owner, *normal);
         rigidbody_on_collide(secondBody->owner, firstBody->owner, *normal);
-        //0 means do nothing, 1 means we collidied and would like to multiply on firstbody
+        /*
+        if (gfc_stricmp("Ball", firstBody->owner->name) == 0){
+            rigidbody_on_collide(firstBody->owner, secondBody->owner, *normal);
+            rigidbody_on_collide(secondBody->owner, firstBody->owner, *normal);
+        }
+        else if(gfc_stricmp("Evil Ball", firstBody->owner->name) == 0 || gfc_stricmp("Evil Ball", secondBody->owner->name)){
+            //rigidbody_on_collide(firstBody->owner,  firstBody->owner, *normal);
+            evilball_on_collide(secondBody->owner, *normal);
+            evilball_on_collide(firstBody->owner, *normal);
+            slog("we hit? %s %s", firstBody->owner->name, secondBody->owner->name);
+
+            //0 means do nothing, 1 means we collidied and would like to multiply on firstbody
+        }*/
     }
     return 0;
         //else{slog("no we didnt");}
@@ -304,7 +316,7 @@ void body_apply_gravity(Rigidbody *self){
         
         if(moveValid != self->velocity.z && fabs(initalZ) > .01){
             //slog("waaa %f %f", self->velocity.z, initalZ);
-            self->velocity.z = initalZ*-.67;
+            self->velocity.z = initalZ*-.9;
             self->position.z += self->velocity.z;
         }
     }

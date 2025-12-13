@@ -611,7 +611,7 @@ void set_think_to_bounce(Entity *self, Uint8 flag){
     self->velocity.z = 1;
     //BOUNCE
     if(!flag){
-        slog("Changing %s's think to bounce", self->name);
+        //slog("Changing %s's think to bounce", self->name);
         self->think = bounce_think;
         self->update = bounce_update;
         //self->velocity.z = 0;
@@ -668,6 +668,7 @@ void set_think_for_movement(Entity *self, Uint8 flag){
 }
 
 void set_think_to_dead(Entity *self){
+    //slog("f u buddy");
     self->rotation.z = GFC_PI*2;
     self->think = dead_think;
     self->update = dead_update;

@@ -21,7 +21,6 @@
 
       ],
       "enemies": [
-        { "type": "evilball", "pos": [0, 100, 200], "color": "red" },
         { "type": "plant", "pos": [0, 0, 0], "color": "white" }
         { "type": "cannon", "pos": [0, 1500, -70.5], "color": "white" }
       ],

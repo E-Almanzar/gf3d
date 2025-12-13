@@ -5,5 +5,5 @@
 #include "entity.h"
 
 Entity *evilball_spawn(GFC_Vector3D position, GFC_Color color, GFC_Vector3D initalVelocity);
-
+void evilball_on_collide(Entity *self, GFC_Vector3D normal);
 #endif

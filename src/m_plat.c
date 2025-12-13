@@ -14,11 +14,12 @@ Uint8 mp_edge_test(Entity *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Vect
 
 void mp_update(Entity *self){
     float initalX = ((float*)self->data)[0];
+    float position = ((float*)self->data)[2];
     //slog("%f, %f",initalX, self->position.x);
     //float initalY = ((float*)self->data)[1] = self->position.y;
     //float moveBy = ((float*)self->data)[2];
     self->position.x += self->velocity.x;
-    if(self->position.x > (initalX+10) || self->position.x < (initalX-10)){
+    if(self->position.x > (initalX+position) || self->position.x < (initalX-position)){
         self->velocity.x *= -1;
         //slog("%f, What??", self->velocity.x);
     }
@@ -58,7 +59,7 @@ void mp_think(Entity *self){
     //float moveBy = ((float*)self->data)[2];
 
     //self->velocity.x;
-    slog("Moveby? %f", self->velocity.x);
+    //slog("Moveby? %f", self->velocity.x);
     self->bounds->x = self->position.x-12;//
     self->bounds->y = self->position.y-14;
     self->bounds->z = self->position.z;
@@ -96,7 +97,11 @@ Entity *mp_spawn(GFC_Vector3D position, GFC_Color color){
     self->data = gfc_allocate_array(sizeof(float),3);
     ((float*)self->data)[0] = self->position.x;
     ((float*)self->data)[1] = self->position.y;
-    ((float*)self->data)[2] = .1;
+    //((float*)self->data)[2] = .1;
+    
+    //float xDir = (gfc_random()-.5)*10;
+
+    ((float*)self->data)[2] = (gfc_random()-.5)*10+10;
     self->velocity.x = .1;
     strcpy(self->name, "mp");
     return self;
