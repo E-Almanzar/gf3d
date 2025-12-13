@@ -20,7 +20,7 @@ void bp_think(Entity *self){
     if(target == NULL){return;} 
     if(target){
         //Bounce em
-        slog("what?");
+        //slog("what?");
         set_think_to_bounce(target, 2);
     }
 

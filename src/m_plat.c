@@ -9,15 +9,18 @@
 #include "m_plat.h"
 #include "monster_thinks.h"
 
-float initalX, initalY;
-float moveBy = .1;
+//float moveBy = .1;
 Uint8 mp_edge_test(Entity *world, GFC_Vector3D start, GFC_Vector3D end, GFC_Vector3D *contact);
+
 void mp_update(Entity *self){
-    
+    float initalX = ((float*)self->data)[0];
+    //slog("%f, %f",initalX, self->position.x);
+    //float initalY = ((float*)self->data)[1] = self->position.y;
+    //float moveBy = ((float*)self->data)[2];
     self->position.x += self->velocity.x;
     if(self->position.x > (initalX+10) || self->position.x < (initalX-10)){
-        moveBy *= -1;
-        
+        self->velocity.x *= -1;
+        //slog("%f, What??", self->velocity.x);
     }
     Entity *target;//, *pair;
     //pair = malloc(sizeof(Entity));
@@ -26,15 +29,17 @@ void mp_update(Entity *self){
     if(target == NULL){return;} 
     if(target){
         //slog("We hit it");
-        if(target->think = glide_think){
+        if(target->think == glide_think){
             set_think_for_movement(target, 3);
         }
         target->position.z = self->position.z+8;
         
         //target->velocity.z = -.00001;
         //slog("target %f", target->velocity.z);
-
+        //slog("tf??");
     }
+    //((float*)self->data)[2] = moveBy;
+    
 
 }
 
@@ -50,7 +55,10 @@ void mp_think(Entity *self){
 
     }
     */
-    self->velocity.x = moveBy;
+    //float moveBy = ((float*)self->data)[2];
+
+    //self->velocity.x;
+    slog("Moveby? %f", self->velocity.x);
     self->bounds->x = self->position.x-12;//
     self->bounds->y = self->position.y-14;
     self->bounds->z = self->position.z;
@@ -84,9 +92,12 @@ Entity *mp_spawn(GFC_Vector3D position, GFC_Color color){
     self->bounds->d = 4;//?
 
     //Uh oh we did a fucky wucky and broke it :<
-    initalX = self->position.x;
-    initalY = self->position.y;
 
+    self->data = gfc_allocate_array(sizeof(float),3);
+    ((float*)self->data)[0] = self->position.x;
+    ((float*)self->data)[1] = self->position.y;
+    ((float*)self->data)[2] = .1;
+    self->velocity.x = .1;
     strcpy(self->name, "mp");
     return self;
 }

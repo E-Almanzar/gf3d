@@ -92,7 +92,6 @@ Uint8 circle_circle_check(Rigidbody *firstBody, Rigidbody *secondBody, GFC_Vecto
 //Theres a big problem- everyone checks velocites, then checks collisions, then moves! bad
 //Is that even an issue? It checks, then looks for collisions, 
 void physics_step(){
-
     Rigidbody *A, *B, *rb;
     Uint8 weCollided = 0;
     float velNormal, impulseScalar, e;
@@ -154,7 +153,7 @@ void physics_step(){
             //slog("no owner %i", i);
             return;
         }
-        
+
         rb->rigid_sphere->x = rb->position.x;
         rb->rigid_sphere->y = rb->position.y;
         rb->rigid_sphere->z = rb->position.z;

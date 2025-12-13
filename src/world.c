@@ -5,7 +5,7 @@
 #include "gfc_primitives.h"
 #include "gf3d_obj_load.h"
 #include "world.h"
-
+#include "boss.h"
 static World * world; 
 //Did we scale the world?
 World * world_new(){
@@ -120,8 +120,14 @@ void spawn_by_types(SJson *ents){
             } 
             else if (strcmp(type, "evilball") == 0) {
                 //slog("here?");
-                dummyEnt = evilball_spawn(pos, GFC_COLOR_RED);
+                //If we spawn from world no inital velocity
+                dummyEnt = evilball_spawn(pos, GFC_COLOR_RED, gfc_vector3d(0,0,0));
                 physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
+            } 
+            else if (strcmp(type, "cannon") == 0) {
+                //slog("here?");
+                cannon_spawn(pos, GFC_COLOR_RED);
+                //physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
             } 
         }
     }

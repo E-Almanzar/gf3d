@@ -5,18 +5,19 @@ void evilball_on_collide(Entity *self, GFC_Vector3D normal){
 
 }
 
-//Lowercase r rigidbody is the entity, and big R is the rigidbody data aka not that
 void evilball_update(Entity *self){
 
     //Convert decisions into physics inputs.
     // entity does not write position
     // entity only writes velocity / forces
 
+
+    //KILL!
 }
 
 void evilball_think(Entity *self){
-    //We REQUEST movement
-    //
+    //We should expire after like 30 seconds?
+    //Maybe our data is just one number thats a time
 
     if(self->velocity.z > -1){
     //self->velocity.z -=.001;
@@ -24,11 +25,11 @@ void evilball_think(Entity *self){
     ((struct Rigidbody*)self->rigidbody_data)->velocity.x = self->velocity.x;
     ((struct Rigidbody*)self->rigidbody_data)->velocity.y = self->velocity.y;
     ((struct Rigidbody*)self->rigidbody_data)->velocity.z = self->velocity.z;
-   //slog("%f, %f, %f", self->velocity.x, self->velocity.y, self->velocity.z);
+    //slog("%f, %f, %f", self->velocity.x, self->velocity.y, self->velocity.z);
 
 }
 
-Entity *evilball_spawn(GFC_Vector3D position, GFC_Color color){
+Entity *evilball_spawn(GFC_Vector3D position, GFC_Color color, GFC_Vector3D initalVelocity){
     //slog("Here ?");
     Entity *self;
     self = entity_new();
@@ -66,6 +67,11 @@ Entity *evilball_spawn(GFC_Vector3D position, GFC_Color color){
     ((struct Rigidbody*)self->rigidbody_data)->onFloor = 0;
     self->color = color;
 
-
+    self->velocity.x = initalVelocity.x;
+    self->velocity.y = initalVelocity.y;
+    self->velocity.z = initalVelocity.z;
+    if(initalVelocity.y != 0){
+        strcpy(self->name, "boss ball");
+    }
     return self;
 }
