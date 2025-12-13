@@ -3,11 +3,12 @@
 #include "physicsworld.h"
 #include "monster.h"
 #include "monster_thinks.h"
-
+#include "goal.h"
 //Cannon boss? He shoots evilballs?
 
 int timesincelastshot = 0;
 int allowShots = true;
+int total_hits_cannon = 0;
 void cannon_update(Entity *self){
     Entity *target;
     if(!self){return;}
@@ -18,6 +19,12 @@ void cannon_update(Entity *self){
         //target->velocity.z = 1.5;
         //set_think_to_dead(target);
         entity_free(target);
+        allowShots = true;
+        total_hits_cannon++;
+        if(total_hits_cannon == 3){
+            goal_set_key(0);
+            slog("the goal is now open");
+        }
     }
 }
 
@@ -30,14 +37,15 @@ void cannon_think(Entity *self){
 
     player = player_get_the();
     if(allowShots){
-        if(timesincelastshot % 100 == 0 && player->think != dead_think){
+        if(player->think != dead_think){
             float xDir = (gfc_random()-.5)*10;
             spawnPos = gfc_vector3d(self->position.x+xDir, self->position.y, self->position.z + 100);
             //spawnPos = gfc_vector3d(0,0,0);
 
-            evilball = evilball_spawn(spawnPos, GFC_COLOR_RED, gfc_vector3d(0,-100,10));
+            evilball = evilball_spawn(spawnPos, GFC_COLOR_RED, gfc_vector3d(0,-100,40));
             physics_world_add(*(Rigidbody*)evilball->rigidbody_data);
         }
+        allowShots = false;
     }
     else if(player->think == dead_think){
         timesincelastshot = 0;
@@ -45,7 +53,7 @@ void cannon_think(Entity *self){
     }
 
     if(timesincelastshot > 10000){
-        allowShots = false;
+        //allowShots = false;
     }
 }
 

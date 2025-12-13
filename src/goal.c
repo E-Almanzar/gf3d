@@ -7,17 +7,29 @@
 #include "gf3d_obj_load.h"
 #include "world.h"
 //int p =0;
+int boss_key = 0;
 void goal_update(Entity *self){
     Entity *target;
     if(!self){return;}
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
-    if(target){
+    if(target && boss_key){
     //slog("We get it %i", p++);
     /*
     *   Request the level manager to change levels based on the current level
     */
+    slog("Changing levels"); 
    }
+
+}
+//0 is boss, 1 is collectables
+void goal_set_key(int flag){
+    if(!flag){
+        boss_key = true;
+    }
+    if(flag==1){
+        //collect_key = true;
+    }
 
 }
 
