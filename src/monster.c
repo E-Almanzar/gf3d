@@ -169,7 +169,7 @@ int forwardposneg = 1, sidesideposneg = 1;
 int previousDirectionX =1, previousDirectionY =1;
 void monster_move(Entity *self, Uint8 calledByPushback)
 {
-    slog("start of monster_move");
+    //slog("start of monster_move");
 
     GFC_Vector3D forward, camForward, right, move = {0}, mHoriz, mForBack;
     // Fix for bounce?
@@ -297,7 +297,7 @@ void monster_move(Entity *self, Uint8 calledByPushback)
     //Set the previous
     //previousDirectionX = (self->velocity.x <= 0 || previousDirectionX == -1) ? 1 : -1;
     //previousDirectionY = (self->velocity.x >= 0) ? 1 : -1;
-    slog("end of monster_move");
+    //slog("end of monster_move");
 }
 /*
     IMPORTANT- Update
@@ -305,7 +305,7 @@ void monster_move(Entity *self, Uint8 calledByPushback)
 */
 void monster_update(Entity *self)
 {
-    slog("update");
+    //slog("update");
     if (!self)
         return;
     monster_move(self, 0);
@@ -320,7 +320,7 @@ void monster_update(Entity *self)
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->x = self->position.x;
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = self->position.y;
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = self->position.z;
-    slog("self: %f, %f, %f", self->position.x, self->position.y, self->position.z);
+    //slog("self: %f, %f, %f", self->position.x, self->position.y, self->position.z);
    
 }
 void monster_control(Entity *self)
@@ -406,7 +406,7 @@ void monster_control(Entity *self)
 */
 void monster_think(Entity *self)
 {
-    slog("we?");
+    //slog("we?");
 
     //lazy_timer++;
     if (!self)

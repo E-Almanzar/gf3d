@@ -51,7 +51,7 @@
         { "pos": [0, 1000, -65.5], "color": "white", "kind": 1 }
       ],
       "goal": [
-        { "pos": [0, 1000, -65.5], "color": "white" }
+        { "pos": [0, 10, -65.5], "color": "white" }
       ],
     }
   }

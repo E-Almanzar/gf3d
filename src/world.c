@@ -6,7 +6,7 @@
 #include "gf3d_obj_load.h"
 #include "world.h"
 #include "boss.h"
-static World * world; 
+World * world; 
 //Did we scale the world?
 World * world_new(){
     //World * world;
@@ -39,6 +39,8 @@ World * world_load(const char *name){
     }
     
     str = sj_object_get_string(config, "terrainMesh");
+
+
     world->mesh = gf3d_mesh_load(str);
     world->texture = gf3d_texture_load(sj_object_get_string(config, "terrainTexture"));
     sj_object_get_vector3d(config,"lightPos", &world->lightPos);
@@ -175,11 +177,21 @@ void spawn_by_types(SJson *ents){
 
 
 void world_free(World * world){
+    if(world->mesh){
+        gf3d_mesh_free(world->mesh);
+        world->mesh = NULL;
+    }
+    if(world->texture){
+        gf3d_texture_free(world->texture);
+        world->texture = NULL;
+    }
+    memset(world, 0, sizeof(World));
+    world = NULL;
     return;
 
 }
 
-
+Mesh *mesher;
 void world_draw(World * world, GFC_Matrix4 mat){
     //GFC_Matrix4 modelMat;
     /*slog("NEW MAT:");
@@ -189,9 +201,11 @@ void world_draw(World * world, GFC_Matrix4 mat){
             slog("mat: %f", mat[i][j]);
          }
     }*/
-
+    if(mesher != world->mesh){
+        slog("FUCKING DIFFERENT");
+    }
     gf3d_mesh_draw(world->mesh, mat, GFC_COLOR_WHITE, world->texture, world->lightPos, world->lightColor);
-    
+    mesher = world->mesh;
 }
 
 //call this in your ent get floor position

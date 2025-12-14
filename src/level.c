@@ -187,12 +187,13 @@ void spawn_next_level(){
     //Change the sky
     //clear the physics system?
     //Or just move everything out of view lol
-    //physics_world_close();
-    //physics_world_init(100);
+    physics_world_close();
+    physics_world_init(100);
     entity_system_close();
     entity_system_init(1024);
+    //world_free();
     GFC_Vector3D startpos =  gfc_vector3d(0,0,-20); 
-    slog("after both?");
+    //slog("after both?");
     Entity *player, *camera;
     player = monster_spawn(startpos, GFC_COLOR_WHITE);  
     camera = camera_entity_spawn(startpos, player);

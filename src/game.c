@@ -181,7 +181,7 @@ int main(int argc,char *argv[])
                 
                 //You need to make sure the edge test is edge testing?
                 //Ask in the discord what the down thing should be?
-                world_draw(world, terrainMat);// World is not being drawn rn
+                world_draw(world_get_the(), terrainMat);// World is not being drawn rn
                 //In level we will have a function to do it from there
                 //gf3d_sky_draw(sky_mesh, skyMat, GFC_COLOR_WHITE, sky_texture);
 
