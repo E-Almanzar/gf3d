@@ -22,6 +22,9 @@
       "goal": [
         { "pos": [40, 20, -24], "color": "white" }
       ],
+      "dino": [
+        { "pos": [-40, 20, -24], "color": "white" }
+      ],
     }
   }
 }

@@ -12,6 +12,11 @@ typedef struct
     Uint8               sprinting;
     int                 collected;
 } MonsterEntityData; // Padding?
+typedef struct player_anim{
+    Mesh        **mesh_list;
+    Texture     **texture_list;
+    Uint16      iterator;
+}player_anim;
 
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color);
 void monster_set_cam(Entity* self, Entity *cam);
@@ -33,5 +38,4 @@ void set_think_to_dead(Entity *self);
 void monster_collect(Entity *self, Entity *target);
 
 long long get_timer_from_player();
-
 #endif

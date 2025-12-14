@@ -188,7 +188,7 @@ void spawn_next_level(){
     //clear the physics system?
     //Or just move everything out of view lol
     physics_world_close();
-    physics_world_init(100);
+    physics_world_init(1000);
     entity_system_close();
     entity_system_init(1024);
     //world_free();

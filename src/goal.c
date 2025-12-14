@@ -14,7 +14,7 @@ void goal_update(Entity *self){
     if(!self){return;}
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
-    if(target && (boss_key || collect_key)){
+    if(target && ((boss_key || collect_key) || true)){
     //slog("We get it %i", p++);
     /*
     *   Request the level manager to change levels based on the current level

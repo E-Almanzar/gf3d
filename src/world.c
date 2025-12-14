@@ -6,6 +6,7 @@
 #include "gf3d_obj_load.h"
 #include "world.h"
 #include "boss.h"
+#include "dino.h"
 World * world; 
 //Did we scale the world?
 World * world_new(){
@@ -55,7 +56,7 @@ World * world_load(const char *name){
         return world;
     }
     spawn_by_types(ents);
-    //slog("we?");
+    slog("we?");
     sj_free(json);
     return world;
 }
@@ -170,6 +171,24 @@ void spawn_by_types(SJson *ents){
             //dummyEnt = 
             goal_spawn(pos, GFC_COLOR_WHITE);
             //physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
+        }
+    }
+
+    SJson *dino = sj_object_get_value(ents, "dino");
+    //Entity * dummyEnt;
+    //slog("Here?");
+    if (dino) {
+        count = sj_array_get_count(dino);
+        slog("COUNT E OUT %i", count);
+        if(count){
+            for (i = 0; i < count; i++) {
+                slog("IF YOURE ZERO DONT FUKCING RUN?");
+                SJson *dinos = sj_array_get_nth(dino, i);
+                sj_object_get_vector3d(dinos,"pos", &pos);
+                //dummyEnt = 
+                dino_spawn(pos, GFC_COLOR_WHITE);
+                //physics_world_add(*(Rigidbody*)dummyEnt->rigidbody_data);
+            }
         }
     }
 

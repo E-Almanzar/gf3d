@@ -10,11 +10,7 @@
 #include "goal.h"
 //Monster is in timeout until we can get physics without it
 
-typedef struct player_anim{
-    Mesh        **mesh_list;
-    Texture     **texture_list;
-    Uint16      iterator;
-}player_anim;
+
 void anim_init(Entity *self);
 #define GRAVITY -.4
 #define JUMP 6

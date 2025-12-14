@@ -440,12 +440,5 @@ void dead_think(Entity *self){
     monster_update_bounds(self);
 }
 
-void dialogue_think(Entity *self){
-    //We do the dialogue
-    //AKA did we click space bar
-    //if we did then iterate the index of thing and the next draw call itll be the next line
-    //We need a conversation list? and read them from def files?
-}
-void dialogue_update(Entity *self){
-    //We do the dialogue
-}
+
+
