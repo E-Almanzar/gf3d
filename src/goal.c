@@ -8,12 +8,13 @@
 #include "world.h"
 //int p =0;
 int boss_key = 0;
+int collect_key = 0;
 void goal_update(Entity *self){
     Entity *target;
     if(!self){return;}
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
-    if((target && boss_key)){
+    if(target && (boss_key || collect_key)){
     //slog("We get it %i", p++);
     /*
     *   Request the level manager to change levels based on the current level
@@ -28,10 +29,13 @@ void goal_update(Entity *self){
 void goal_set_key(int flag){
     if(!flag){
         boss_key = true;
+        slog("Boss Key");
     }
     if(flag==1){
-        //collect_key = true;
+        collect_key = true;
+        slog("Collect Key");
     }
+    
 
 }
 

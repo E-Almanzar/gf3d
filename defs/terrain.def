@@ -42,7 +42,7 @@
         { "pos": [-50, 20, 0], "color": "white", "kind": 1 }
       ],
       "goal": [
-        { "pos": [40, 20, -24], "color": "white" }
+        { "pos": [140, 120, -30.5], "color": "white" }
       ],
     }
   }

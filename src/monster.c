@@ -7,6 +7,7 @@
 #include "world.h"
 #include "monster_thinks.h"
 #include "rigidbody.h"
+#include "goal.h"
 //Monster is in timeout until we can get physics without it
 
 typedef struct player_anim{
@@ -425,7 +426,7 @@ void monster_control(Entity *self)
 */
 void monster_think(Entity *self)
 {
-    slog("%f, %f, %f", self->position.x, self->position.y, self->position.z);
+    //slog("%f, %f, %f", self->position.x, self->position.y, self->position.z);
     //slog("we?");
 
     //lazy_timer++;
@@ -714,6 +715,9 @@ MonsterEntityData * get_data_from_player(){
 }
 void monster_collect(Entity *self, Entity *target){
     MonsterData->collected++;
+    if(MonsterData->collected > 5){
+        goal_set_key(1);
+    }
 }
 
 int monster_get_collected(){
