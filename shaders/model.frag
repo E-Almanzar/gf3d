@@ -20,14 +20,14 @@ void main()
     vec3 lightDir = normalize(worldPosition.xyz-lightPos.xyz);
     vec4 texColor = texture(texSampler, fragTexCoord);
     //vec4 temp;
-    float intensity = dot(-lightDir,inNormal);
+    float intensity = max(dot(-lightDir,inNormal), 0.0);
     //did he un negative the lightdir
 
-    if(intensity > 1){intensity = 1;}
-    else if(intensity > .98){intensity = 1.25;}
-    else if(intensity > .50){intensity = .75;}
-    else if(intensity > .05){intensity =  .45;}
-    else{intensity = .35;}
+    
+    if(intensity > .98){intensity = 1;}
+    else if(intensity > .60){intensity = .8;}
+    else if(intensity > .25){intensity =  .45;}
+    else{intensity = .2;}
 
     texColor.xyz = texColor.xyz *intensity;
     

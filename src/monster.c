@@ -310,6 +310,25 @@ void monster_update(Entity *self)
         return;
     monster_move(self, 0);
     //slog("%f, %f", self->position.z, self->velocity.z);
+    //Its caused here istg
+    GFC_Vector3D *contact;
+    int hitFloor;
+    //Started clipping through tall boys
+    contact = malloc(sizeof(GFC_Vector3D));
+    hitFloor = entity_get_floor_position(self, world_get_the(), contact);
+    if(!hitFloor){
+        //
+        if(self->velocity.z < 0){
+            //monster_push_back(self);
+            self->velocity.z *= -1;
+        }
+        else{
+            self->position.z += 10;
+        }
+        hitFloor = entity_get_floor_position(self, world_get_the(), contact);
+        if(!hitFloor){slog("We fucked up");}
+        slog("we here?");
+    }
     self->position.z += self->velocity.z;
 
     self->bounds->x = self->position.x-4;
