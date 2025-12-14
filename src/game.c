@@ -24,6 +24,9 @@ long long get_timer(){
 
 int main(int argc,char *argv[])
 {
+    char * collected = malloc(sizeof(char)*10);
+    
+    // /SDL_itoa(collected_num, collected, 10);
     //local variables
     GFC_Matrix4 dinoM;
     GFC_Matrix4 id, skyMat, terrainMat;
@@ -124,9 +127,11 @@ int main(int argc,char *argv[])
         spawn_level(3);
     }*/
     dialogue_init();
-    int collected = 0;
+    int collected_num = 0;
     world = world_get_the();
     //main loop: everything in here is run repeatedly
+    Sprite star = *gf2d_sprite_load_image("images/Star.png");
+    GFC_Vector2D star_scale = gfc_vector2d(.33,.33);
     while(!_done)
     {
         if(player->think == dead_think){
@@ -136,7 +141,8 @@ int main(int argc,char *argv[])
             started = true;
         }
         timer++;
-        collected = monster_get_collected();
+        collected_num = monster_get_collected();
+        SDL_itoa(collected_num, collected, 10);
 
         gfc_input_update();
         gf2d_mouse_update();
@@ -201,7 +207,8 @@ int main(int argc,char *argv[])
                 }
                 else{
                     //TODO To string the stupid thing
-                     gf2d_font_draw_line_tag("",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(20,100));
+                    gf2d_sprite_draw(&star, gfc_vector2d(10,10), &star_scale,0,0,0,0,0,0);
+                    gf2d_font_draw_line_tag(collected,FT_H1,GFC_COLOR_BLACK, gfc_vector2d(80,80));
                 }
                     //gf2d_font_draw_line_tag("WOMBO COMBO",FT_H1,GFC_COLOR_BLACK, gfc_vector2d(10,10));
                 //gf2d_mouse_draw();

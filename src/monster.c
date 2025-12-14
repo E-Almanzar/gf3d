@@ -425,6 +425,7 @@ void monster_control(Entity *self)
 */
 void monster_think(Entity *self)
 {
+    slog("%f, %f, %f", self->position.x, self->position.y, self->position.z);
     //slog("we?");
 
     //lazy_timer++;

@@ -7,6 +7,8 @@
     "Ents": {
       "movepads": [
         { "pos": [40, 20, -10], "color": "white" }
+        { "pos": [140, 20, -10], "color": "white" }
+
       ],
       "bouncepads": [
         { "pos": [-25, 0, -30.5], "color": "white" }
@@ -16,8 +18,17 @@
         { "pos": [-70, 0, -30.5], "color": "white", "pair": 1 }
       ],
       "enemies": [
-        { "type": "saucer", "pos": [100, 100, 10], "color": "white" },
+        { "type": "saucer", "pos": [83, 75, 10], "color": "white" },
         { "type": "plant", "pos": [-100, -100, 10], "color": "white" }
+        { "type": "plant", "pos": [137, -41, 100], "color": "white" }
+        { "type": "plant", "pos": [100, -84, 132], "color": "white" }
+        { "type": "plant", "pos": [52, 126, 177], "color": "white" }
+        { "type": "plant", "pos": [-60, 86, 150], "color": "white" }
+        { "type": "plant", "pos": [6, 103, 150], "color": "white" }
+        { "type": "plant", "pos": [-67, -105, 170], "color": "white" }
+        { "type": "plant", "pos": [-87, -45, 170], "color": "white" }
+        { "type": "plant", "pos": [140, 20, 170], "color": "white" }
+
       ],
       "powerups": [
         { "pos": [0, -20, -28], "color": "white", "kind": 0 },
