@@ -9,8 +9,11 @@ typedef struct {
     Uint32          sprite_count;
     GFC_TextBlock   *current_words;
     Uint8           visible;
+    SJson           *current_dialogue; 
+    int             index
 } DialogueManager;
 static DialogueManager dialogue_manager = {0};
+void dialogue_end();
 
 void dialogue_init(){
 
@@ -24,6 +27,7 @@ void dialogue_init(){
     dialogue_manager.sprite_list[2] = *gf2d_sprite_load_image("models/dino/dino.png");
 
     dialogue_manager.current_words = "";
+    dialogue_manager.index = 0;
 }
 
 void dialogue_think(Entity *self){
@@ -31,8 +35,41 @@ void dialogue_think(Entity *self){
     //AKA did we click space bar
     //if we did then iterate the index of thing and the next draw call itll be the next line
     //We need a conversation list? and read them from def files?
+    //sj_object_get_vector3d(dialogue_manager.current_dialogue,\, &pos);
+    //int count, i;
+    //    count = sj_array_get_count(dialogue_manager.current_dialogue);
+    //    for (i = 0; i < count; i++) {
+
+    //    }
+    SJson *dialogue_json = dialogue_manager.current_dialogue;
+    SJson *text_array = sj_object_get_value(dialogue_json, "text");
+
+    if (!text_array || text_array->sjtype != SJVT_Array) {
+        return;
+    }
+
+    SJson *text = sj_array_get_nth(text_array, dialogue_manager.index);
+    if (!text || text->sjtype != SJVT_String) {
+        return;
+    }
+
+    char *words = sj_get_string_value(text);
+    slog("%s, %i", dialogue_manager.current_words, dialogue_manager.index);
+
+    
+
+
+// Proceed to the next dialogue line after a button press or event
+
     if(gf2d_mouse_button_pressed(0)){
-        dialogue_manager.current_words = "Holy moly guacamole cheese all holey easy peasy lemon squeezy";
+        dialogue_manager.current_words = words;
+        dialogue_manager.index++;
+    }
+    if(gfc_stricmp(dialogue_manager.current_words, "ENDL") == 0){
+        slog("Thats the ends %i", dialogue_manager.index);
+        words = 0;
+        dialogue_end();
+        return;
     }
 }
 void dialogue_update(Entity *self){
@@ -53,21 +90,44 @@ void set_think_to_dialogue(){
         //self->think = monster_think;
         //self->update = monster_update;
     }
+    
 }
 
 void draw_dialogue(){
-    if(dialogue_manager.visible){
-    GFC_Vector2D position;
-    position = gfc_vector2d(0,0);
-    //gfc_vector2d(120,450)
-    gf2d_sprite_draw_image(&dialogue_manager.sprite_list[0], position);
+    if(dialogue_manager.visible && dialogue_manager.current_words){
+        GFC_Vector2D position;
+        position = gfc_vector2d(0,0);
+        //gfc_vector2d(120,450)
+        gf2d_sprite_draw_image(&dialogue_manager.sprite_list[0], position);
         gf2d_font_draw_line_tag(dialogue_manager.current_words,3,GFC_COLOR_BLACK, gfc_vector2d(120,500));
 
     }
 }
 void shop_dialogue_begin(){
     //In theory we should read from a def but idgaf atp
-    dialogue_manager.current_words = "Heya pal";
+    dialogue_manager.current_dialogue = sj_load("defs/shop_dialogue.def");
 
+    SJson *dialogue_json = dialogue_manager.current_dialogue;
+    SJson *text_array = sj_object_get_value(dialogue_json, "text");
+
+    if (!text_array || text_array->sjtype != SJVT_Array) {
+        return;
+    }
+
+    SJson *text = sj_array_get_nth(text_array, dialogue_manager.index);
+    if (!text || text->sjtype != SJVT_String) {
+        return;
+    }
+
+    char *words = sj_get_string_value(text);
+    dialogue_manager.current_words = words;
+    dialogue_manager.index++;
     
+}
+
+void dialogue_end(){
+    slog("ENDING!!");
+    dialogue_manager.index = 0;
+    dialogue_manager.visible = false;
+    set_think_for_movement(player_get_the(), 3);
 }

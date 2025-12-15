@@ -16,8 +16,8 @@ void dino_update(Entity *self){
     if(!self){return;}
     target = entity_check_collide(self, 0);
     if(target == NULL){return;} 
-    if(target && gf2d_mouse_button_pressed(0)){
-        set_think_to_dialogue();
+    if(target && gf2d_mouse_button_released(0)){
+            set_think_to_dialogue();
     }
 
 }
