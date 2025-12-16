@@ -30,7 +30,7 @@ void dialogue_init(){
     dialogue_manager.index = 0;
 }
 
-
+int flag = 0;
 void dialogue_think(Entity *self){
     //We do the dialogue
     //AKA did we click space bar
@@ -68,9 +68,10 @@ void dialogue_think(Entity *self){
         dino_sprite_next();
     }
 
-    if(gfc_input_command_down("yes")){
+    if(gfc_input_command_down("yes") && gfc_stricmp(dialogue_manager.current_words, "Congrats") != 0){
         slog("We bought stuff");
-        monster_buy_hat();
+        monster_buy_hat(flag);
+        flag++;
         dialogue_manager.current_words = "Congrats";
     }
     else if (gfc_input_command_down("no")){

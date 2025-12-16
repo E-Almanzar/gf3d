@@ -43,6 +43,21 @@
         { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
         { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
         
+                
+        { "type": "plant", "pos": [-150, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-151, 101, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-152, 102, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-151, 101, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-150, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-150, 99, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-151, 98, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-150, 99, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-156, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-155, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-154, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-153, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-152, 100, -30.5], "color": "white" }
+        
 
       ],
       "powerups": [

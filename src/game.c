@@ -50,6 +50,9 @@ int main(int argc,char *argv[])
     gfc_input_init("config/input.cfg");
     gfc_config_def_init();
     gfc_action_init(1024);
+    //gfc_audio_init(100, 1,1);
+    gfc_sound_init_config("config/audio.cfg");
+    //gfc_audio_parse_groups("config/audio.cfg");
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
     gf2d_font_init("config/font.cfg");
@@ -134,6 +137,7 @@ int main(int argc,char *argv[])
     GFC_Vector2D star_scale = gfc_vector2d(.33,.33);
     while(!_done)
     {
+        
         if(player->think == dead_think){
             ifDead = 1;
         } else{

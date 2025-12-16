@@ -8,6 +8,7 @@
 #include "monster_thinks.h"
 #include "rigidbody.h"
 #include "goal.h"
+#include "gfc_audio.h"
 //Monster is in timeout until we can get physics without it
 
 
@@ -537,11 +538,11 @@ void monster_data_init(Entity *self)
     MonsterData->hats[0] = hat_spawn();
     MonsterData->hats[1] = hat_spawn();
     
-    MonsterData->hats[0]->mesh  = gf3d_mesh_load("models/hat/beanie.obj");
-    MonsterData->hats[1]->mesh  = gf3d_mesh_load("models/hat/tophat.obj");
+    //MonsterData->hats[0]->mesh  = gf3d_mesh_load("models/hat/beanie.obj");
+    //MonsterData->hats[1]->mesh  = gf3d_mesh_load("models/hat/tophat.obj");
     MonsterData->hats[0]->texture  = gf3d_texture_load("models/hat/beanie.png");
     MonsterData->hats[1]->texture  = gf3d_texture_load("models/hat/tophat.png");
-
+    
     //strcpy(self->mesh->filename, "models/dino/dino.obj");
 }
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
@@ -707,6 +708,9 @@ void set_think_for_movement(Entity *self, Uint8 flag){
        if(self->velocity.x == 0 && self->velocity.y == 0){return;}
         self->think = roll_think;
         self->update = roll_update;
+        GFC_Sound * wah = gfc_sound_load("audio/wah.wav", 100, 0);
+
+        gfc_sound_play(wah, 0, 1, -1);
     }
     //Rainbow Jump
     if(flag == 1){
@@ -761,8 +765,14 @@ int monster_get_collected(){
     return MonsterData->collected;
 }
 
-void monster_buy_hat(){
-    
+void monster_buy_hat(int flag){
+    MonsterData->collected -= 10;
+    goal_set_key(1);
+    slog("%i", flag);
+    if(!flag)
+    MonsterData->hats[0]->mesh  = gf3d_mesh_load("models/hat/beanie.obj");
+    else
+    MonsterData->hats[1]->mesh  = gf3d_mesh_load("models/hat/tophat.obj");
 }
 
 /*eol@eof*/

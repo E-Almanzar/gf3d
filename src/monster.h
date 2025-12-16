@@ -40,6 +40,6 @@ void monster_collect(Entity *self, Entity *target);
 
 long long get_timer_from_player();
 int monster_get_collected();
-void monster_buy_hat();
+void monster_buy_hat(int flag);
 void hat_update();
 #endif
