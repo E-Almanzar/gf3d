@@ -3,14 +3,14 @@
 #include "monster.h"
 #include "gf2d_mouse.h"
 #include "gfc_input.h"
-
+#include "dino.h"
 typedef struct {
     Sprite          *sprite_list;
     Uint32          sprite_count;
     GFC_TextBlock   *current_words;
     Uint8           visible;
     SJson           *current_dialogue; 
-    int             index
+    int             index;
 } DialogueManager;
 static DialogueManager dialogue_manager = {0};
 void dialogue_end();
@@ -29,6 +29,7 @@ void dialogue_init(){
     dialogue_manager.current_words = "";
     dialogue_manager.index = 0;
 }
+
 
 void dialogue_think(Entity *self){
     //We do the dialogue
@@ -54,7 +55,7 @@ void dialogue_think(Entity *self){
     }
 
     char *words = sj_get_string_value(text);
-    slog("%s, %i", dialogue_manager.current_words, dialogue_manager.index);
+    //slog("%s, %i", dialogue_manager.current_words, dialogue_manager.index);
 
     
 
@@ -64,9 +65,21 @@ void dialogue_think(Entity *self){
     if(gf2d_mouse_button_pressed(0)){
         dialogue_manager.current_words = words;
         dialogue_manager.index++;
+        dino_sprite_next();
     }
+
+    if(gfc_input_command_down("yes")){
+        slog("We bought stuff");
+        monster_buy_hat();
+        dialogue_manager.current_words = "Congrats";
+    }
+    else if (gfc_input_command_down("no")){
+        dialogue_manager.current_words = "ENDL";
+    }
+
+
     if(gfc_stricmp(dialogue_manager.current_words, "ENDL") == 0){
-        slog("Thats the ends %i", dialogue_manager.index);
+        //slog("Thats the ends %i", dialogue_manager.index);
         words = 0;
         dialogue_end();
         return;
@@ -76,15 +89,19 @@ void dialogue_update(Entity *self){
     //We do the dialogue
 }
 
-void set_think_to_dialogue(){
+void set_think_to_dialogue(int flag){
     Entity *self;
     self = player_get_the();
     if(self->think != dialogue_think)
     {
+        dino_sprite_next();
+
         self->think = dialogue_think;
         self->update = dialogue_update;
-        shop_dialogue_begin();
+        shop_dialogue_begin(flag);
         dialogue_manager.visible = true;
+//        gf2d_mouse_show();
+
     }
     else{
         //self->think = monster_think;
@@ -99,14 +116,19 @@ void draw_dialogue(){
         position = gfc_vector2d(0,0);
         //gfc_vector2d(120,450)
         gf2d_sprite_draw_image(&dialogue_manager.sprite_list[0], position);
-        gf2d_font_draw_line_tag(dialogue_manager.current_words,3,GFC_COLOR_BLACK, gfc_vector2d(120,500));
+        gf2d_font_draw_line_tag(dialogue_manager.current_words,4,GFC_COLOR_BLACK, gfc_vector2d(120,500));
 
     }
 }
-void shop_dialogue_begin(){
+void shop_dialogue_begin(int flag){
     //In theory we should read from a def but idgaf atp
+    slog("WHAT");
+    if(flag == 0){
     dialogue_manager.current_dialogue = sj_load("defs/shop_dialogue.def");
-
+    }
+    else{
+        dialogue_manager.current_dialogue = sj_load("defs/shop_dialogue_2.def");
+    }
     SJson *dialogue_json = dialogue_manager.current_dialogue;
     SJson *text_array = sj_object_get_value(dialogue_json, "text");
 

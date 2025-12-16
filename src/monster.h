@@ -11,6 +11,7 @@ typedef struct
     Uint8               jumpAllowed;
     Uint8               sprinting;
     int                 collected;
+    Entity              **hats;
 } MonsterEntityData; // Padding?
 typedef struct player_anim{
     Mesh        **mesh_list;
@@ -38,4 +39,7 @@ void set_think_to_dead(Entity *self);
 void monster_collect(Entity *self, Entity *target);
 
 long long get_timer_from_player();
+int monster_get_collected();
+void monster_buy_hat();
+void hat_update();
 #endif

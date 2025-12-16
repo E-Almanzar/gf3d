@@ -130,6 +130,7 @@ void bounce_update(Entity *self){
     }
 
     }
+hat_update();
 
 
 }
@@ -171,6 +172,8 @@ void teleport_update(Entity *self){
         self->bounds->y = self->position.y;
         self->bounds->z = self->position.z;
     }
+    hat_update();
+
 
 }
 
@@ -277,6 +280,7 @@ void roll_update(Entity *self){
                 gfc_vector3d_add(move, move, right);
         }
         move.z = 0;
+        hat_update();
 }
 
 float rainbowdir = 1;
@@ -361,6 +365,7 @@ void rainbow_update(Entity *self){
     //monster_gravity(self);
     //slog("%f", self->velocity.z);
 */
+hat_update();
 }
 
 //Glide think?
@@ -385,6 +390,8 @@ void glide_update(Entity *self){
         self->rotation.y +=.01;
 
     monster_update_bounds(self);
+    hat_update();
+
 }
 
 void glide_think(Entity *self){
@@ -421,6 +428,7 @@ void glide_think(Entity *self){
 
 void dead_update(Entity *self){
     monster_update_bounds(self);
+    //hat_update();
 
 }
 

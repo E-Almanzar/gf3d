@@ -56,7 +56,7 @@ World * world_load(const char *name){
         return world;
     }
     spawn_by_types(ents);
-    slog("we?");
+    //slog("we?");
     sj_free(json);
     return world;
 }
@@ -179,10 +179,10 @@ void spawn_by_types(SJson *ents){
     //slog("Here?");
     if (dino) {
         count = sj_array_get_count(dino);
-        slog("COUNT E OUT %i", count);
+        //slog("COUNT E OUT %i", count);
         if(count){
             for (i = 0; i < count; i++) {
-                slog("IF YOURE ZERO DONT FUKCING RUN?");
+                //slog("IF YOURE ZERO DONT FUKCING RUN?");
                 SJson *dinos = sj_array_get_nth(dino, i);
                 sj_object_get_vector3d(dinos,"pos", &pos);
                 //dummyEnt = 
@@ -221,7 +221,7 @@ void world_draw(World * world, GFC_Matrix4 mat){
          }
     }*/
     if(mesher != world->mesh){
-        slog("FUCKING DIFFERENT");
+        //slog("FUCKING DIFFERENT");
     }
     gf3d_mesh_draw(world->mesh, mat, GFC_COLOR_WHITE, world->texture, world->lightPos, world->lightColor);
     mesher = world->mesh;

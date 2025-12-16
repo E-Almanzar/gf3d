@@ -28,6 +28,21 @@
         { "type": "plant", "pos": [-67, -105, 170], "color": "white" }
         { "type": "plant", "pos": [-87, -45, 170], "color": "white" }
         { "type": "plant", "pos": [140, 20, 170], "color": "white" }
+        
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-141, 101, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-142, 102, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-141, 101, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 99, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-141, 98, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 99, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        { "type": "plant", "pos": [-140, 100, -30.5], "color": "white" }
+        
 
       ],
       "powerups": [

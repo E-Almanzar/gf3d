@@ -23,6 +23,15 @@ void teleport_update(Entity *self);
 
 MonsterEntityData *MonsterData;
 
+void hat_update(){
+    Entity *self = player_get_the();
+    MonsterData->hats[0]->position = self->position;
+    MonsterData->hats[1]->position = self->position;
+    MonsterData->hats[0]->rotation = self->rotation;
+    MonsterData->hats[1]->rotation = self->rotation;
+    MonsterData->hats[0]->position.z -= 4;
+    MonsterData->hats[1]->position.z -= 4;
+}
 // 1 for allowed to jump, 0 for not
 Uint8 jumpAllowed = 0;
 Uint8 jumping = 0;
@@ -337,7 +346,9 @@ void monster_update(Entity *self)
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->y = self->position.y;
     ((struct Rigidbody*)self->rigidbody_data)->rigid_sphere->z = self->position.z;
     //slog("self: %f, %f, %f", self->position.x, self->position.y, self->position.z);
-   
+   //Hats
+   hat_update();
+
 }
 void monster_control(Entity *self)
 {
@@ -495,14 +506,44 @@ void snap_to_ground(Entity *self)
     free(contact);/
 }*/
 
+void hat_think(Entity * self){
+
+}
+Entity* hat_spawn(){
+    Entity *self;
+    self = entity_new();
+    if (!self)
+        return NULL;
+
+    //self->think = hat_think;
+    self->color = GFC_COLOR_WHITE;
+        Entity *player = player_get_the();
+    if(player)
+        self->position = player->position;
+    self->data = gfc_allocate_array(sizeof(MonsterEntityData), 1);
+    
+  //  physics_world_add(*(Rigidbody*)self->rigidbody_data);
+    return self;
+
+}
+
 void monster_data_init(Entity *self)
 {
     MonsterEntityData *data;
     data = malloc(sizeof(MonsterEntityData));
     MonsterData = data;
     MonsterData->collected = 0;
-}
+    MonsterData->hats = gfc_allocate_array(sizeof(Entity), 2);
+    MonsterData->hats[0] = hat_spawn();
+    MonsterData->hats[1] = hat_spawn();
+    
+    MonsterData->hats[0]->mesh  = gf3d_mesh_load("models/hat/beanie.obj");
+    MonsterData->hats[1]->mesh  = gf3d_mesh_load("models/hat/tophat.obj");
+    MonsterData->hats[0]->texture  = gf3d_texture_load("models/hat/beanie.png");
+    MonsterData->hats[1]->texture  = gf3d_texture_load("models/hat/tophat.png");
 
+    //strcpy(self->mesh->filename, "models/dino/dino.obj");
+}
 Entity *monster_spawn(GFC_Vector3D position, GFC_Color Color)
 {
     Entity *self;
@@ -718,6 +759,10 @@ void monster_collect(Entity *self, Entity *target){
 
 int monster_get_collected(){
     return MonsterData->collected;
+}
+
+void monster_buy_hat(){
+    
 }
 
 /*eol@eof*/
